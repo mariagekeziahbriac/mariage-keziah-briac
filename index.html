@@ -1210,6 +1210,19 @@ const CHECKLIST_DATA = [
     { t: "Lancer du bouquet de la mariée", r: "Keziah", c: "Animation" },
     { t: "Soirée dansante jusqu'à l'aube !", r: "Tous", c: "Animation" },
   ]},
+  { cat: "Lendemain du mariage 🥐", tasks: [
+    { t: "Choisir le format du brunch (lieu, horaire, nombre d'invités)", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Définir le menu du brunch", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Choisir le traiteur brunch ou prévoir un buffet", r: "Estelle", c: "Prestataires" },
+    { t: "Louer ou prévoir la vaisselle pour le brunch", r: "Estelle", c: "Logistique" },
+    { t: "Envoyer les invitations pour le brunch du lendemain", r: "Keziah & Briac", c: "Invités" },
+    { t: "Prévoir la décoration de table pour le brunch", r: "Keziah", c: "Décoration" },
+    { t: "Confirmer la liste des participants au brunch", r: "Estelle", c: "Invités" },
+    { t: "Faire les courses / commander les produits brunch", r: "Estelle", c: "Logistique" },
+    { t: "Accueillir les invités pour le brunch (Jour J+1)", r: "Keziah & Briac", c: "Invités" },
+    { t: "Retourner la vaisselle louée pour le brunch", r: "Estelle", c: "Logistique" },
+    { t: "Profiter des derniers moments avec la famille et les amis 🥂", r: "Tous", c: "Bien-être" },
+  ]},
   { cat: "Après le mariage", tasks: [
     { t: "Envoyer les remerciements aux invités", r: "Keziah & Briac", c: "Invités" },
     { t: "Récupérer les photos et vidéos du photographe", r: "Keziah", c: "Logistique" },
@@ -1238,6 +1251,8 @@ const BUDGET_DATA = [
   { cat: "Alliances", est: 1500, prev: 0, acomp: 0 },
   { cat: "Cadeaux invités / dragées", est: 500, prev: 0, acomp: 0 },
   { cat: "Lune de miel", est: 4000, prev: 0, acomp: 0 },
+  { cat: "Brunch du lendemain (traiteur / buffet)", est: 1500, prev: 0, acomp: 0 },
+  { cat: "Vaisselle brunch (location)", est: 300, prev: 0, acomp: 0 },
   { cat: "Divers & imprévus (10%)", est: 3500, prev: 0, acomp: 0 },
 ];
 
@@ -1953,6 +1968,7 @@ const GANTT_PHASES = [
   { label: "1 mois avant",    cat: "1 mois avant",    start: "2027-06-10", end: "2027-07-02", color: "#4527A0" },
   { label: "Semaine du mariage", cat: "Semaine du mariage", start: "2027-07-03", end: "2027-07-10", color: "#1565C0" },
   { label: "Jour J ✨",       cat: "Jour J ✨",        start: "2027-07-10", end: "2027-07-10", color: "#FFD700" },
+  { label: "Lendemain 🥐",   cat: "Lendemain du mariage 🥐", start: "2027-07-11", end: "2027-07-11", color: "#FF8F00" },
 ];
 
 function renderGantt() {
@@ -2473,4 +2489,5 @@ updateDashboard();
 </script>
 </body>
 </html>
+
 
