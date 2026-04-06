@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mariage Keziah & Briac — Juillet 2027</title>
+<style>
+  :root {
+    --pink: #C2185B;
+    --light-pink: #FCE4EC;
+    --dark-pink: #880E4F;
+    --dark: #3E2723;
+    --grey: #757575;
+    --light-grey: #F5F5F5;
+    --green: #388E3C;
+    --light-green: #E8F5E9;
+    --orange: #F57C00;
+    --light-orange: #FFF3E0;
+    --red: #C62828;
+    --light-red: #FFEBEE;
+    --blue: #1565C0;
+    --light-blue: #E3F2FD;
+    --yellow: #F9A825;
+    --light-yellow: #FFFDE7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fafafa; color: var(--dark); }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, var(--dark-pink) 0%, var(--pink) 50%, #E91E8C 100%);
+    color: white; text-align: center; padding: 50px 20px 40px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero .emoji { font-size: 3rem; margin-bottom: 10px; display: block; }
+  .hero h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: 1px; }
+  .hero h2 { font-size: 1.3rem; font-weight: 300; margin-top: 8px; opacity: 0.9; }
+  .hero .sub { font-size: 1rem; margin-top: 12px; opacity: 0.75; font-style: italic; }
+  .hero .venue { background: rgba(255,255,255,0.15); display: inline-block; padding: 8px 20px; border-radius: 20px; margin-top: 14px; font-size: 1rem; }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: sticky; top: 0; z-index: 100;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 8px;
+  }
+  .nav a {
+    padding: 8px 16px; border-radius: 20px; text-decoration: none;
+    font-size: 0.85rem; font-weight: 600; color: var(--grey); transition: all 0.2s;
+  }
+  .nav a:hover, .nav a.active { background: var(--pink); color: white; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: white; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 24px;
+  }
+  .card-title {
+    font-size: 1.2rem; font-weight: 700; color: var(--pink);
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--light-pink);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: white; border-radius: 12px; padding: 20px; text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); border-top: 4px solid var(--pink);
+  }
+  .stat-card .val { font-size: 2rem; font-weight: 800; color: var(--pink); }
+  .stat-card .lbl { font-size: 0.8rem; color: var(--grey); margin-top: 4px; }
+
+  /* ── COUNTDOWN ── */
+  .countdown { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
+  .count-box { text-align: center; }
+  .count-box .num { font-size: 3rem; font-weight: 800; color: var(--pink); line-height: 1; }
+  .count-box .unit { font-size: 0.75rem; color: var(--grey); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 3px; background: var(--light-pink); }
+  .tl-item { padding-left: 55px; margin-bottom: 28px; position: relative; }
+  .tl-dot {
+    position: absolute; left: 8px; top: 0; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--pink); color: white;
+    display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;
+    box-shadow: 0 0 0 4px var(--light-pink);
+  }
+  .tl-date { font-size: 0.8rem; color: var(--grey); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .tl-title { font-weight: 700; color: var(--dark); margin-bottom: 8px; font-size: 1rem; }
+  .tl-tasks { list-style: none; }
+  .tl-tasks li { padding: 4px 0 4px 20px; position: relative; font-size: 0.9rem; color: #555; }
+  .tl-tasks li::before { content: '→'; position: absolute; left: 0; color: var(--pink); font-weight: 700; }
+
+  /* ── CHECKLIST ── */
+  .check-section { margin-bottom: 20px; }
+  .check-header {
+    background: var(--pink); color: white; padding: 10px 16px; border-radius: 8px 8px 0 0;
+    font-weight: 700; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+  }
+  .check-header .badge { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 10px; font-size: 0.8rem; }
+  .check-body { border: 1px solid var(--light-pink); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; }
+  .check-item {
+    display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid #f0f0f0;
+    gap: 12px; transition: background 0.15s;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: var(--light-pink); }
+  .check-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--pink); cursor: pointer; flex-shrink: 0; }
+  .check-item label { flex: 1; cursor: pointer; font-size: 0.9rem; }
+  .check-item.done label { text-decoration: line-through; color: var(--grey); }
+  .check-item .resp { font-size: 0.75rem; color: var(--grey); white-space: nowrap; font-style: italic; }
+  .progress-bar-wrap { background: #eee; border-radius: 10px; height: 8px; margin: 4px 0 0; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--green); border-radius: 10px; transition: width 0.3s; }
+
+  /* ── BUDGET ── */
+  .budget-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .budget-box { padding: 16px; border-radius: 10px; text-align: center; }
+  .budget-box .val { font-size: 1.6rem; font-weight: 800; }
+  .budget-box .lbl { font-size: 0.8rem; margin-top: 4px; }
+  .budget-total { background: var(--light-pink); color: var(--pink); }
+  .budget-paye { background: var(--light-green); color: var(--green); }
+  .budget-reste { background: var(--light-orange); color: var(--orange); }
+  .budget-libre { background: var(--light-blue); color: var(--blue); }
+
+  .budget-input { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .budget-row {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 120px;
+    gap: 0; border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+  }
+  .budget-row.header-row { background: var(--pink); color: white; font-weight: 700; font-size: 0.8rem; border-radius: 8px 8px 0 0; }
+  .budget-row:nth-child(even) { background: var(--light-grey); }
+  .budget-row div { padding: 10px 12px; font-size: 0.88rem; }
+  .budget-row input {
+    width: 100%; border: none; background: transparent; font-family: inherit;
+    font-size: 0.88rem; color: var(--dark); text-align: right; padding: 10px 12px;
+  }
+  .budget-row select {
+    border: none; background: transparent; font-family: inherit; font-size: 0.8rem;
+    padding: 8px; color: var(--dark); cursor: pointer; width: 100%;
+  }
+  .budget-row.total-row { background: var(--dark-pink) !important; color: white; font-weight: 800; border-radius: 0 0 8px 8px; }
+  .budget-row.total-row div { color: white; }
+
+  /* ── INVITES ── */
+  .guest-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .guest-toolbar input {
+    flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid #ddd;
+    border-radius: 8px; font-family: inherit; font-size: 0.9rem;
+  }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: inherit; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .btn-pink { background: var(--pink); color: white; }
+  .btn-pink:hover { background: var(--dark-pink); }
+  .btn-outline { background: white; color: var(--pink); border: 2px solid var(--pink); }
+  .btn-outline:hover { background: var(--light-pink); }
+
+  table.guest-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  .guest-table th { background: var(--pink); color: white; padding: 10px 12px; text-align: left; font-size: 0.82rem; }
+  .guest-table td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; }
+  .guest-table tr:nth-child(even) td { background: var(--light-grey); }
+  .guest-table tr:hover td { background: var(--light-pink); }
+  .guest-table input, .guest-table select {
+    border: 1px solid #ddd; border-radius: 4px; padding: 4px 8px;
+    font-family: inherit; font-size: 0.82rem; width: 100%;
+  }
+  .badge-a { background: var(--light-pink); color: var(--pink); border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; }
+  .badge-oui { background: var(--light-green); color: var(--green); border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; }
+  .badge-non { background: var(--light-red); color: var(--red); border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; }
+  .badge-att { background: var(--light-yellow); color: var(--yellow); border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; }
+
+  /* ── PRESTATAIRES ── */
+  .prest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .prest-card {
+    background: white; border-radius: 10px; padding: 18px;
+    border: 1px solid #eee; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--light-pink);
+    transition: all 0.2s;
+  }
+  .prest-card.signed { border-left-color: var(--green); }
+  .prest-card.nego { border-left-color: var(--orange); }
+  .prest-cat { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey); margin-bottom: 6px; }
+  .prest-name { font-weight: 700; color: var(--dark); font-size: 1rem; margin-bottom: 10px; }
+  .prest-field { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+  .prest-field label { font-size: 0.78rem; color: var(--grey); min-width: 80px; }
+  .prest-field input, .prest-field select {
+    flex: 1; border: 1px solid #e0e0e0; border-radius: 6px; padding: 5px 10px;
+    font-family: inherit; font-size: 0.82rem;
+  }
+  .prest-status { text-align: right; margin-top: 8px; }
+
+  /* ── PLANNING JOURNÉE ── */
+  .day-timeline { position: relative; padding-left: 80px; }
+  .day-item { position: relative; margin-bottom: 16px; }
+  .day-time { position: absolute; left: -80px; top: 3px; font-weight: 700; color: var(--pink); font-size: 0.9rem; white-space: nowrap; }
+  .day-item::before { content: ''; position: absolute; left: -24px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+  .day-item::after { content: ''; position: absolute; left: -20px; top: 18px; width: 2px; bottom: -16px; background: var(--light-pink); }
+  .day-item:last-child::after { display: none; }
+  .day-content { background: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .day-content .who { font-size: 0.78rem; color: var(--grey); margin-top: 4px; }
+
+  /* ── VENUE ── */
+  .venue-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .venue-info { grid-template-columns: 1fr; } }
+  .info-box { background: var(--light-pink); border-radius: 10px; padding: 18px; }
+  .info-box h4 { color: var(--pink); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .info-box p { font-size: 0.9rem; line-height: 1.6; color: var(--dark); }
+  .info-box a { color: var(--pink); }
+  .tip-box { background: var(--light-yellow); border-left: 4px solid var(--yellow); border-radius: 8px; padding: 14px 18px; margin-top: 16px; font-size: 0.9rem; line-height: 1.6; }
+
+  /* ── MISC ── */
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin: 2px; }
+  .tag-pink { background: var(--light-pink); color: var(--pink); }
+  .tag-green { background: var(--light-green); color: var(--green); }
+  .tag-orange { background: var(--light-orange); color: var(--orange); }
+  .footer { text-align: center; padding: 30px; color: var(--grey); font-size: 0.82rem; font-style: italic; }
+
+  @media print { .nav { display: none; } .section { display: block !important; } }
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .budget-row { grid-template-columns: 1fr; }
+    .budget-row.header-row { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="emoji">💍</span>
+  <h1>Keziah & Briac</h1>
+  <h2>Mariage — Samedi 10 juillet 2027</h2>
+  <div class="venue">🏰 Château de Jallanges — Touraine, Val de Loire</div>
+  <div class="sub">Plan d'organisation préparé avec amour par Estelle</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="active" onclick="showSection('dashboard',this)">🏠 Tableau de bord</a>
+  <a href="#" onclick="showSection('planning',this)">📅 Rétroplanning</a>
+  <a href="#" onclick="showSection('checklist',this)">✅ Checklist</a>
+  <a href="#" onclick="showSection('budget',this)">💰 Budget</a>
+  <a href="#" onclick="showSection('guests',this)">👥 Invités</a>
+  <a href="#" onclick="showSection('vendors',this)">📋 Prestataires</a>
+  <a href="#" onclick="showSection('daytimeline',this)">🎉 Jour J</a>
+  <a href="#" onclick="showSection('venue',this)">🏰 Château</a>
+  <a href="#" onclick="showSection('filrouge',this)">📋 Fil rouge Jour J</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══ TABLEAU DE BORD ═══ -->
+<div id="dashboard" class="section active">
+
+  <div class="card">
+    <div class="card-title">⏰ Compte à rebours jusqu'au grand jour</div>
+    <div class="countdown" id="countdown">
+      <div class="count-box"><div class="num" id="cd-days">-</div><div class="unit">Jours</div></div>
+      <div class="count-box"><div class="num" id="cd-months">-</div><div class="unit">Mois</div></div>
+      <div class="count-box"><div class="num" id="cd-weeks">-</div><div class="unit">Semaines</div></div>
+    </div>
+    <p style="text-align:center;color:var(--grey);font-size:0.85rem;">Date fixée : <strong>10 juillet 2027</strong> — Château de Jallanges, Vernon-sur-Brenne</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="val" id="stat-tasks-done">0</div>
+      <div class="lbl">Tâches complétées</div>
+    </div>
+    <div class="stat-card" style="border-top-color:var(--orange)">
+      <div class="val" style="color:var(--orange)" id="stat-tasks-left">0</div>
+      <div class="lbl">Tâches restantes</div>
+    </div>
+    <div class="stat-card" style="border-top-color:var(--green)">
+      <div class="val" style="color:var(--green)" id="stat-budget-used">0 €</div>
+      <div class="lbl">Budget engagé</div>
+    </div>
+    <div class="stat-card" style="border-top-color:var(--blue)">
+      <div class="val" style="color:var(--blue)" id="stat-guests">0</div>
+      <div class="lbl">Invités enregistrés</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Avancement de la checklist</div>
+    <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:0.9rem;">
+      <span>Progression globale</span>
+      <span id="progress-pct" style="font-weight:700;color:var(--pink)">0%</span>
+    </div>
+    <div class="progress-bar-wrap" style="height:16px;">
+      <div class="progress-bar" id="main-progress" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💡 Infos clés</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+      <div class="info-box">
+        <h4>🏰 Lieu</h4>
+        <p><strong>Château de Jallanges</strong><br>Vernon-sur-Brenne, Touraine<br>Val de Loire<br><a href="https://www.jallanges.com" target="_blank">jallanges.com</a></p>
+      </div>
+      <div class="info-box">
+        <h4>👰 Mariée</h4>
+        <p><strong>Keziah</strong><br>Téléphone : à renseigner<br>Email : à renseigner</p>
+      </div>
+      <div class="info-box">
+        <h4>🤵 Marié</h4>
+        <p><strong>Briac</strong><br>Téléphone : à renseigner<br>Email : à renseigner</p>
+      </div>
+      <div class="info-box">
+        <h4>💐 Organisatrice</h4>
+        <p><strong>Estelle</strong><br>ehuguet@cfmrobotique.com</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RÉTROPLANNING ═══ -->
+<div id="planning" class="section">
+  <div class="card">
+    <div class="card-title">📅 Rétroplanning — De maintenant à juillet 2027</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot">1</div>
+        <div class="tl-date">Maintenant — Juin 2026 (15+ mois avant)</div>
+        <div class="tl-title">🚀 Poser les bases</div>
+        <ul class="tl-tasks">
+          <li>Définir le budget global et les contributeurs</li>
+          <li>Confirmer la date : samedi 10 juillet 2027</li>
+          <li>Confirmer le Château de Jallanges et signer le contrat</li>
+          <li>Estimer et valider le nombre d'invités</li>
+          <li>Réserver traiteur, photographe, vidéaste</li>
+          <li>Commencer les visites de robes de mariée</li>
+          <li>Ouvrir la liste de mariage</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">2</div>
+        <div class="tl-date">Juil. — Déc. 2026 (12–7 mois avant)</div>
+        <div class="tl-title">📬 Communiquer & sécuriser</div>
+        <ul class="tl-tasks">
+          <li>Envoyer les Save the Date</li>
+          <li>Confirmer les témoins officiels</li>
+          <li>Contacter la mairie de Vernon-sur-Brenne pour le dossier civil</li>
+          <li>Contacter le curé / pasteur pour la cérémonie religieuse (réserver l'église)</li>
+          <li>S'inscrire aux réunions de préparation au mariage (obligatoires à l'église)</li>
+          <li>Réserver le DJ / groupe musical</li>
+          <li>Commander la robe de mariée</li>
+          <li>Réserver le fleuriste et définir le style déco</li>
+          <li>Réserver coiffeur et maquilleur</li>
+          <li>Bloquer des chambres dans les hôtels proches du château</li>
+          <li>Commencer la planification de la lune de miel</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">3</div>
+        <div class="tl-date">Jan. — Mars 2027 (6–4 mois avant)</div>
+        <div class="tl-title">📝 Finaliser les grands choix</div>
+        <ul class="tl-tasks">
+          <li>Envoyer les faire-part officiels</li>
+          <li>Finaliser le menu avec le traiteur</li>
+          <li>Déposer le dossier de mariage civil à la mairie</li>
+          <li>Choisir les alliances</li>
+          <li>Réserver les billets de lune de miel</li>
+          <li>Démarrer le plan de table</li>
+          <li>Visiter le château avec le fleuriste pour la décoration</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">4</div>
+        <div class="tl-date">Avr. — Juin 2027 (3–1 mois avant)</div>
+        <div class="tl-title">🎯 Tout confirmer</div>
+        <ul class="tl-tasks">
+          <li>Confirmer TOUS les prestataires par écrit</li>
+          <li>Finaliser le plan de table</li>
+          <li>Préparer le livret de cérémonie</li>
+          <li>Organiser l'EVJF de Keziah (Estelle !)</li>
+          <li>Écrire et répéter le discours des témoins</li>
+          <li>Préparer le sac de survie de la mariée</li>
+          <li>Essayage final de la robe + accessoires</li>
+          <li>Envoyer le planning du jour J à tous les prestataires</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">5</div>
+        <div class="tl-date">Semaine du mariage</div>
+        <div class="tl-title">✨ La ligne d'arrivée</div>
+        <ul class="tl-tasks">
+          <li>Décoration du château (J-2)</li>
+          <li>Répétition de la cérémonie (J-1)</li>
+          <li>Soirée détente / spa pour la mariée (J-1)</li>
+          <li>Livraison des fleurs (J-1 ou matin du J)</li>
+          <li>Vérifier la météo et confirmer le plan B en cas de pluie</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot">💍</div>
+        <div class="tl-date" style="color:var(--pink);font-weight:800">10 JUILLET 2027 — LE GRAND JOUR ✝️</div>
+        <div class="tl-title" style="color:var(--pink)">🎉 Keziah & Briac se marient !</div>
+        <ul class="tl-tasks">
+          <li>Coiffure & maquillage le matin au château</li>
+          <li>Cérémonie civile à la mairie (matin)</li>
+          <li>✝️ Messe de mariage à l'église (après-midi)</li>
+          <li>Sortie de l'église — pétales de roses & photos</li>
+          <li>Cocktail dans les jardins du Château de Jallanges</li>
+          <li>Dîner de gala dans la salle de réception</li>
+          <li>Soirée dansante jusqu'à l'aube !</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHECKLIST ═══ -->
+<div id="checklist" class="section">
+  <div class="card">
+    <div class="card-title">✅ Checklist complète
+      <span style="margin-left:auto;font-size:0.85rem;color:var(--grey);font-weight:400" id="check-progress-txt">0 / 0 tâches</span>
+    </div>
+    <div class="progress-bar-wrap" style="margin-bottom:20px;">
+      <div class="progress-bar" id="check-progress-bar" style="width:0%"></div>
+    </div>
+    <div id="checklist-container"></div>
+  </div>
+</div>
+
+<!-- ═══ BUDGET ═══ -->
+<div id="budget" class="section">
+  <div class="card">
+    <div class="card-title">💰 Suivi budgétaire</div>
+    <div class="budget-summary">
+      <div class="budget-box budget-total">
+        <div class="val" id="b-total">30 000 €</div>
+        <div class="lbl">Budget prévu<br><input id="budget-input" type="number" value="30000" style="border:none;background:transparent;color:var(--pink);font-weight:800;font-size:1rem;text-align:center;width:120px;" oninput="updateBudget()"> €</div>
+      </div>
+      <div class="budget-box budget-paye">
+        <div class="val" id="b-paid">0 €</div>
+        <div class="lbl">Montant prévu (saisi)</div>
+      </div>
+      <div class="budget-box budget-reste">
+        <div class="val" id="b-left">0 €</div>
+        <div class="lbl">Reste à budgéter</div>
+      </div>
+      <div class="budget-box budget-libre">
+        <div class="val" id="b-pct">0%</div>
+        <div class="lbl">% du budget utilisé</div>
+      </div>
+    </div>
+
+    <div class="budget-input">
+      <div class="budget-row header-row">
+        <div>Poste</div><div>Estimation</div><div>Montant prévu</div><div>Acompte versé</div><div>Statut</div>
+      </div>
+      <div id="budget-rows"></div>
+      <div class="budget-row total-row" id="budget-total-row">
+        <div>TOTAL</div><div id="bt-est">0 €</div><div id="bt-prev">0 €</div><div id="bt-acomp">0 €</div><div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INVITÉS ═══ -->
+<div id="guests" class="section">
+  <div class="card">
+    <div class="card-title">👥 Liste des invités
+      <span style="margin-left:auto;font-size:0.85rem;font-weight:400;color:var(--grey)" id="guest-count-display">0 invité(s)</span>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+      <div class="budget-box budget-total" style="flex:1;min-width:120px;padding:12px">
+        <div class="val" id="g-total" style="font-size:1.5rem">0</div><div class="lbl">Total</div>
+      </div>
+      <div class="budget-box budget-paye" style="flex:1;min-width:120px;padding:12px">
+        <div class="val" id="g-oui" style="font-size:1.5rem;color:var(--green)">0</div><div class="lbl">Confirmés ✅</div>
+      </div>
+      <div class="budget-box" style="flex:1;min-width:120px;padding:12px;background:var(--light-yellow)">
+        <div class="val" id="g-att" style="font-size:1.5rem;color:var(--yellow)">0</div><div class="lbl">En attente ⏳</div>
+      </div>
+      <div class="budget-box budget-reste" style="flex:1;min-width:120px;padding:12px">
+        <div class="val" id="g-non" style="font-size:1.5rem;color:var(--red)">0</div><div class="lbl">Déclinés ❌</div>
+      </div>
+    </div>
+
+    <div class="guest-toolbar">
+      <input type="text" id="guest-search" placeholder="🔍 Rechercher un invité…" oninput="filterGuests()">
+      <button class="btn btn-pink" onclick="addGuest()">+ Ajouter un invité</button>
+      <button class="btn btn-outline" onclick="exportGuests()">📥 Exporter CSV</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="guest-table" id="guest-table">
+        <thead><tr>
+          <th>N°</th><th>Prénom & Nom</th><th>Lien</th><th>Email</th><th>Liste</th><th>Réponse</th><th>Régime</th><th>Notes</th><th>Action</th>
+        </tr></thead>
+        <tbody id="guest-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PRESTATAIRES ═══ -->
+<div id="vendors" class="section">
+  <div class="card">
+    <div class="card-title">📋 Carnet des prestataires</div>
+    <div class="prest-grid" id="vendors-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ JOUR J ═══ -->
+<div id="daytimeline" class="section">
+  <div class="card">
+    <div class="card-title">🎉 Planning du Jour J — Samedi 10 juillet 2027</div>
+    <div style="background:var(--light-blue);border-left:4px solid var(--blue);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:0.9rem;color:var(--dark)">
+      ✝️ <strong>Programme :</strong> Cérémonie civile (mairie) → Cérémonie religieuse (église) → Cocktail & réception au Château de Jallanges
+    </div>
+    <div class="day-timeline">
+      <div class="day-item">
+        <div class="day-time">8h00</div>
+        <div class="day-content"><strong>Coiffure & Maquillage</strong><div class="who">Keziah, Estelle et l'équipe de la mariée — Espace préparation du château</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">10h30</div>
+        <div class="day-content"><strong>Habillage de la mariée & Photos préparatifs</strong><div class="who">Keziah + photographe — Chambres du château</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">11h30</div>
+        <div class="day-content"><strong>⚖️ Cérémonie civile à la mairie</strong><div class="who">Mariés + famille proche + témoins — Mairie de Vernon-sur-Brenne</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">14h30</div>
+        <div class="day-content"><strong>✝️ Cérémonie religieuse (messe de mariage)</strong><div class="who">Tous les invités — Église à Vernon-sur-Brenne ou église choisie<br><em style="color:var(--grey);font-size:0.8rem">Entrée en musique · Lectures · Échange des vœux et alliances · Bénédiction · Chants liturgiques</em></div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">16h00</div>
+        <div class="day-content"><strong>📸 Sortie de l'église & photos</strong><div class="who">Lancé de pétales de roses ou confettis — Photos de couple et de groupe devant l'église</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">16h30</div>
+        <div class="day-content"><strong>🏰 Arrivée au Château de Jallanges</strong><div class="who">Tous les invités accueillis dans les allées du château</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">17h00</div>
+        <div class="day-content"><strong>🥂 Cocktail & Photos de couple</strong><div class="who">Cocktail dans les jardins du domaine — Photographe & vidéaste</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">19h30</div>
+        <div class="day-content"><strong>Entrée dans la salle de réception</strong><div class="who">Entrée des mariés en musique — Discours des témoins</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">20h00</div>
+        <div class="day-content"><strong>🍽️ Dîner de gala</strong><div class="who">Tous les invités — Menu gastronomique, ambiance musicale douce</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">22h30</div>
+        <div class="day-content"><strong>💃 Ouverture du bal & Pièce montée</strong><div class="who">Keziah & Briac ouvrent le bal — Découpe de la pièce montée</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">23h00</div>
+        <div class="day-content"><strong>🎵 Soirée dansante</strong><div class="who">Tous les invités — DJ jusqu'à l'aube !</div></div>
+      </div>
+      <div class="day-item">
+        <div class="day-time">2h00+</div>
+        <div class="day-content"><strong>Fin de soirée & Bouquet de la mariée</strong><div class="who">Les plus courageux… et Estelle !</div></div>
+      </div>
+    </div>
+
+    <div class="tip-box" style="margin-top:24px">
+      💡 <strong>Sac de survie d'Estelle :</strong> Rouge à lèvres, épingles à cheveux, double face, pansements, chargeur, médicaments, copie du planning + numéros de tous les prestataires.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHÂTEAU ═══ -->
+<div id="venue" class="section">
+  <div class="card">
+    <div class="card-title">🏰 Château de Jallanges — Vernon-sur-Brenne, Touraine</div>
+    <div class="venue-info">
+      <div>
+        <div class="info-box">
+          <h4>📍 Localisation</h4>
+          <p><strong>Château de Jallanges</strong><br>Vernon-sur-Brenne<br>37210, Indre-et-Loire<br>Touraine — Val de Loire<br><br><a href="https://www.jallanges.com" target="_blank">🌐 www.jallanges.com</a></p>
+        </div>
+        <br>
+        <div class="info-box">
+          <h4>🚗 Accès</h4>
+          <p>À 20 min de Tours (A10)<br>À 30 min d'Amboise<br>À 2h30 de Paris (TGV Tours + voiture)<br><br>Prévoir navettes depuis la gare de Tours pour les invités sans voiture.</p>
+        </div>
+      </div>
+      <div>
+        <div class="info-box">
+          <h4>✨ Points forts</h4>
+          <p>
+            🌹 Domaine viticole & château Renaissance<br>
+            🛏️ Chambres d'hôtes sur place<br>
+            🌳 Jardins à la française<br>
+            🍷 Vins du domaine disponibles<br>
+            📷 Cadre exceptionnel pour les photos<br>
+            🎪 Grande salle de réception<br>
+            🌞 Espaces extérieurs pour le cocktail
+          </p>
+        </div>
+        <br>
+        <div class="info-box">
+          <h4>❓ Questions à poser au château</h4>
+          <p>
+            • Traiteur libre ou liste imposée ?<br>
+            • Nombre de chambres disponibles ?<br>
+            • Horaire limite pour la musique ?<br>
+            • Parking : combien de places ?<br>
+            • Plan B en cas de pluie ?<br>
+            • Accès PMR (personnes à mobilité réduite) ?<br>
+            • Montant et modalités de l'acompte ?
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box">
+      🌹 <strong>Idée déco :</strong> Le Château de Jallanges est entouré de vignes et de jardins à la française. Un thème floral champêtre et romantique avec des pivoines, roses et hortensias en rose et blanc sera parfaitement en harmonie avec le cadre de la Touraine en juillet.
+    </div>
+
+    <div style="height:24px"></div>
+
+    <div class="card-title">✝️ Cérémonie religieuse chrétienne</div>
+    <div class="venue-info">
+      <div>
+        <div class="info-box">
+          <h4>📋 Démarches à effectuer</h4>
+          <p>
+            • Contacter le curé / pasteur dès maintenant (12+ mois avant)<br>
+            • Choisir l'église : à Vernon-sur-Brenne ou dans la paroisse de Keziah ou Briac<br>
+            • Retirer et déposer le dossier de mariage religieux<br>
+            • Participer aux sessions de préparation au mariage (obligatoires, souvent 3 à 5 séances)<br>
+            • Confirmer la date et l'heure de la messe avec le prêtre
+          </p>
+        </div>
+        <br>
+        <div class="info-box">
+          <h4>🎵 Musique liturgique</h4>
+          <p>
+            • Organiste ou chantre à réserver séparément<br>
+            • Chants recommandés en juillet (été) : Ave Maria, Magnificat, chants de louange…<br>
+            • Chant d'entrée · Psaume · Alleluia · Chant d'offertoire · Notre Père chanté · Chant de sortie<br>
+            • Répétition avec le musicien recommandée avant le jour J
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="info-box">
+          <h4>📖 Déroulement type d'une messe de mariage</h4>
+          <p>
+            🎶 Entrée en musique des mariés<br>
+            📖 Liturgie de la Parole (3 lectures + psaume)<br>
+            💍 Rite du mariage (consentement, échange des alliances)<br>
+            🙏 Liturgie eucharistique (communion)<br>
+            🌹 Bénédiction solennelle des époux<br>
+            🎵 Sortie en musique
+          </p>
+        </div>
+        <br>
+        <div class="info-box">
+          <h4>📝 Lectures bibliques populaires</h4>
+          <p>
+            • 1 Co 13 : «L'amour est patient, l'amour est serviable…»<br>
+            • Rt 1,16 : «Où tu iras, j'irai…»<br>
+            • Gn 2,18-24 : La création de la femme<br>
+            • Jn 2,1-11 : Les noces de Cana<br>
+            • Ep 5,2a.25-32 : L'amour mutuel des époux<br>
+            • Sg 8,7 : La tempérance, la prudence, la justice
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:16px">
+      ✝️ <strong>Conseil :</strong> Prévoir un <em>livret de messe</em> pour les invités avec les textes des lectures, les paroles des chants et le déroulé de la cérémonie. Cela permet à tous les invités, même non pratiquants, de suivre et de participer. Estelle peut s'en charger avec Keziah !
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- ═══ FIL ROUGE JOUR J ═══ -->
+<div id="filrouge" class="section">
+
+  <div class="card">
+    <div class="card-title">📋 Fil rouge du Jour J — 10 juillet 2027
+      <span style="margin-left:auto;font-size:0.82rem;font-weight:400;color:var(--grey);font-style:italic">Document de coordination — à affiner au fil du temps</span>
+    </div>
+    <div class="tip-box" style="margin-bottom:20px">
+      🎯 <strong>Objectif :</strong> Permettre aux mariés de profiter pleinement de leur journée sans aucune charge mentale. Chaque rôle est confié à une personne de confiance qui sait quoi faire, quand et avec qui.
+    </div>
+
+    <!-- ── RÔLES CLÉS ── -->
+    <div class="card-title" style="margin-top:8px">👥 Rôles clés à attribuer</div>
+    <p style="font-size:0.88rem;color:var(--grey);margin-bottom:16px">Cliquez sur un rôle pour modifier le nom et les notes de la personne assignée.</p>
+
+    <div id="roles-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:28px"></div>
+
+    <!-- ── FIL ROUGE HORAIRE ── -->
+    <div class="card-title" style="margin-top:8px">⏱️ Fil rouge heure par heure</div>
+    <p style="font-size:0.88rem;color:var(--grey);margin-bottom:16px">Pour chaque moment clé, la personne responsable et les points de vigilance. À compléter ensemble.</p>
+
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.87rem" id="filrouge-table">
+        <thead>
+          <tr>
+            <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;width:90px">Horaire</th>
+            <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left">Moment / Action</th>
+            <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;width:160px">Responsable</th>
+            <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left">Points de vigilance / Notes</th>
+          </tr>
+        </thead>
+        <tbody id="filrouge-tbody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-pink" onclick="addFilRougeRow()">+ Ajouter une ligne</button>
+      <button class="btn btn-outline" onclick="exportFilRouge()">📥 Exporter PDF (impression)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📞 Contacts d'urgence du Jour J</div>
+    <p style="font-size:0.88rem;color:var(--grey);margin-bottom:16px">À imprimer et distribuer à chaque responsable le matin du mariage.</p>
+    <div id="urgence-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+    <div style="margin-top:12px">
+      <button class="btn btn-pink" onclick="addUrgenceContact()">+ Ajouter un contact</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">💕 Fait avec amour pour Keziah & Briac — Juillet 2027 — Château de Jallanges, Touraine</div>
+
+<script>
+// ═══════════════════════════════════════
+// DONNÉES
+// ═══════════════════════════════════════
+const CHECKLIST_DATA = [
+  { cat: "15+ mois avant", tasks: [
+    { t: "Définir le budget global", r: "Keziah & Briac" },
+    { t: "Choisir la date précise en juillet 2027", r: "Keziah & Briac" },
+    { t: "Visiter et confirmer le Château de Jallanges", r: "Keziah, Briac & Estelle" },
+    { t: "Signer le contrat du château", r: "Keziah & Briac" },
+    { t: "Établir la liste d'invités", r: "Keziah & Briac" },
+    { t: "Réserver le traiteur", r: "Keziah & Briac" },
+    { t: "Réserver le photographe", r: "Keziah & Briac" },
+    { t: "Réserver le vidéaste", r: "Keziah & Briac" },
+    { t: "Commencer les visites de robes", r: "Keziah & Estelle" },
+    { t: "Ouvrir la liste de mariage", r: "Keziah & Briac" },
+  ]},
+  { cat: "12 mois avant", tasks: [
+    { t: "Envoyer les Save the Date", r: "Keziah & Briac" },
+    { t: "Confirmer les témoins officiels", r: "Keziah & Briac" },
+    { t: "Contacter la mairie pour le dossier civil", r: "Keziah & Briac" },
+    { t: "Contacter le curé / pasteur et réserver l'église", r: "Keziah & Briac" },
+    { t: "S'inscrire aux réunions de préparation au mariage (église)", r: "Keziah & Briac" },
+    { t: "Réserver le DJ / groupe musical", r: "Keziah & Briac" },
+    { t: "Commander la robe de mariée", r: "Keziah" },
+    { t: "Choisir le costume du marié", r: "Briac" },
+    { t: "Bloquer des chambres pour les invités", r: "Estelle" },
+    { t: "Réserver le fleuriste", r: "Keziah & Estelle" },
+    { t: "Réserver coiffeur & maquilleur", r: "Keziah" },
+  ]},
+  { cat: "9 mois avant", tasks: [
+    { t: "Définir le style déco (Pinterest avec le château)", r: "Keziah & Estelle" },
+    { t: "Visiter Jallanges avec le fleuriste", r: "Keziah & fleuriste" },
+    { t: "Assister aux sessions de préparation au mariage à l'église", r: "Keziah & Briac" },
+    { t: "Choisir les lectures bibliques et les chants pour la messe", r: "Keziah & Briac" },
+    { t: "Commencer la planification lune de miel", r: "Keziah & Briac" },
+    { t: "Choisir le gâteau / pièce montée", r: "Keziah & Briac" },
+    { t: "Planifier les navettes depuis Tours", r: "Estelle" },
+  ]},
+  { cat: "6 mois avant", tasks: [
+    { t: "Envoyer les faire-part officiels", r: "Keziah & Briac" },
+    { t: "Finaliser le menu avec le traiteur", r: "Keziah & Briac" },
+    { t: "Déposer le dossier civil à la mairie", r: "Keziah & Briac" },
+    { t: "Choisir les alliances", r: "Keziah & Briac" },
+    { t: "Réserver les billets de lune de miel", r: "Keziah & Briac" },
+    { t: "Démarrer le plan de table", r: "Estelle" },
+    { t: "Réserver la voiture des mariés", r: "Briac / famille" },
+  ]},
+  { cat: "3 mois avant", tasks: [
+    { t: "Confirmer TOUS les prestataires par écrit", r: "Estelle" },
+    { t: "Finaliser le plan de table", r: "Estelle" },
+    { t: "Préparer le livret de cérémonie religieuse (chants, lectures)", r: "Keziah & Estelle" },
+    { t: "Finaliser les chants et l'orgue / musique liturgique avec l'église", r: "Keziah & Briac" },
+    { t: "Organiser l'EVJF !", r: "Estelle 🎉" },
+    { t: "Écrire le discours des témoins (si tu es désignée)", r: "Estelle" },
+    { t: "Répéter le discours des témoins", r: "Témoins des mariés" },
+    { t: "Préparer le sac de survie de la mariée", r: "Estelle" },
+    { t: "Essayage final de la robe", r: "Keziah" },
+  ]},
+  { cat: "1 mois avant", tasks: [
+    { t: "Envoyer planning du jour J aux prestataires", r: "Estelle" },
+    { t: "Réunion finale avec tous les prestataires", r: "Keziah & Estelle" },
+    { t: "Confirmer le nombre d'invités au traiteur", r: "Estelle" },
+    { t: "Récupérer alliances et tenues", r: "Keziah & Briac" },
+    { t: "Vérifier validité des passeports", r: "Keziah & Briac" },
+  ]},
+  { cat: "Semaine du mariage", tasks: [
+    { t: "Décoration du château (J-2)", r: "Estelle & équipe" },
+    { t: "Répétition de la cérémonie (J-1)", r: "Tous" },
+    { t: "Soirée détente / spa pour la mariée (J-1)", r: "Keziah & Estelle" },
+    { t: "Livraison des fleurs", r: "Fleuriste" },
+    { t: "Vérifier météo & plan B pluie", r: "Estelle" },
+  ]},
+  { cat: "Jour J ✨", tasks: [
+    { t: "Coiffure & maquillage (matin)", r: "Keziah & témoins" },
+    { t: "Photos préparatifs au château", r: "Photographe" },
+    { t: "Cérémonie civile à la mairie", r: "Tous" },
+    { t: "Cérémonie laïque dans les jardins du château", r: "Tous" },
+    { t: "Cocktail & photos de couple", r: "Tous" },
+    { t: "Discours des témoins", r: "Témoins des mariés" },
+    { t: "Dîner de gala", r: "Tous" },
+    { t: "Ouverture du bal & pièce montée", r: "Keziah & Briac" },
+    { t: "Soirée dansante jusqu'à l'aube !", r: "Tous" },
+  ]},
+  { cat: "Après le mariage", tasks: [
+    { t: "Envoyer les remerciements aux invités", r: "Keziah & Briac" },
+    { t: "Récupérer les photos et vidéos", r: "Keziah" },
+    { t: "Changer les noms officiels si souhaité", r: "Keziah" },
+    { t: "Retourner les costumes loués", r: "Briac" },
+  ]},
+];
+
+const BUDGET_DATA = [
+  { cat: "Lieu de réception (Château de Jallanges)", est: 8000, prev: 0, acomp: 0 },
+  { cat: "Traiteur (repas)", est: 12000, prev: 0, acomp: 0 },
+  { cat: "Boissons / Bar open", est: 2500, prev: 0, acomp: 0 },
+  { cat: "Photographe", est: 2500, prev: 0, acomp: 0 },
+  { cat: "Vidéaste", est: 1500, prev: 0, acomp: 0 },
+  { cat: "DJ / Musique", est: 1500, prev: 0, acomp: 0 },
+  { cat: "Fleurs & Décoration", est: 2500, prev: 0, acomp: 0 },
+  { cat: "Robe de mariée", est: 2000, prev: 0, acomp: 0 },
+  { cat: "Costume du marié", est: 800, prev: 0, acomp: 0 },
+  { cat: "Faire-part & papeterie", est: 600, prev: 0, acomp: 0 },
+  { cat: "Coiffure & maquillage", est: 500, prev: 0, acomp: 0 },
+  { cat: "Voiture des mariés", est: 600, prev: 0, acomp: 0 },
+  { cat: "Navettes invités (depuis Tours)", est: 700, prev: 0, acomp: 0 },
+  { cat: "Gâteau / Pièce montée", est: 700, prev: 0, acomp: 0 },
+  { cat: "Alliances", est: 1500, prev: 0, acomp: 0 },
+  { cat: "Cadeaux invités / dragées", est: 500, prev: 0, acomp: 0 },
+  { cat: "Lune de miel", est: 4000, prev: 0, acomp: 0 },
+  { cat: "Divers & imprévus (10%)", est: 3500, prev: 0, acomp: 0 },
+];
+
+const VENDORS_DATA = [
+  { cat: "Lieu de réception", name: "Château de Jallanges", tel: "", email: "contact@jallanges.com", site: "jallanges.com", status: "⏳ À contacter" },
+  { cat: "Traiteur", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Photographe", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Vidéaste", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "DJ / Musiciens", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Fleuriste", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Coiffeur", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Maquilleur", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Gâteau / Pâtissier", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Voiture des mariés", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Transport invités", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Officiant cérémonie laïque", name: "À choisir", tel: "", email: "", site: "", status: "⏳ À contacter" },
+  { cat: "Mairie", name: "Mairie Vernon-sur-Brenne", tel: "", email: "", site: "", status: "⏳ À contacter" },
+];
+
+// ═══════════════════════════════════════
+// ÉTAT & STORAGE
+// ═══════════════════════════════════════
+let state = { checks: {}, budget: JSON.parse(JSON.stringify(BUDGET_DATA)), guests: [], budgetTotal: 30000 };
+
+function save() { try { localStorage.setItem('wedding_state', JSON.stringify(state)); } catch(e) {} }
+function load() {
+  try {
+    const s = localStorage.getItem('wedding_state');
+    if (s) state = JSON.parse(s);
+    if (!state.guests) state.guests = [];
+    if (!state.budget) state.budget = JSON.parse(JSON.stringify(BUDGET_DATA));
+    if (!state.checks) state.checks = {};
+    if (!state.budgetTotal) state.budgetTotal = 30000;
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function showSection(id, link) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (link) link.classList.add('active');
+  updateDashboard();
+}
+
+// ═══════════════════════════════════════
+// COUNTDOWN
+// ═══════════════════════════════════════
+function updateCountdown() {
+  const target = new Date('2027-07-10');
+  const now = new Date();
+  const diff = target - now;
+  if (diff > 0) {
+    const days = Math.floor(diff / (1000*60*60*24));
+    const months = Math.floor(days / 30.44);
+    const weeks = Math.floor(days / 7);
+    document.getElementById('cd-days').textContent = days.toLocaleString('fr');
+    document.getElementById('cd-months').textContent = months;
+    document.getElementById('cd-weeks').textContent = weeks;
+  }
+}
+
+// ═══════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════
+function renderChecklist() {
+  const container = document.getElementById('checklist-container');
+  container.innerHTML = '';
+  CHECKLIST_DATA.forEach((section, si) => {
+    const done = section.tasks.filter((t, ti) => state.checks[`${si}-${ti}`]).length;
+    const total = section.tasks.length;
+    const pct = total > 0 ? Math.round(done/total*100) : 0;
+
+    const div = document.createElement('div');
+    div.className = 'check-section';
+    div.innerHTML = `
+      <div class="check-header" onclick="toggleSection(this)">
+        <span>${section.cat}</span>
+        <span class="badge">${done}/${total} — ${pct}%</span>
+      </div>
+      <div class="check-body">
+        <div class="progress-bar-wrap" style="margin:4px 8px;"><div class="progress-bar" style="width:${pct}%"></div></div>
+        ${section.tasks.map((task, ti) => {
+          const key = `${si}-${ti}`;
+          const checked = state.checks[key] || false;
+          return `<div class="check-item ${checked ? 'done' : ''}" id="ci-${key}">
+            <input type="checkbox" id="cb-${key}" ${checked ? 'checked' : ''} onchange="toggleCheck('${key}', this)">
+            <label for="cb-${key}">${task.t}</label>
+            <span class="resp">${task.r}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+  updateCheckProgress();
+}
+
+function toggleCheck(key, cb) {
+  state.checks[key] = cb.checked;
+  const item = document.getElementById(`ci-${key}`);
+  item.classList.toggle('done', cb.checked);
+  save(); updateCheckProgress(); updateDashboard();
+  renderChecklist(); // re-render to update badges
+}
+
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateCheckProgress() {
+  const total = Object.values(CHECKLIST_DATA).reduce((a,s) => a + s.tasks.length, 0);
+  const done = Object.values(state.checks).filter(Boolean).length;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  const el = document.getElementById('check-progress-txt');
+  const bar = document.getElementById('check-progress-bar');
+  if (el) el.textContent = `${done} / ${total} tâches`;
+  if (bar) bar.style.width = pct + '%';
+}
+
+// ═══════════════════════════════════════
+// BUDGET
+// ═══════════════════════════════════════
+function renderBudget() {
+  const container = document.getElementById('budget-rows');
+  container.innerHTML = '';
+  state.budget.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'budget-row';
+    row.innerHTML = `
+      <div style="font-weight:600">${item.cat}</div>
+      <div style="text-align:right;color:#888">${fmtEur(item.est)}</div>
+      <div><input type="number" value="${item.prev}" placeholder="0" min="0" onchange="updateBudgetItem(${i},'prev',this.value)" style="text-align:right;font-weight:600;color:#1565C0;width:100%;border:none;background:transparent;font-family:inherit;font-size:0.88rem;padding:10px 8px;"></div>
+      <div><input type="number" value="${item.acomp}" placeholder="0" min="0" onchange="updateBudgetItem(${i},'acomp',this.value)" style="text-align:right;color:#388E3C;width:100%;border:none;background:transparent;font-family:inherit;font-size:0.88rem;padding:10px 8px;"></div>
+      <div><select onchange="updateBudgetItem(${i},'status',this.value)" style="font-size:0.8rem;border:none;background:transparent;font-family:inherit;cursor:pointer;">
+        <option ${!item.status||item.status==='⏳ À contacter'?'selected':''}>⏳ À contacter</option>
+        <option ${item.status==='🔄 En négo.'?'selected':''}>🔄 En négo.</option>
+        <option ${item.status==='✅ Signé'?'selected':''}>✅ Signé</option>
+      </select></div>`;
+    container.appendChild(row);
+  });
+  updateBudget();
+}
+
+function updateBudgetItem(i, field, val) {
+  state.budget[i][field] = field === 'status' ? val : (parseFloat(val) || 0);
+  save(); updateBudget();
+}
+
+function updateBudget() {
+  const totalPrev = state.budgetTotal;
+  const totalEst = state.budget.reduce((a,b) => a+b.est, 0);
+  const totalPrev2 = state.budget.reduce((a,b) => a+b.prev, 0);
+  const totalAcomp = state.budget.reduce((a,b) => a+b.acomp, 0);
+  const libre = totalPrev - totalPrev2;
+  const pct = totalPrev > 0 ? Math.round(totalPrev2/totalPrev*100) : 0;
+
+  document.getElementById('b-total').textContent = fmtEur(totalPrev);
+  document.getElementById('b-paid').textContent = fmtEur(totalPrev2);
+  document.getElementById('b-left').textContent = fmtEur(libre);
+  document.getElementById('b-pct').textContent = pct + '%';
+  document.getElementById('bt-est').textContent = fmtEur(totalEst);
+  document.getElementById('bt-prev').textContent = fmtEur(totalPrev2);
+  document.getElementById('bt-acomp').textContent = fmtEur(totalAcomp);
+
+  const inp = document.getElementById('budget-input');
+  if (inp) { state.budgetTotal = parseFloat(inp.value) || 30000; save(); }
+
+  document.getElementById('stat-budget-used').textContent = fmtEur(totalPrev2);
+}
+
+function fmtEur(n) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n || 0);
+}
+
+// ═══════════════════════════════════════
+// INVITÉS
+// ═══════════════════════════════════════
+const GUESTS_COLLECTION_PATH = "wedding/keziah-briac/guests";
+
+async function loadGuestsFromFirebase() {
+  if (!window.db) return;
+
+  try {
+    const snapshot = await window.fbGetDocs(
+      window.fbCollection(window.db, GUESTS_COLLECTION_PATH)
+    );
+
+    state.guests = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+
+    renderGuests();
+  } catch (error) {
+    console.error("Erreur chargement invités Firebase :", error);
+  }
+}
+
+async function addGuestToFirebase(guest) {
+  if (!window.db) return null;
+
+  try {
+    const docRef = await window.fbAddDoc(
+      window.fbCollection(window.db, GUESTS_COLLECTION_PATH),
+      {
+        name: guest.name || "",
+        link: guest.link || "",
+        email: guest.email || "",
+        liste: guest.liste || "A",
+        rep: guest.rep || "⏳ En attente",
+        regime: guest.regime || "",
+        notes: guest.notes || "",
+        createdAt: window.fbServerTimestamp()
+      }
+    );
+
+    return docRef.id;
+  } catch (error) {
+    console.error("Erreur ajout invité Firebase :", error);
+    return null;
+  }
+}
+
+async function updateGuestInFirebase(i, field, val) {
+  if (!window.db) return;
+  const guest = state.guests[i];
+  if (!guest || !guest.id) return;
+
+  try {
+    await window.fbUpdateDoc(
+      window.fbDoc(window.db, GUESTS_COLLECTION_PATH, guest.id),
+      { [field]: val }
+    );
+  } catch (error) {
+    console.error("Erreur mise à jour invité Firebase :", error);
+  }
+}
+
+async function removeGuestFromFirebase(i) {
+  if (!window.db) return;
+  const guest = state.guests[i];
+  if (!guest || !guest.id) return;
+
+  try {
+    await window.fbDeleteDoc(
+      window.fbDoc(window.db, GUESTS_COLLECTION_PATH, guest.id)
+    );
+  } catch (error) {
+    console.error("Erreur suppression invité Firebase :", error);
+  }
+}
+function renderGuests() {
+  const tbody = document.getElementById('guest-tbody');
+  const q = (document.getElementById('guest-search')?.value || '').toLowerCase();
+  tbody.innerHTML = '';
+  state.guests.filter(g => !q || g.name.toLowerCase().includes(q) || (g.link||'').toLowerCase().includes(q))
+    .forEach((g, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td><input value="${g.name||''}" onchange="updateGuest(${i},'name',this.value)" style="font-weight:600"></td>
+        <td><input value="${g.link||''}" onchange="updateGuest(${i},'link',this.value)"></td>
+        <td><input value="${g.email||''}" onchange="updateGuest(${i},'email',this.value)"></td>
+        <td><select onchange="updateGuest(${i},'liste',this.value)">
+          <option ${g.liste==='A'?'selected':''}>A</option>
+          <option ${g.liste==='B'?'selected':''}>B</option>
+          <option ${g.liste==='C'?'selected':''}>C</option>
+        </select></td>
+        <td><select onchange="updateGuest(${i},'rep',this.value)">
+          <option ${g.rep==='⏳ En attente'?'selected':''}>⏳ En attente</option>
+          <option ${g.rep==='✅ Oui'?'selected':''}>✅ Oui</option>
+          <option ${g.rep==='❌ Non'?'selected':''}>❌ Non</option>
+        </select></td>
+        <td><input value="${g.regime||''}" placeholder="végétarien…" onchange="updateGuest(${i},'regime',this.value)"></td>
+        <td><input value="${g.notes||''}" onchange="updateGuest(${i},'notes',this.value)"></td>
+        <td><button onclick="removeGuest(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem;">🗑️</button></td>`;
+      tbody.appendChild(tr);
+    });
+  updateGuestStats();
+}
+
+async function addGuest() {
+  const newGuest = {
+    name: "Nouveau / Nouvelle",
+    link: "",
+    email: "",
+    liste: "A",
+    rep: "⏳ En attente",
+    regime: "",
+    notes: ""
+  };
+
+  const newId = await addGuestToFirebase(newGuest);
+
+  if (newId) {
+    await loadGuestsFromFirebase();
+  }
+}
+async function removeGuest(i) {
+  if (confirm("Supprimer cet invité ?")) {
+    await removeGuestFromFirebase(i);
+    await loadGuestsFromFirebase();
+  }
+}
+
+async function updateGuest(i, field, val) {
+  state.guests[i][field] = val;
+  save();
+  updateGuestStats();
+  await updateGuestInFirebase(i, field, val);
+}
+
+function filterGuests() { renderGuests(); }
+
+function updateGuestStats() {
+  const total = state.guests.length;
+  const oui = state.guests.filter(g => g.rep === '✅ Oui').length;
+  const non = state.guests.filter(g => g.rep === '❌ Non').length;
+  const att = state.guests.filter(g => g.rep === '⏳ En attente').length;
+  document.getElementById('g-total').textContent = total;
+  document.getElementById('g-oui').textContent = oui;
+  document.getElementById('g-non').textContent = non;
+  document.getElementById('g-att').textContent = att;
+  document.getElementById('guest-count-display').textContent = `${total} invité(s)`;
+  document.getElementById('stat-guests').textContent = total;
+}
+
+function exportGuests() {
+  const header = ['Nom','Lien','Email','Liste','Réponse','Régime','Notes'];
+  const rows = state.guests.map(g => [g.name,g.link,g.email,g.liste,g.rep,g.regime,g.notes].map(v => `"${(v||'').replace(/"/g,'""')}"`));
+  const csv = [header, ...rows].map(r => r.join(';')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'invites_mariage_keziah_briac.csv'; a.click();
+}
+
+// ═══════════════════════════════════════
+// PRESTATAIRES
+// ═══════════════════════════════════════
+function renderVendors() {
+  const grid = document.getElementById('vendors-grid');
+  grid.innerHTML = '';
+  VENDORS_DATA.forEach((v, i) => {
+    const div = document.createElement('div');
+    div.className = 'prest-card';
+    const saved = state['vendor_'+i] || v;
+    div.innerHTML = `
+      <div class="prest-cat">${v.cat}</div>
+      <div class="prest-field"><label>Nom :</label><input value="${saved.name||v.name}" onchange="saveVendor(${i},'name',this.value)" style="font-weight:700"></div>
+      <div class="prest-field"><label>Téléphone :</label><input value="${saved.tel||''}" placeholder="06 XX XX XX XX" onchange="saveVendor(${i},'tel',this.value)"></div>
+      <div class="prest-field"><label>Email :</label><input value="${saved.email||v.email||''}" placeholder="contact@…" onchange="saveVendor(${i},'email',this.value)"></div>
+      <div class="prest-field"><label>Site :</label><input value="${saved.site||v.site||''}" placeholder="www…" onchange="saveVendor(${i},'site',this.value)"></div>
+      <div class="prest-status">
+        <select onchange="saveVendor(${i},'status',this.value)" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-family:inherit;font-size:0.82rem;">
+          <option ${!saved.status||saved.status==='⏳ À contacter'?'selected':''}>⏳ À contacter</option>
+          <option ${saved.status==='🔄 En négociation'?'selected':''}>🔄 En négociation</option>
+          <option ${saved.status==='✅ Contrat signé'?'selected':''}>✅ Contrat signé</option>
+          <option ${saved.status==='❌ Non retenu'?'selected':''}>❌ Non retenu</option>
+        </select>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function saveVendor(i, field, val) {
+  if (!state['vendor_'+i]) state['vendor_'+i] = {};
+  state['vendor_'+i][field] = val;
+  save();
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function updateDashboard() {
+  const total = CHECKLIST_DATA.reduce((a,s) => a+s.tasks.length, 0);
+  const done = Object.values(state.checks).filter(Boolean).length;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  const el1 = document.getElementById('stat-tasks-done');
+  const el2 = document.getElementById('stat-tasks-left');
+  const bar = document.getElementById('main-progress');
+  const pctEl = document.getElementById('progress-pct');
+  if (el1) el1.textContent = done;
+  if (el2) el2.textContent = total - done;
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+// ═══════════════════════════════════════
+// FIL ROUGE — DONNÉES
+// ═══════════════════════════════════════
+const ROLES_DATA = [
+  {
+    icon: "🎯", title: "Coordinateur·rice général·e",
+    desc: "Suit le planning heure par heure, résout les imprévus, point de contact unique pour tous les prestataires.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "🚗", title: "Responsable logistique & transports",
+    desc: "Gère les navettes, coordonne les arrivées/départs, s'assure que tout le monde est au bon endroit.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "📸", title: "Référent·e photographe & vidéaste",
+    desc: "Accompagne le photographe, lui communique la liste des photos de groupe souhaitées, rassemble les personnes.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "🎵", title: "Référent·e DJ / Musique",
+    desc: "Point de contact avec le DJ, valide les transitions musicales clés (entrée mariés, ouverture de bal…).",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "🍽️", title: "Référent·e traiteur & salle",
+    desc: "Suit le déroulé du repas avec le traiteur, valide le placement des plats, coordonne la pièce montée.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "💐", title: "Responsable déco & accueil",
+    desc: "Accueille les invités à l'arrivée au château, vérifie la déco, distribue les livrets de messe/programme.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "👶", title: "Responsable enfants",
+    desc: "Supervise les animations pour enfants, veille à leur confort et sécurité pendant la journée.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "💍", title: "Gardien·ne des alliances",
+    desc: "Conserve les alliances en sécurité et les remet au bon moment lors de la cérémonie.",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "🎤", title: "Responsable discours & animations",
+    desc: "Coordonne l'ordre et le timing des discours, des animations, du jeu de diaporama…",
+    person: "", tel: "", notes: ""
+  },
+  {
+    icon: "👗", title: "Référent·e mariée (préparatifs)",
+    desc: "Présent·e dès le matin, sac de survie en main, veille au confort et au timing de la mariée.",
+    person: "", tel: "", notes: ""
+  },
+];
+
+const FILROUGE_ROWS_DEFAULT = [
+  { heure: "8h00",  action: "Début coiffure & maquillage de la mariée", resp: "", notes: "Prévoir petits déjeuners pour l'équipe" },
+  { heure: "10h30", action: "Habillage de la mariée — début shooting préparatifs", resp: "", notes: "Vérifier que le photographe est arrivé" },
+  { heure: "11h00", action: "Arrivée des témoins et proches à la mairie", resp: "", notes: "Prévoir covoiturage depuis le château" },
+  { heure: "11h30", action: "Cérémonie civile à la mairie", resp: "", notes: "Vérifier les documents et pièces d'identité des témoins" },
+  { heure: "12h30", action: "Fin de la mairie — déplacement vers l'église", resp: "", notes: "Prévoir navette ou cortège de voitures" },
+  { heure: "13h30", action: "Ouverture des portes de l'église — accueil des invités", resp: "", notes: "Distribuer les livrets de messe à l'entrée" },
+  { heure: "14h30", action: "Entrée des mariés dans l'église — début de la messe", resp: "", notes: "Vérifier que le musicien / organiste est en place" },
+  { heure: "16h00", action: "Fin de la messe — sortie de l'église", resp: "", notes: "Pétales de roses / confettis prêts pour la sortie" },
+  { heure: "16h15", action: "Photos de groupe devant l'église", resp: "", notes: "Liste des groupes photos à avoir préparée" },
+  { heure: "16h45", action: "Départ en cortège vers le Château de Jallanges", resp: "", notes: "Navettes prévues pour les invités sans voiture" },
+  { heure: "17h00", action: "Arrivée au château — accueil cocktail", resp: "", notes: "Musique d'ambiance, boissons et amuse-bouches prêts" },
+  { heure: "17h00", action: "Photos de couple dans les jardins du château", resp: "", notes: "Photographe + mariés — témoins gèrent les invités" },
+  { heure: "19h00", action: "Fin du cocktail — placement des invités en salle", resp: "", notes: "Plans de table affichés à l'entrée de la salle" },
+  { heure: "19h30", action: "Entrée des mariés dans la salle de réception", resp: "", notes: "Musique d'entrée validée avec le DJ" },
+  { heure: "19h45", action: "Discours de bienvenue & début du dîner", resp: "", notes: "Ordre des discours à définir" },
+  { heure: "21h30", action: "Discours des témoins", resp: "", notes: "Micro, verre de champagne prêts" },
+  { heure: "22h00", action: "Pièce montée — ouverture du bal", resp: "", notes: "Coordonner traiteur + DJ + photographe" },
+  { heure: "22h30", action: "Soirée dansante", resp: "", notes: "Premier slow, animations, photobooth…" },
+  { heure: "2h00",  action: "Fin de soirée — bouquet de la mariée (optionnel)", resp: "", notes: "Dernière danse, remerciements des mariés" },
+];
+
+const URGENCE_DEFAULT = [
+  { cat: "Lieu — Château de Jallanges", nom: "", tel: "", role: "Responsable du domaine" },
+  { cat: "Traiteur", nom: "", tel: "", role: "Chef ou responsable événement" },
+  { cat: "Photographe", nom: "", tel: "", role: "" },
+  { cat: "Vidéaste", nom: "", tel: "", role: "" },
+  { cat: "DJ", nom: "", tel: "", role: "" },
+  { cat: "Fleuriste", nom: "", tel: "", role: "" },
+  { cat: "Transport / Navettes", nom: "", tel: "", role: "" },
+  { cat: "Mairie", nom: "", tel: "", role: "Officier d'état civil" },
+  { cat: "Église / Officiant", nom: "", tel: "", role: "Curé / Pasteur" },
+];
+
+function renderRoles() {
+  const grid = document.getElementById('roles-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const saved = state.roles || ROLES_DATA.map(r => ({...r}));
+  saved.forEach((role, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:white;border-radius:10px;padding:16px;border:1px solid #eee;box-shadow:0 1px 6px rgba(0,0,0,0.06);border-left:4px solid var(--light-pink)';
+    div.innerHTML = `
+      <div style="font-size:1.4rem;margin-bottom:6px">${role.icon}</div>
+      <div style="font-weight:700;color:var(--dark);margin-bottom:4px;font-size:0.95rem">${role.title}</div>
+      <div style="font-size:0.8rem;color:var(--grey);margin-bottom:12px;line-height:1.5">${role.desc}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <input placeholder="👤 Prénom & Nom" value="${role.person||''}"
+          style="border:1px solid #e0e0e0;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:0.85rem;font-weight:600;color:var(--dark)"
+          onchange="saveRole(${i},'person',this.value)">
+        <input placeholder="📞 Téléphone" value="${role.tel||''}"
+          style="border:1px solid #e0e0e0;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:0.85rem"
+          onchange="saveRole(${i},'tel',this.value)">
+        <textarea placeholder="📝 Notes / consignes spécifiques…" rows="2"
+          style="border:1px solid #e0e0e0;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:0.82rem;resize:vertical"
+          onchange="saveRole(${i},'notes',this.value)">${role.notes||''}</textarea>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function saveRole(i, field, val) {
+  if (!state.roles) state.roles = ROLES_DATA.map(r => ({...r}));
+  state.roles[i][field] = val;
+  save();
+}
+
+function renderFilRouge() {
+  const tbody = document.getElementById('filrouge-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const rows = state.filrougeRows || FILROUGE_ROWS_DEFAULT.map(r => ({...r}));
+  rows.forEach((row, i) => {
+    const bg = i % 2 === 0 ? '#fafafa' : 'white';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg};font-weight:700;color:var(--pink);white-space:nowrap">
+        <input value="${row.heure}" onchange="saveFilRouge(${i},'heure',this.value)"
+          style="width:70px;border:1px solid #e0e0e0;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:0.85rem;font-weight:700;color:var(--pink)">
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
+        <input value="${row.action}" onchange="saveFilRouge(${i},'action',this.value)"
+          style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.87rem;font-weight:600">
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
+        <input value="${row.resp}" placeholder="À définir…" onchange="saveFilRouge(${i},'resp',this.value)"
+          style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.85rem;color:var(--pink);font-weight:600">
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
+        <input value="${row.notes}" placeholder="Notes…" onchange="saveFilRouge(${i},'notes',this.value)"
+          style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.82rem;color:var(--grey)">
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  if (!state.filrougeRows) { state.filrougeRows = FILROUGE_ROWS_DEFAULT.map(r => ({...r})); save(); }
+}
+
+function saveFilRouge(i, field, val) {
+  if (!state.filrougeRows) state.filrougeRows = FILROUGE_ROWS_DEFAULT.map(r => ({...r}));
+  state.filrougeRows[i][field] = val;
+  save();
+}
+
+function addFilRougeRow() {
+  if (!state.filrougeRows) state.filrougeRows = FILROUGE_ROWS_DEFAULT.map(r => ({...r}));
+  state.filrougeRows.push({ heure: '', action: '', resp: '', notes: '' });
+  save(); renderFilRouge();
+}
+
+function renderUrgence() {
+  const grid = document.getElementById('urgence-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const contacts = state.urgenceContacts || URGENCE_DEFAULT.map(c => ({...c}));
+  contacts.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--light-grey);border-radius:8px;padding:14px;border:1px solid #e0e0e0';
+    div.innerHTML = `
+      <div style="font-weight:700;color:var(--pink);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${c.cat}</div>
+      <input placeholder="👤 Nom / Prénom" value="${c.nom||''}" onchange="saveUrgence(${i},'nom',this.value)"
+        style="width:100%;margin-bottom:6px;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:0.85rem;font-weight:600">
+      <input placeholder="📞 Téléphone" value="${c.tel||''}" onchange="saveUrgence(${i},'tel',this.value)"
+        style="width:100%;margin-bottom:6px;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:0.85rem">
+      <input placeholder="Rôle / Fonction" value="${c.role||''}" onchange="saveUrgence(${i},'role',this.value)"
+        style="width:100%;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:0.82rem;color:var(--grey)">`;
+    grid.appendChild(div);
+  });
+  if (!state.urgenceContacts) { state.urgenceContacts = URGENCE_DEFAULT.map(c => ({...c})); save(); }
+}
+
+function saveUrgence(i, field, val) {
+  if (!state.urgenceContacts) state.urgenceContacts = URGENCE_DEFAULT.map(c => ({...c}));
+  state.urgenceContacts[i][field] = val;
+  save();
+}
+
+function addUrgenceContact() {
+  if (!state.urgenceContacts) state.urgenceContacts = URGENCE_DEFAULT.map(c => ({...c}));
+  state.urgenceContacts.push({ cat: 'Nouveau contact', nom: '', tel: '', role: '' });
+  save(); renderUrgence();
+}
+
+function exportFilRouge() {
+  window.print();
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+load();
+updateCountdown();
+renderChecklist();
+renderBudget();
+renderGuests();
+renderVendors();
+renderRoles();
+renderFilRouge();
+renderUrgence();
+updateDashboard();
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCYFt12IsMtPEUOlaV0TauBTjWtg1uNkRk",
+    authDomain: "mariage-keziah-et-briac.firebaseapp.com",
+    projectId: "mariage-keziah-et-briac",
+    storageBucket: "mariage-keziah-et-briac.firebasestorage.app",
+    messagingSenderId: "279749705930",
+    appId: "1:279749705930:web:b9e5f706da973a5f4e7433"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.fbCollection = collection;
+  window.fbGetDocs = getDocs;
+  window.fbAddDoc = addDoc;
+  window.fbUpdateDoc = updateDoc;
+  window.fbDeleteDoc = deleteDoc;
+  window.fbDoc = doc;
+  window.fbServerTimestamp = serverTimestamp;
+
+  console.log("Firebase connecté 🚀");
+</script>
+</body>
+</html>
