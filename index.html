@@ -887,7 +887,12 @@ const VENDORS_DATA = [
 // ═══════════════════════════════════════
 let state = { checks: {}, budget: JSON.parse(JSON.stringify(BUDGET_DATA)), guests: [], budgetTotal: 30000 };
 
-function save() { try { localStorage.setItem('wedding_state', JSON.stringify(state)); } catch(e) {} }
+// Sauvegarde locale (fallback) + Firebase
+function save() {
+  try { localStorage.setItem('wedding_state', JSON.stringify(state)); } catch(e) {}
+  saveToFirebase();
+}
+
 function load() {
   try {
     const s = localStorage.getItem('wedding_state');
@@ -898,6 +903,52 @@ function load() {
     if (!state.budgetTotal) state.budgetTotal = 30000;
   } catch(e) {}
 }
+
+// ─── Firebase : sauvegarde de tout l'état (hors invités)
+async function saveToFirebase() {
+  if (!window.fbSetDoc || !window.fbDoc || !window.db) return;
+  try {
+    const toSave = {
+      checks: state.checks || {},
+      budget: state.budget || [],
+      budgetTotal: state.budgetTotal || 30000,
+      roles: state.roles || [],
+      filrougeRows: state.filrougeRows || [],
+      urgenceContacts: state.urgenceContacts || [],
+    };
+    Object.keys(state).filter(k => k.startsWith('vendor_')).forEach(k => { toSave[k] = state[k]; });
+    await window.fbSetDoc(window.fbDoc(window.db, 'wedding', 'keziah-briac'), toSave, { merge: true });
+  } catch(e) { console.warn('Firebase save error:', e); }
+}
+
+// ─── Firebase : chargement initial de tout l'état
+async function loadAllFromFirebase() {
+  if (!window.fbGetDoc || !window.fbDoc || !window.db) return;
+  try {
+    const snap = await window.fbGetDoc(window.fbDoc(window.db, 'wedding', 'keziah-briac'));
+    if (snap.exists()) {
+      const d = snap.data();
+      if (d.checks)           state.checks = d.checks;
+      if (d.budget)           state.budget = d.budget;
+      if (d.budgetTotal)      state.budgetTotal = d.budgetTotal;
+      if (d.roles)            state.roles = d.roles;
+      if (d.filrougeRows)     state.filrougeRows = d.filrougeRows;
+      if (d.urgenceContacts)  state.urgenceContacts = d.urgenceContacts;
+      Object.keys(d).filter(k => k.startsWith('vendor_')).forEach(k => { state[k] = d[k]; });
+    }
+  } catch(e) { console.warn('Firebase load error:', e); }
+  // Charger les invités séparément
+  await loadGuestsFromFirebase();
+  // Re-rendre tout avec les données Firebase
+  renderChecklist();
+  renderBudget();
+  renderVendors();
+  renderRoles();
+  renderFilRouge();
+  renderUrgence();
+  updateDashboard();
+}
+window.loadAllFromFirebase = loadAllFromFirebase;
 
 // ═══════════════════════════════════════
 // NAVIGATION
@@ -1479,6 +1530,8 @@ updateDashboard();
     updateDoc,
     deleteDoc,
     doc,
+    setDoc,
+    getDoc,
     serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
@@ -1501,9 +1554,14 @@ updateDashboard();
   window.fbUpdateDoc = updateDoc;
   window.fbDeleteDoc = deleteDoc;
   window.fbDoc = doc;
+  window.fbSetDoc = setDoc;
+  window.fbGetDoc = getDoc;
   window.fbServerTimestamp = serverTimestamp;
 
   console.log("Firebase connecté 🚀");
+
+  // Chargement initial de toutes les données depuis Firebase
+  window.loadAllFromFirebase();
 </script>
 </body>
 </html>
