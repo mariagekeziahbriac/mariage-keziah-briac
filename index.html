@@ -240,6 +240,72 @@
   .tag-orange { background: var(--light-orange); color: var(--orange); }
   .footer { text-align: center; padding: 30px; color: var(--grey); font-size: 0.82rem; font-style: italic; }
 
+  /* ── CHECKLIST ENRICHIE ── */
+  .check-item { flex-wrap: wrap; }
+  .task-meta { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
+  .task-cat-badge {
+    display: inline-block; padding: 1px 7px; border-radius: 8px;
+    font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+  }
+  .task-date-badge {
+    display: inline-block; padding: 1px 7px; border-radius: 8px;
+    font-size: 0.7rem; background: var(--light-blue); color: var(--blue); white-space: nowrap;
+  }
+  .task-resp {
+    font-size: 0.75rem; color: var(--grey); white-space: nowrap; font-style: italic; max-width: 130px;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .task-edit-btn {
+    background: none; border: none; cursor: pointer; color: var(--grey);
+    font-size: 0.85rem; padding: 2px 4px; opacity: 0.6; transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .task-edit-btn:hover { opacity: 1; }
+  .task-del-btn {
+    background: none; border: none; cursor: pointer; color: var(--red);
+    font-size: 0.85rem; padding: 2px 4px; opacity: 0.6; transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .task-del-btn:hover { opacity: 1; }
+  .task-edit-form {
+    display: none; width: 100%; padding: 8px 12px 10px 44px;
+    background: #fafafa; border-top: 1px solid #f0f0f0;
+    gap: 8px; flex-wrap: wrap; align-items: flex-end;
+  }
+  .task-edit-form.open { display: flex; }
+  .task-edit-form input, .task-edit-form select {
+    padding: 5px 10px; border: 1px solid #ddd; border-radius: 6px;
+    font-family: inherit; font-size: 0.82rem; background: white;
+  }
+  .task-edit-form input[type=text] { flex: 1; min-width: 160px; }
+  .task-edit-form input[type=date] { min-width: 130px; }
+  .task-edit-form select { min-width: 130px; }
+  .task-edit-form .form-label { font-size: 0.72rem; color: var(--grey); font-weight: 600; text-transform: uppercase; }
+  .task-edit-form .field-group { display: flex; flex-direction: column; gap: 2px; }
+  .add-task-row {
+    padding: 8px 16px; display: flex; justify-content: center;
+    border-top: 1px dashed #e0e0e0;
+  }
+  .btn-add-task {
+    background: none; border: 1px dashed var(--pink); color: var(--pink);
+    padding: 5px 16px; border-radius: 8px; cursor: pointer;
+    font-family: inherit; font-size: 0.82rem; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-add-task:hover { background: var(--light-pink); }
+  .new-task-form {
+    display: none; padding: 10px 16px; background: #FFF5F8;
+    border-top: 1px solid var(--light-pink); gap: 8px; flex-wrap: wrap; align-items: flex-end;
+  }
+  .new-task-form.open { display: flex; }
+  .new-task-form input, .new-task-form select {
+    padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px;
+    font-family: inherit; font-size: 0.85rem; background: white;
+  }
+  .new-task-form input[type=text] { flex: 2; min-width: 200px; }
+  .new-task-form select { min-width: 130px; }
+  .new-task-form input[type=date] { min-width: 130px; }
+
   @media print { .nav { display: none; } .section { display: block !important; } }
   @media (max-width: 768px) {
     .hero h1 { font-size: 1.8rem; }
@@ -1013,100 +1079,144 @@
 // ═══════════════════════════════════════
 // DONNÉES
 // ═══════════════════════════════════════
+// Couleurs par catégorie thématique
+const TASK_CAT_COLORS = {
+  "Budget":       { bg:"#E3F2FD", color:"#1565C0" },
+  "Lieu":         { bg:"#F3E5F5", color:"#7B1FA2" },
+  "Cérémonie":    { bg:"#FCE4EC", color:"#C2185B" },
+  "Prestataires": { bg:"#FFF3E0", color:"#E65100" },
+  "Invités":      { bg:"#E8F5E9", color:"#2E7D32" },
+  "Tenue":        { bg:"#FFFDE7", color:"#F57F17" },
+  "Décoration":   { bg:"#FBE9E7", color:"#BF360C" },
+  "Musique":      { bg:"#E1F5FE", color:"#0277BD" },
+  "Animation":    { bg:"#F0F4C3", color:"#558B2F" },
+  "Papeterie":    { bg:"#E0F2F1", color:"#00695C" },
+  "Logistique":   { bg:"#EFEBE9", color:"#4E342E" },
+  "Bien-être":    { bg:"#FCE4EC", color:"#AD1457" },
+  "Après":        { bg:"#E8EAF6", color:"#283593" },
+};
+
 const CHECKLIST_DATA = [
   { cat: "15+ mois avant", tasks: [
-    { t: "Définir le budget global", r: "Keziah & Briac" },
-    { t: "Choisir la date précise en juillet 2027", r: "Keziah & Briac" },
-    { t: "Visiter et confirmer le Château de Jallanges", r: "Keziah, Briac & Estelle" },
-    { t: "Signer le contrat du château", r: "Keziah & Briac" },
-    { t: "Établir la liste d'invités", r: "Keziah & Briac" },
-    { t: "Réserver le traiteur", r: "Keziah & Briac" },
-    { t: "Réserver le photographe", r: "Keziah & Briac" },
-    { t: "Réserver le vidéaste", r: "Keziah & Briac" },
-    { t: "Commencer les visites de robes", r: "Keziah & Estelle" },
-    { t: "Ouvrir la liste de mariage", r: "Keziah & Briac" },
+    { t: "Définir le budget global", r: "Keziah & Briac", c: "Budget" },
+    { t: "Choisir la date précise en juillet 2027", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Visiter et confirmer le Château de Jallanges", r: "Keziah, Briac & Estelle", c: "Lieu" },
+    { t: "Signer le contrat du château", r: "Keziah & Briac", c: "Lieu" },
+    { t: "Établir la liste d'invités préliminaire", r: "Keziah & Briac", c: "Invités" },
+    { t: "Réserver le traiteur", r: "Keziah & Briac", c: "Prestataires" },
+    { t: "Réserver le photographe", r: "Keziah & Briac", c: "Prestataires" },
+    { t: "Réserver le vidéaste", r: "Keziah & Briac", c: "Prestataires" },
+    { t: "Premiers essayages de robes de mariée", r: "Keziah & Estelle", c: "Tenue" },
+    { t: "Ouvrir la liste de mariage (cadeaux)", r: "Keziah & Briac", c: "Invités" },
+    { t: "Réfléchir au thème et style du mariage", r: "Keziah & Briac", c: "Décoration" },
   ]},
   { cat: "12 mois avant", tasks: [
-    { t: "Envoyer les Save the Date", r: "Keziah & Briac" },
-    { t: "Confirmer les témoins officiels", r: "Keziah & Briac" },
-    { t: "Contacter la mairie pour le dossier civil", r: "Keziah & Briac" },
-    { t: "Contacter le curé / pasteur et réserver l'église", r: "Keziah & Briac" },
-    { t: "S'inscrire aux réunions de préparation au mariage (église)", r: "Keziah & Briac" },
-    { t: "Réserver le DJ / groupe musical", r: "Keziah & Briac" },
-    { t: "Commander la robe de mariée", r: "Keziah" },
-    { t: "Choisir le costume du marié", r: "Briac" },
-    { t: "Bloquer des chambres pour les invités", r: "Estelle" },
-    { t: "Réserver le fleuriste", r: "Keziah & Estelle" },
-    { t: "Réserver coiffeur & maquilleur", r: "Keziah" },
+    { t: "Envoyer les Save the Date", r: "Keziah & Briac", c: "Papeterie" },
+    { t: "Confirmer les témoins officiels", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Contacter la mairie pour le dossier civil", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Contacter le curé / pasteur et réserver l'église", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "S'inscrire aux réunions de préparation au mariage (église)", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Réserver le DJ / groupe musical", r: "Keziah & Briac", c: "Musique" },
+    { t: "Commander la robe de mariée", r: "Keziah", c: "Tenue" },
+    { t: "Choisir et commander le costume du marié", r: "Briac", c: "Tenue" },
+    { t: "Bloquer des chambres pour les invités", r: "Estelle", c: "Logistique" },
+    { t: "Réserver le fleuriste", r: "Keziah & Estelle", c: "Prestataires" },
+    { t: "Réserver coiffeur & maquilleur", r: "Keziah", c: "Bien-être" },
+    { t: "Choisir les tenues des demoiselles d'honneur", r: "Keziah & Estelle", c: "Tenue" },
+    { t: "Choisir les tenues des garçons d'honneur", r: "Briac", c: "Tenue" },
+    { t: "Choisir les tenues des enfants d'honneur", r: "Keziah & Briac", c: "Tenue" },
   ]},
   { cat: "9 mois avant", tasks: [
-    { t: "Définir le style déco (Pinterest avec le château)", r: "Keziah & Estelle" },
-    { t: "Visiter Jallanges avec le fleuriste", r: "Keziah & fleuriste" },
-    { t: "Assister aux sessions de préparation au mariage à l'église", r: "Keziah & Briac" },
-    { t: "Choisir les lectures bibliques et les chants pour la messe", r: "Keziah & Briac" },
-    { t: "Commencer la planification lune de miel", r: "Keziah & Briac" },
-    { t: "Choisir le gâteau / pièce montée", r: "Keziah & Briac" },
-    { t: "Contacter les hôtels proches du Château de Jallanges pour un tarif groupe", r: "Estelle" },
-    { t: "Décider si on organise une navette de soir pour les invités (retour hôtel/gare)", r: "Keziah & Briac" },
-    { t: "Décider si on fait appel à une ou des babysitters pour le jour J", r: "Keziah & Briac" },
-    { t: "Planifier les navettes depuis Tours (arrivée au château)", r: "Estelle" },
+    { t: "Définir le style déco (Pinterest avec le château)", r: "Keziah & Estelle", c: "Décoration" },
+    { t: "Visiter Jallanges avec le fleuriste", r: "Keziah & fleuriste", c: "Décoration" },
+    { t: "Assister aux sessions de préparation au mariage à l'église", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Choisir les lectures bibliques et les chants pour la messe", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Commencer la planification lune de miel", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Choisir le gâteau / pièce montée", r: "Keziah & Briac", c: "Prestataires" },
+    { t: "Contacter les hôtels proches pour un tarif groupe", r: "Estelle", c: "Logistique" },
+    { t: "Décider si on organise une navette de soir", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Décider si on fait appel à des babysitters pour le jour J", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Planifier les navettes depuis Tours (arrivée au château)", r: "Estelle", c: "Logistique" },
+    { t: "Commander les alliances + gravures", r: "Keziah & Briac", c: "Tenue" },
+    { t: "Essayages intermédiaires de la robe de mariée", r: "Keziah", c: "Tenue" },
+    { t: "Choisir les accessoires de la mariée (chaussures, bijoux, voile)", r: "Keziah & Estelle", c: "Tenue" },
+    { t: "Planifier les animations et jeux pour les invités", r: "Estelle", c: "Animation" },
+    { t: "Acheter livre d'or et urne à cadeaux", r: "Estelle", c: "Décoration" },
   ]},
   { cat: "6 mois avant", tasks: [
-    { t: "Envoyer les faire-part officiels", r: "Keziah & Briac" },
-    { t: "Finaliser le menu avec le traiteur", r: "Keziah & Briac" },
-    { t: "Déposer le dossier civil à la mairie", r: "Keziah & Briac" },
-    { t: "Choisir les alliances", r: "Keziah & Briac" },
-    { t: "Réserver les billets de lune de miel", r: "Keziah & Briac" },
-    { t: "Démarrer le plan de table", r: "Estelle" },
-    { t: "Réserver la voiture des mariés", r: "Briac / famille" },
-    { t: "Confirmer l'accord tarif groupe avec les hôtels et communiquer aux invités", r: "Estelle" },
-    { t: "Réserver la navette de soir si décidée", r: "Estelle" },
-    { t: "Réserver la/les babysitters si décidé", r: "Estelle" },
+    { t: "Envoyer les faire-part officiels", r: "Keziah & Briac", c: "Papeterie" },
+    { t: "Finaliser le menu avec le traiteur", r: "Keziah & Briac", c: "Prestataires" },
+    { t: "Déposer le dossier civil à la mairie", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Choisir les alliances (confirmation modèle)", r: "Keziah & Briac", c: "Tenue" },
+    { t: "Réserver les billets de lune de miel", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Démarrer le plan de table", r: "Estelle", c: "Invités" },
+    { t: "Réserver la voiture des mariés", r: "Briac / famille", c: "Logistique" },
+    { t: "Confirmer l'accord tarif groupe avec les hôtels et communiquer aux invités", r: "Estelle", c: "Logistique" },
+    { t: "Réserver la navette de soir si décidée", r: "Estelle", c: "Logistique" },
+    { t: "Réserver la/les babysitters si décidé", r: "Estelle", c: "Logistique" },
+    { t: "Réserver l'hôtel pour la nuit de noces", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Commander les cadeaux invités / faveurs", r: "Keziah & Briac", c: "Invités" },
+    { t: "Prendre RDV essais coiffure et maquillage", r: "Keziah", c: "Bien-être" },
+    { t: "Planifier la playlist musicale de la soirée", r: "Keziah & Briac", c: "Musique" },
   ]},
   { cat: "3 mois avant", tasks: [
-    { t: "Confirmer TOUS les prestataires par écrit", r: "Estelle" },
-    { t: "Finaliser le plan de table", r: "Estelle" },
-    { t: "Préparer le livret de cérémonie religieuse (chants, lectures)", r: "Keziah & Estelle" },
-    { t: "Finaliser les chants et l'orgue / musique liturgique avec l'église", r: "Keziah & Briac" },
-    { t: "Organiser l'EVJF !", r: "Estelle 🎉" },
-    { t: "Écrire le discours des témoins (si tu es désignée)", r: "Estelle" },
-    { t: "Répéter le discours des témoins", r: "Témoins des mariés" },
-    { t: "Préparer le sac de survie de la mariée", r: "Estelle" },
-    { t: "Essayage final de la robe", r: "Keziah" },
-    { t: "Envoyer les infos hébergement et navettes aux invités", r: "Estelle" },
+    { t: "Confirmer TOUS les prestataires par écrit", r: "Estelle", c: "Prestataires" },
+    { t: "Finaliser le plan de table", r: "Estelle", c: "Invités" },
+    { t: "Préparer le livret de cérémonie (chants, lectures)", r: "Keziah & Estelle", c: "Cérémonie" },
+    { t: "Finaliser les chants et la musique liturgique avec l'église", r: "Keziah & Briac", c: "Cérémonie" },
+    { t: "Organiser l'EVJF !", r: "Estelle 🎉", c: "Animation" },
+    { t: "Écrire le discours des témoins", r: "Estelle", c: "Cérémonie" },
+    { t: "Répéter le discours des témoins", r: "Témoins des mariés", c: "Cérémonie" },
+    { t: "Préparer le sac de survie de la mariée", r: "Estelle", c: "Logistique" },
+    { t: "Essayage final de la robe de mariée", r: "Keziah", c: "Tenue" },
+    { t: "Dernier essayage du costume du marié", r: "Briac", c: "Tenue" },
+    { t: "Envoyer les infos hébergement et navettes aux invités", r: "Estelle", c: "Invités" },
+    { t: "Faire la liste des photos de groupe souhaitées", r: "Keziah & Briac", c: "Logistique" },
+    { t: "S'entraîner pour la chorégraphie d'ouverture du bal", r: "Keziah & Briac", c: "Musique" },
+    { t: "Réserver / préparer le photobooth", r: "Estelle", c: "Animation" },
   ]},
   { cat: "1 mois avant", tasks: [
-    { t: "Envoyer planning du jour J aux prestataires", r: "Estelle" },
-    { t: "Réunion finale avec tous les prestataires", r: "Keziah & Estelle" },
-    { t: "Confirmer le nombre d'invités au traiteur", r: "Estelle" },
-    { t: "Récupérer alliances et tenues", r: "Keziah & Briac" },
-    { t: "Vérifier validité des passeports", r: "Keziah & Briac" },
-    { t: "Confirmer le planning navette de soir avec le prestataire", r: "Estelle" },
-    { t: "Briefer la/les babysitters sur le déroulé de la journée", r: "Estelle" },
+    { t: "Envoyer planning du jour J aux prestataires", r: "Estelle", c: "Logistique" },
+    { t: "Réunion finale avec tous les prestataires", r: "Keziah & Estelle", c: "Prestataires" },
+    { t: "Confirmer le nombre d'invités au traiteur", r: "Estelle", c: "Prestataires" },
+    { t: "Récupérer les alliances", r: "Keziah & Briac", c: "Tenue" },
+    { t: "Récupérer et finaliser les tenues", r: "Keziah & Briac", c: "Tenue" },
+    { t: "Vérifier validité des passeports (lune de miel)", r: "Keziah & Briac", c: "Logistique" },
+    { t: "Confirmer le planning navette de soir", r: "Estelle", c: "Logistique" },
+    { t: "Briefer la/les babysitters sur le déroulé", r: "Estelle", c: "Logistique" },
+    { t: "Imprimer menus, plan de table, panneau de bienvenue", r: "Estelle", c: "Papeterie" },
+    { t: "Lister le programme de la soirée pour les témoins", r: "Estelle", c: "Logistique" },
   ]},
   { cat: "Semaine du mariage", tasks: [
-    { t: "Décoration du château (J-2)", r: "Estelle & équipe" },
-    { t: "Répétition de la cérémonie (J-1)", r: "Tous" },
-    { t: "Soirée détente / spa pour la mariée (J-1)", r: "Keziah & Estelle" },
-    { t: "Livraison des fleurs", r: "Fleuriste" },
-    { t: "Vérifier météo & plan B pluie", r: "Estelle" },
+    { t: "Décoration du château (J-2)", r: "Estelle & équipe", c: "Décoration" },
+    { t: "Répétition de la cérémonie (J-1)", r: "Tous", c: "Cérémonie" },
+    { t: "Soirée détente / spa pour la mariée (J-1)", r: "Keziah & Estelle", c: "Bien-être" },
+    { t: "Livraison des fleurs", r: "Fleuriste", c: "Décoration" },
+    { t: "Vérifier météo & plan B pluie", r: "Estelle", c: "Logistique" },
+    { t: "Récupérer la robe de mariée", r: "Keziah", c: "Tenue" },
+    { t: "Récupérer le costume du marié", r: "Briac", c: "Tenue" },
+    { t: "Récupérer le photobooth", r: "Estelle", c: "Animation" },
+    { t: "Faire les courses complémentaires (bougies, confettis…)", r: "Estelle", c: "Décoration" },
   ]},
   { cat: "Jour J ✨", tasks: [
-    { t: "Coiffure & maquillage (matin)", r: "Keziah & témoins" },
-    { t: "Photos préparatifs au château", r: "Photographe" },
-    { t: "Cérémonie civile à la mairie", r: "Tous" },
-    { t: "Cérémonie laïque dans les jardins du château", r: "Tous" },
-    { t: "Cocktail & photos de couple", r: "Tous" },
-    { t: "Discours des témoins", r: "Témoins des mariés" },
-    { t: "Dîner de gala", r: "Tous" },
-    { t: "Ouverture du bal & pièce montée", r: "Keziah & Briac" },
-    { t: "Soirée dansante jusqu'à l'aube !", r: "Tous" },
+    { t: "Coiffure & maquillage (matin)", r: "Keziah & témoins", c: "Bien-être" },
+    { t: "Photos préparatifs au château", r: "Photographe", c: "Logistique" },
+    { t: "Cérémonie civile à la mairie", r: "Tous", c: "Cérémonie" },
+    { t: "Cérémonie religieuse à l'église", r: "Tous", c: "Cérémonie" },
+    { t: "Cocktail & photos de couple dans les jardins", r: "Tous", c: "Logistique" },
+    { t: "Discours des témoins", r: "Témoins des mariés", c: "Cérémonie" },
+    { t: "Dîner de gala", r: "Tous", c: "Logistique" },
+    { t: "Ouverture du bal & pièce montée", r: "Keziah & Briac", c: "Musique" },
+    { t: "Lancer du bouquet de la mariée", r: "Keziah", c: "Animation" },
+    { t: "Soirée dansante jusqu'à l'aube !", r: "Tous", c: "Animation" },
   ]},
   { cat: "Après le mariage", tasks: [
-    { t: "Envoyer les remerciements aux invités", r: "Keziah & Briac" },
-    { t: "Récupérer les photos et vidéos", r: "Keziah" },
-    { t: "Changer les noms officiels si souhaité", r: "Keziah" },
-    { t: "Retourner les costumes loués", r: "Briac" },
+    { t: "Envoyer les remerciements aux invités", r: "Keziah & Briac", c: "Invités" },
+    { t: "Récupérer les photos et vidéos du photographe", r: "Keziah", c: "Logistique" },
+    { t: "Changer les noms officiels si souhaité", r: "Keziah", c: "Logistique" },
+    { t: "Retourner les costumes / tenues loués(es)", r: "Keziah & Briac", c: "Tenue" },
+    { t: "Retourner le photobooth", r: "Estelle", c: "Animation" },
+    { t: "Se reposer et profiter ! 🥂", r: "Tous", c: "Bien-être" },
   ]},
 ];
 
@@ -1150,7 +1260,14 @@ const VENDORS_DATA = [
 // ═══════════════════════════════════════
 // ÉTAT & STORAGE
 // ═══════════════════════════════════════
-let state = { checks: {}, budget: JSON.parse(JSON.stringify(BUDGET_DATA)), guests: [], budgetTotal: 30000 };
+let state = {
+  checks: {},
+  taskEdits: {},      // { "si-ti": { r, date, c } } — overrides pour tâches par défaut
+  customTasks: [],    // [ { id, phase, t, r, c, date } ] — tâches ajoutées par l'utilisateur
+  budget: JSON.parse(JSON.stringify(BUDGET_DATA)),
+  guests: [],
+  budgetTotal: 30000
+};
 
 // Sauvegarde locale (fallback) + Firebase
 function save() {
@@ -1162,9 +1279,11 @@ function load() {
   try {
     const s = localStorage.getItem('wedding_state');
     if (s) state = JSON.parse(s);
-    if (!state.guests) state.guests = [];
-    if (!state.budget) state.budget = JSON.parse(JSON.stringify(BUDGET_DATA));
-    if (!state.checks) state.checks = {};
+    if (!state.guests)      state.guests = [];
+    if (!state.budget)      state.budget = JSON.parse(JSON.stringify(BUDGET_DATA));
+    if (!state.checks)      state.checks = {};
+    if (!state.taskEdits)   state.taskEdits = {};
+    if (!state.customTasks) state.customTasks = [];
     if (!state.budgetTotal) state.budgetTotal = 30000;
   } catch(e) {}
 }
@@ -1175,6 +1294,8 @@ async function saveToFirebase() {
   try {
     const toSave = {
       checks: state.checks || {},
+      taskEdits: state.taskEdits || {},
+      customTasks: state.customTasks || [],
       budget: state.budget || [],
       budgetTotal: state.budgetTotal || 30000,
       roles: state.roles || [],
@@ -1195,6 +1316,8 @@ async function loadAllFromFirebase() {
     if (snap.exists()) {
       const d = snap.data();
       if (d.checks)           state.checks = d.checks;
+      if (d.taskEdits)        state.taskEdits = d.taskEdits;
+      if (d.customTasks)      state.customTasks = d.customTasks;
       if (d.budget)           state.budget = d.budget;
       if (d.budgetTotal)      state.budgetTotal = d.budgetTotal;
       if (d.roles)            state.roles = d.roles;
@@ -1250,44 +1373,210 @@ function updateCountdown() {
 // ═══════════════════════════════════════
 // CHECKLIST
 // ═══════════════════════════════════════
+
+// ── Helpers ──
+function taskCatBadge(c) {
+  const col = TASK_CAT_COLORS[c] || { bg: '#eee', color: '#555' };
+  return c ? `<span class="task-cat-badge" style="background:${col.bg};color:${col.color}">${c}</span>` : '';
+}
+function taskDateBadge(d) {
+  if (!d) return '';
+  const fmt = new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'2-digit' });
+  return `<span class="task-date-badge">📅 ${fmt}</span>`;
+}
+function getTaskResp(key, defaultR) {
+  return (state.taskEdits[key] && state.taskEdits[key].r !== undefined) ? state.taskEdits[key].r : defaultR;
+}
+function getTaskDate(key) { return state.taskEdits[key]?.date || ''; }
+function getTaskCat(key, defaultC) {
+  return (state.taskEdits[key] && state.taskEdits[key].c) ? state.taskEdits[key].c : (defaultC || '');
+}
+
+// ── Render ──
 function renderChecklist() {
   const container = document.getElementById('checklist-container');
+  if (!container) return;
   container.innerHTML = '';
+
   CHECKLIST_DATA.forEach((section, si) => {
-    const done = section.tasks.filter((t, ti) => state.checks[`${si}-${ti}`]).length;
-    const total = section.tasks.length;
-    const pct = total > 0 ? Math.round(done/total*100) : 0;
+    // Tâches par défaut de cette section
+    const defDone  = section.tasks.filter((_, ti) => state.checks[`${si}-${ti}`]).length;
+    const customs  = (state.customTasks || []).filter(ct => ct.phase === section.cat);
+    const custDone = customs.filter(ct => state.checks[`c-${ct.id}`]).length;
+    const total = section.tasks.length + customs.length;
+    const done  = defDone + custDone;
+    const pct   = total > 0 ? Math.round(done / total * 100) : 0;
 
     const div = document.createElement('div');
     div.className = 'check-section';
-    div.innerHTML = `
+
+    // En-tête
+    let html = `
       <div class="check-header" onclick="toggleSection(this)">
         <span>${section.cat}</span>
         <span class="badge">${done}/${total} — ${pct}%</span>
       </div>
       <div class="check-body">
-        <div class="progress-bar-wrap" style="margin:4px 8px;"><div class="progress-bar" style="width:${pct}%"></div></div>
-        ${section.tasks.map((task, ti) => {
-          const key = `${si}-${ti}`;
-          const checked = state.checks[key] || false;
-          return `<div class="check-item ${checked ? 'done' : ''}" id="ci-${key}">
-            <input type="checkbox" id="cb-${key}" ${checked ? 'checked' : ''} onchange="toggleCheck('${key}', this)">
-            <label for="cb-${key}">${task.t}</label>
-            <span class="resp">${task.r}</span>
-          </div>`;
-        }).join('')}
+        <div class="progress-bar-wrap" style="margin:4px 8px;"><div class="progress-bar" style="width:${pct}%"></div></div>`;
+
+    // Tâches par défaut
+    section.tasks.forEach((task, ti) => {
+      const key     = `${si}-${ti}`;
+      const checked = state.checks[key] || false;
+      const resp    = getTaskResp(key, task.r);
+      const date    = getTaskDate(key);
+      const cat     = getTaskCat(key, task.c);
+      const catOpts = Object.keys(TASK_CAT_COLORS).map(k => `<option${cat===k?' selected':''}>${k}</option>`).join('');
+      html += `
+        <div class="check-item ${checked ? 'done' : ''}" id="ci-${key}">
+          <input type="checkbox" id="cb-${key}" ${checked ? 'checked' : ''} onchange="toggleCheck('${key}',this)">
+          <label for="cb-${key}">${escH(task.t)}</label>
+          <div class="task-meta">
+            ${taskCatBadge(cat)}
+            ${taskDateBadge(date)}
+            <span class="task-resp" title="${escH(resp)}">${escH(resp)}</span>
+            <button class="task-edit-btn" onclick="toggleTaskForm('ef-${key}')" title="Modifier">✏️</button>
+          </div>
+        </div>
+        <div class="task-edit-form" id="ef-${key}">
+          <div class="field-group"><span class="form-label">Responsable</span>
+            <input type="text" value="${escH(resp)}" placeholder="Qui ?" onchange="saveTaskEdit('${key}','r',this.value)">
+          </div>
+          <div class="field-group"><span class="form-label">Catégorie</span>
+            <select onchange="saveTaskEdit('${key}','c',this.value)"><option value="">—</option>${catOpts}</select>
+          </div>
+          <div class="field-group"><span class="form-label">Date cible</span>
+            <input type="date" value="${date}" onchange="saveTaskEdit('${key}','date',this.value)">
+          </div>
+          <button class="btn btn-pink" style="padding:5px 14px;font-size:0.82rem" onclick="toggleTaskForm('ef-${key}')">✓ OK</button>
+        </div>`;
+    });
+
+    // Tâches custom de cette section
+    customs.forEach(ct => {
+      const key     = `c-${ct.id}`;
+      const checked = state.checks[key] || false;
+      const cat     = ct.c || '';
+      const catOpts = Object.keys(TASK_CAT_COLORS).map(k => `<option${cat===k?' selected':''}>${k}</option>`).join('');
+      html += `
+        <div class="check-item ${checked ? 'done' : ''}" id="ci-${key}" style="background:#FFF9FB">
+          <input type="checkbox" id="cb-${key}" ${checked ? 'checked' : ''} onchange="toggleCheck('${key}',this)">
+          <label for="cb-${key}">${escH(ct.t)}</label>
+          <div class="task-meta">
+            ${taskCatBadge(cat)}
+            ${taskDateBadge(ct.date)}
+            <span class="task-resp">${escH(ct.r || '')}</span>
+            <button class="task-edit-btn" onclick="toggleTaskForm('ef-${key}')" title="Modifier">✏️</button>
+            <button class="task-del-btn" onclick="deleteCustomTask('${ct.id}')" title="Supprimer">🗑️</button>
+          </div>
+        </div>
+        <div class="task-edit-form" id="ef-${key}">
+          <div class="field-group"><span class="form-label">Tâche</span>
+            <input type="text" value="${escH(ct.t)}" onchange="updateCustomTask('${ct.id}','t',this.value)">
+          </div>
+          <div class="field-group"><span class="form-label">Responsable</span>
+            <input type="text" value="${escH(ct.r||'')}" placeholder="Qui ?" onchange="updateCustomTask('${ct.id}','r',this.value)">
+          </div>
+          <div class="field-group"><span class="form-label">Catégorie</span>
+            <select onchange="updateCustomTask('${ct.id}','c',this.value)"><option value="">—</option>${catOpts}</select>
+          </div>
+          <div class="field-group"><span class="form-label">Date cible</span>
+            <input type="date" value="${ct.date||''}" onchange="updateCustomTask('${ct.id}','date',this.value)">
+          </div>
+          <button class="btn btn-pink" style="padding:5px 14px;font-size:0.82rem" onclick="toggleTaskForm('ef-${key}')">✓ OK</button>
+        </div>`;
+    });
+
+    // Ligne "+ Ajouter" + formulaire inline
+    const formId = `nf-${si}`;
+    const catOpts2 = Object.keys(TASK_CAT_COLORS).map(k => `<option>${k}</option>`).join('');
+    html += `
+        <div class="add-task-row">
+          <button class="btn-add-task" onclick="toggleTaskForm('${formId}')">+ Ajouter une tâche</button>
+        </div>
+        <div class="new-task-form" id="${formId}">
+          <div class="field-group"><span class="form-label">Tâche *</span>
+            <input type="text" id="nt-text-${si}" placeholder="Description de la tâche…">
+          </div>
+          <div class="field-group"><span class="form-label">Responsable</span>
+            <input type="text" id="nt-resp-${si}" placeholder="Qui ?">
+          </div>
+          <div class="field-group"><span class="form-label">Catégorie</span>
+            <select id="nt-cat-${si}"><option value="">—</option>${catOpts2}</select>
+          </div>
+          <div class="field-group"><span class="form-label">Date cible</span>
+            <input type="date" id="nt-date-${si}">
+          </div>
+          <button class="btn btn-pink" style="padding:6px 16px;font-size:0.85rem" onclick="addCustomTask(${si},'${section.cat}','${formId}')">✓ Ajouter</button>
+          <button class="btn btn-outline" style="padding:6px 12px;font-size:0.85rem" onclick="toggleTaskForm('${formId}')">Annuler</button>
+        </div>
       </div>`;
+
+    div.innerHTML = html;
     container.appendChild(div);
   });
+
   updateCheckProgress();
 }
 
+function escH(s) {
+  return (s == null ? '' : String(s))
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Checkbox ──
 function toggleCheck(key, cb) {
   state.checks[key] = cb.checked;
   const item = document.getElementById(`ci-${key}`);
-  item.classList.toggle('done', cb.checked);
-  save(); updateCheckProgress(); updateDashboard();
-  renderChecklist(); // re-render to update badges
+  if (item) item.classList.toggle('done', cb.checked);
+  save(); updateCheckProgress(); updateDashboard(); renderGantt();
+}
+
+// ── Toggle form ──
+function toggleTaskForm(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+}
+
+// ── Edit default task fields ──
+function saveTaskEdit(key, field, val) {
+  if (!state.taskEdits[key]) state.taskEdits[key] = {};
+  state.taskEdits[key][field] = val;
+  save();
+  renderChecklist();
+}
+
+// ── Custom tasks ──
+function addCustomTask(si, phase, formId) {
+  const text = document.getElementById(`nt-text-${si}`)?.value.trim();
+  if (!text) { alert('Veuillez saisir une description.'); return; }
+  const id   = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  const task = {
+    id,
+    phase,
+    t:    text,
+    r:    document.getElementById(`nt-resp-${si}`)?.value.trim() || '',
+    c:    document.getElementById(`nt-cat-${si}`)?.value || '',
+    date: document.getElementById(`nt-date-${si}`)?.value || '',
+  };
+  if (!state.customTasks) state.customTasks = [];
+  state.customTasks.push(task);
+  save();
+  renderChecklist();
+}
+
+function updateCustomTask(id, field, val) {
+  const ct = (state.customTasks || []).find(t => t.id === id);
+  if (ct) { ct[field] = val; save(); renderChecklist(); }
+}
+
+function deleteCustomTask(id) {
+  if (!confirm('Supprimer cette tâche ?')) return;
+  state.customTasks = (state.customTasks || []).filter(t => t.id !== id);
+  const key = `c-${id}`;
+  delete state.checks[key];
+  save(); renderChecklist();
 }
 
 function toggleSection(header) {
@@ -1296,12 +1585,15 @@ function toggleSection(header) {
 }
 
 function updateCheckProgress() {
-  const total = Object.values(CHECKLIST_DATA).reduce((a,s) => a + s.tasks.length, 0);
-  const done = Object.values(state.checks).filter(Boolean).length;
-  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  // Total = tâches par défaut + tâches custom
+  const defTotal = CHECKLIST_DATA.reduce((a,s) => a + s.tasks.length, 0);
+  const custTotal = (state.customTasks || []).length;
+  const total = defTotal + custTotal;
+  const done  = Object.values(state.checks).filter(Boolean).length;
+  const pct   = total > 0 ? Math.round(done / total * 100) : 0;
   const el = document.getElementById('check-progress-txt');
   const bar = document.getElementById('check-progress-bar');
-  if (el) el.textContent = `${done} / ${total} tâches`;
+  if (el)  el.textContent = `${done} / ${total} tâches`;
   if (bar) bar.style.width = pct + '%';
 }
 
@@ -1672,11 +1964,15 @@ function renderGantt() {
   const totalDays   = (GANTT_END - GANTT_START) / 86400000;
   const today       = new Date();
 
-  // Calcul du % fait par phase depuis la checklist
+  // Calcul du % fait par phase depuis la checklist (défaut + custom)
   const phaseDone = {};
   CHECKLIST_DATA.forEach((section, si) => {
-    const done  = section.tasks.filter((_, ti) => state.checks[`${si}-${ti}`]).length;
-    phaseDone[section.cat] = section.tasks.length > 0 ? Math.round(done / section.tasks.length * 100) : 0;
+    const defDone  = section.tasks.filter((_, ti) => state.checks[`${si}-${ti}`]).length;
+    const customs  = (state.customTasks || []).filter(ct => ct.phase === section.cat);
+    const custDone = customs.filter(ct => state.checks[`c-${ct.id}`]).length;
+    const total    = section.tasks.length + customs.length;
+    const done     = defDone + custDone;
+    phaseDone[section.cat] = total > 0 ? Math.round(done / total * 100) : 0;
   });
 
   // Mois à afficher
@@ -2177,3 +2473,4 @@ updateDashboard();
 </script>
 </body>
 </html>
+
