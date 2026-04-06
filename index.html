@@ -235,7 +235,53 @@
     .budget-row { grid-template-columns: 1fr; }
     .budget-row.header-row { display: none; }
   }
+
+  /* ── MODAL INVITÉ ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: white; border-radius: 16px; width: 100%; max-width: 700px;
+    max-height: 92vh; overflow-y: auto; padding: 28px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  }
+  .modal-title { font-size: 1.2rem; font-weight: 700; color: var(--pink); margin-bottom: 20px; border-bottom: 2px solid var(--light-pink); padding-bottom: 12px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 520px) { .modal-grid { grid-template-columns: 1fr; } }
+  .modal-field { display: flex; flex-direction: column; gap: 4px; }
+  .modal-field.full { grid-column: 1 / -1; }
+  .modal-field label { font-size: 0.74rem; font-weight: 700; color: var(--grey); text-transform: uppercase; letter-spacing: 0.4px; }
+  .modal-field input, .modal-field select, .modal-field textarea {
+    border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    font-family: inherit; font-size: 0.9rem; color: var(--dark);
+  }
+  .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
+    outline: none; border-color: var(--pink); box-shadow: 0 0 0 2px var(--light-pink);
+  }
+  .modal-field textarea { resize: vertical; min-height: 60px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+  .modal-section-label { grid-column: 1 / -1; font-size: 0.78rem; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; border-bottom: 1px solid var(--light-pink); padding-bottom: 4px; }
+
+  /* ── BADGES INVITÉS ── */
+  .badge-liste-a { background: var(--light-pink); color: var(--pink); border-radius: 10px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; }
+  .badge-liste-b { background: var(--light-blue); color: var(--blue); border-radius: 10px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; }
+
+  /* ── TOOLBAR INVITÉS ── */
+  .guest-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .guest-toolbar input, .guest-toolbar select {
+    padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px;
+    font-family: inherit; font-size: 0.85rem; background: white;
+  }
+  .guest-toolbar input { min-width: 150px; }
+  table.guest-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .guest-table th { background: var(--pink); color: white; padding: 9px 10px; text-align: left; font-size: 0.78rem; white-space: nowrap; }
+  .guest-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .guest-table tr:nth-child(even) td { background: var(--light-grey); }
+  .guest-table tr:hover td { background: var(--light-pink); }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -258,6 +304,8 @@
   <a href="#" onclick="showSection('vendors',this)">📋 Prestataires</a>
   <a href="#" onclick="showSection('daytimeline',this)">🎉 Jour J</a>
   <a href="#" onclick="showSection('venue',this)">🏰 Château</a>
+  <a href="#" onclick="showSection('gantt',this)">📊 Gantt</a>
+  <a href="#" onclick="showSection('matrix',this)">⚖️ Décisions</a>
   <a href="#" onclick="showSection('filrouge',this)">📋 Fil rouge Jour J</a>
 </nav>
 
@@ -482,39 +530,182 @@
 
 <!-- ═══ INVITÉS ═══ -->
 <div id="guests" class="section">
+
+  <!-- Stats -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+    <div class="budget-box budget-total" style="flex:1;min-width:90px;padding:10px">
+      <div class="val" id="g-total" style="font-size:1.4rem">0</div><div class="lbl">Total</div>
+    </div>
+    <div class="budget-box budget-paye" style="flex:1;min-width:90px;padding:10px">
+      <div class="val" id="g-oui" style="font-size:1.4rem;color:var(--green)">0</div><div class="lbl">Confirmés ✅</div>
+    </div>
+    <div class="budget-box" style="flex:1;min-width:90px;padding:10px;background:var(--light-yellow)">
+      <div class="val" id="g-att" style="font-size:1.4rem;color:var(--yellow)">0</div><div class="lbl">En attente ⏳</div>
+    </div>
+    <div class="budget-box budget-reste" style="flex:1;min-width:90px;padding:10px">
+      <div class="val" id="g-non" style="font-size:1.4rem;color:var(--red)">0</div><div class="lbl">Déclinés ❌</div>
+    </div>
+    <div class="budget-box" style="flex:1;min-width:90px;padding:10px;background:var(--light-pink)">
+      <div class="val" id="g-adultes" style="font-size:1.4rem;color:var(--pink)">0</div><div class="lbl">Adultes</div>
+    </div>
+    <div class="budget-box" style="flex:1;min-width:90px;padding:10px;background:#F3E5F5">
+      <div class="val" id="g-enfants" style="font-size:1.4rem;color:#7B1FA2">0</div><div class="lbl">Enfants</div>
+    </div>
+    <div class="budget-box" style="flex:1;min-width:90px;padding:10px;background:#FCE4EC">
+      <div class="val" id="g-listea" style="font-size:1.4rem;color:var(--pink)">0</div><div class="lbl">Liste A 💗</div>
+    </div>
+    <div class="budget-box" style="flex:1;min-width:90px;padding:10px;background:var(--light-blue)">
+      <div class="val" id="g-listeb" style="font-size:1.4rem;color:var(--blue)">0</div><div class="lbl">Liste B 💙</div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">👥 Liste des invités
       <span style="margin-left:auto;font-size:0.85rem;font-weight:400;color:var(--grey)" id="guest-count-display">0 invité(s)</span>
     </div>
 
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-      <div class="budget-box budget-total" style="flex:1;min-width:120px;padding:12px">
-        <div class="val" id="g-total" style="font-size:1.5rem">0</div><div class="lbl">Total</div>
-      </div>
-      <div class="budget-box budget-paye" style="flex:1;min-width:120px;padding:12px">
-        <div class="val" id="g-oui" style="font-size:1.5rem;color:var(--green)">0</div><div class="lbl">Confirmés ✅</div>
-      </div>
-      <div class="budget-box" style="flex:1;min-width:120px;padding:12px;background:var(--light-yellow)">
-        <div class="val" id="g-att" style="font-size:1.5rem;color:var(--yellow)">0</div><div class="lbl">En attente ⏳</div>
-      </div>
-      <div class="budget-box budget-reste" style="flex:1;min-width:120px;padding:12px">
-        <div class="val" id="g-non" style="font-size:1.5rem;color:var(--red)">0</div><div class="lbl">Déclinés ❌</div>
-      </div>
-    </div>
-
+    <!-- Toolbar : recherche + filtres + actions -->
     <div class="guest-toolbar">
-      <input type="text" id="guest-search" placeholder="🔍 Rechercher un invité…" oninput="filterGuests()">
-      <button class="btn btn-pink" onclick="addGuest()">+ Ajouter un invité</button>
-      <button class="btn btn-outline" onclick="exportGuests()">📥 Exporter CSV</button>
+      <input type="text" id="guest-search" placeholder="🔍 Rechercher…" oninput="renderGuests()">
+      <select id="f-liste" onchange="renderGuests()">
+        <option value="">Toutes les listes</option>
+        <option value="A">Liste A 💗</option>
+        <option value="B">Liste B 💙</option>
+      </select>
+      <select id="f-rsvp" onchange="renderGuests()">
+        <option value="">Tous les RSVP</option>
+        <option value="✅ Confirmé">✅ Confirmés</option>
+        <option value="⏳ En attente">⏳ En attente</option>
+        <option value="❌ Décliné">❌ Déclinés</option>
+      </select>
+      <select id="f-cat" onchange="renderGuests()">
+        <option value="">Toutes catégories</option>
+        <option>Famille mariée</option><option>Famille marié</option>
+        <option>Amis communs</option><option>Amis mariée</option><option>Amis marié</option>
+        <option>Collègues</option><option>Autres</option>
+      </select>
+      <button class="btn btn-pink" onclick="openGuestModal(-1)">+ Ajouter</button>
+      <button class="btn btn-outline" onclick="exportGuestsExcel()">📥 Export Excel</button>
+      <label class="btn btn-outline" style="cursor:pointer;margin:0">
+        📤 Import Excel
+        <input type="file" id="import-file" accept=".xlsx" onchange="importGuestsExcel(this)" style="display:none">
+      </label>
     </div>
 
+    <!-- Tableau -->
     <div style="overflow-x:auto;">
       <table class="guest-table" id="guest-table">
         <thead><tr>
-          <th>N°</th><th>Prénom & Nom</th><th>Lien</th><th>Email</th><th>Liste</th><th>Réponse</th><th>Régime</th><th>Notes</th><th>Action</th>
+          <th>N°</th>
+          <th>Prénom Nom</th>
+          <th>Catégorie</th>
+          <th>Liste</th>
+          <th>Type invitation</th>
+          <th>RSVP</th>
+          <th>Ad./Enf.</th>
+          <th>Nb/foyer</th>
+          <th>Régime</th>
+          <th>Hébergement</th>
+          <th>Table</th>
+          <th>Actions</th>
         </tr></thead>
         <tbody id="guest-tbody"></tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ÉDITION INVITÉ -->
+<div class="modal-overlay hidden" id="guest-modal" onclick="if(event.target===this)closeGuestModal()">
+  <div class="modal-box">
+    <div class="modal-title">✏️ <span id="modal-title-text">Ajouter un invité</span></div>
+    <input type="hidden" id="modal-guest-idx" value="-1">
+    <div class="modal-grid">
+
+      <div class="modal-section-label">👤 Identité</div>
+      <div class="modal-field"><label>Prénom</label><input id="m-prenom" placeholder="Prénom"></div>
+      <div class="modal-field"><label>Nom</label><input id="m-nom" placeholder="Nom de famille"></div>
+      <div class="modal-field"><label>Catégorie</label>
+        <select id="m-cat">
+          <option value="">— Sélectionner —</option>
+          <option>Famille mariée</option><option>Famille marié</option>
+          <option>Amis communs</option><option>Amis mariée</option><option>Amis marié</option>
+          <option>Collègues</option><option>Autres</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Liste priorité</label>
+        <select id="m-liste">
+          <option value="A">A — Famille proche / indispensables 💗</option>
+          <option value="B">B — Collègues / connaissances 💙</option>
+        </select>
+      </div>
+
+      <div class="modal-section-label">💌 Invitation & RSVP</div>
+      <div class="modal-field"><label>Type invitation</label>
+        <select id="m-type-inv">
+          <option>Journée complète</option>
+          <option>Messe &amp; réception</option>
+          <option>Vin d'honneur &amp; dîner</option>
+          <option>Vin d'honneur seul</option>
+          <option>Mairie seule</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>RSVP</label>
+        <select id="m-rsvp">
+          <option>⏳ En attente</option>
+          <option>✅ Confirmé</option>
+          <option>❌ Décliné</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Adulte / Enfant</label>
+        <select id="m-ae"><option>Adulte</option><option>Enfant</option></select>
+      </div>
+      <div class="modal-field"><label>Nb personnes / foyer</label>
+        <input type="number" id="m-nb" min="1" value="1">
+      </div>
+
+      <div class="modal-section-label">🍽️ Logistique</div>
+      <div class="modal-field"><label>Régime alimentaire</label>
+        <select id="m-regime">
+          <option value="">Aucun</option>
+          <option>Végétarien</option><option>Vegan</option>
+          <option>Sans gluten</option><option>Halal</option>
+          <option>Allergie noix</option><option>Autre</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Hébergement</label>
+        <select id="m-heberg">
+          <option value="">À confirmer</option>
+          <option>Oui - château</option><option>Oui - hôtel</option>
+          <option>Non</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Table affectée</label>
+        <input id="m-table" placeholder="ex : Table 3">
+      </div>
+      <div class="modal-field"><label>Centres d'intérêts</label>
+        <input id="m-interets" placeholder="Musique, Voyage, Sport…">
+      </div>
+
+      <div class="modal-section-label">📬 Coordonnées</div>
+      <div class="modal-field"><label>Email</label>
+        <input type="email" id="m-email" placeholder="adresse@email.com">
+      </div>
+      <div class="modal-field"><label>Téléphone</label>
+        <input id="m-tel" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="modal-field full"><label>Adresse postale</label>
+        <input id="m-adresse" placeholder="Numéro, rue, code postal, ville">
+      </div>
+
+      <div class="modal-section-label">📝 Notes</div>
+      <div class="modal-field full">
+        <textarea id="m-notes" placeholder="Notes libres…"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeGuestModal()">Annuler</button>
+      <button class="btn btn-pink" onclick="saveGuestFromModal()">💾 Enregistrer</button>
     </div>
   </div>
 </div>
@@ -699,6 +890,60 @@
 
 </div><!-- /container -->
 
+<!-- ═══ GANTT ═══ -->
+<div id="gantt" class="section">
+  <div class="card">
+    <div class="card-title">📊 Planning Gantt — Avril 2026 → Juillet 2027
+      <span style="margin-left:auto;font-size:0.82rem;font-weight:400;color:var(--grey)">Généré depuis le rétroplanning · statut suivi automatiquement</span>
+    </div>
+    <div style="overflow-x:auto" id="gantt-container"></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;font-size:0.82rem">
+      <span><span style="display:inline-block;width:14px;height:14px;background:var(--green);border-radius:3px;vertical-align:middle;margin-right:5px"></span>Phase terminée (&gt;80%)</span>
+      <span><span style="display:inline-block;width:14px;height:14px;background:var(--pink);border-radius:3px;vertical-align:middle;margin-right:5px"></span>Phase en cours (1-79%)</span>
+      <span><span style="display:inline-block;width:14px;height:14px;background:var(--light-grey);border-radius:3px;border:1px solid #ddd;vertical-align:middle;margin-right:5px"></span>Phase à venir (0%)</span>
+      <span><span style="display:inline-block;width:14px;height:14px;background:#FFD700;border-radius:3px;vertical-align:middle;margin-right:5px"></span>Aujourd'hui</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MATRICE DE DÉCISION ═══ -->
+<div id="matrix" class="section">
+  <div class="card">
+    <div class="card-title">⚖️ Matrice de décision — Prestataires
+      <span style="margin-left:auto;font-size:0.82rem;font-weight:400;color:var(--grey)">Évaluez chaque candidat sur 5 critères pondérés</span>
+    </div>
+    <div class="tip-box" style="margin-bottom:20px">
+      💡 <strong>Comment ça marche :</strong> Pour chaque catégorie de prestataire, ajoutez les candidats et notez-les de 1 à 5 sur chaque critère. Le score final pondéré vous aide à prendre une décision rationnelle, loin du coup de cœur seul.
+    </div>
+
+    <!-- Sélecteur de catégorie -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
+      <label style="font-weight:700;color:var(--dark)">Catégorie :</label>
+      <select id="matrix-cat-select" onchange="renderMatrix()"
+        style="padding:8px 14px;border:2px solid var(--pink);border-radius:8px;font-family:inherit;font-size:0.9rem;color:var(--dark);cursor:pointer">
+      </select>
+      <button class="btn btn-pink" onclick="addMatrixCandidate()">+ Ajouter un candidat</button>
+    </div>
+
+    <!-- Poids des critères -->
+    <div style="background:var(--light-grey);border-radius:10px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;color:var(--dark);margin-bottom:12px;font-size:0.9rem">⚙️ Poids des critères (total = 100%)</div>
+      <div id="weights-container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px"></div>
+    </div>
+
+    <!-- Tableau de notation -->
+    <div style="overflow-x:auto">
+      <table id="matrix-table" style="width:100%;border-collapse:collapse;font-size:0.87rem">
+        <thead id="matrix-thead"></thead>
+        <tbody id="matrix-tbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;font-size:0.82rem;color:var(--grey);font-style:italic">
+      ★ Score = moyenne pondérée des notes (1–5) × poids de chaque critère. Le candidat avec le score le plus élevé est recommandé.
+    </div>
+  </div>
+</div>
+
 <!-- ═══ FIL ROUGE JOUR J ═══ -->
 <div id="filrouge" class="section">
 
@@ -790,7 +1035,10 @@ const CHECKLIST_DATA = [
     { t: "Choisir les lectures bibliques et les chants pour la messe", r: "Keziah & Briac" },
     { t: "Commencer la planification lune de miel", r: "Keziah & Briac" },
     { t: "Choisir le gâteau / pièce montée", r: "Keziah & Briac" },
-    { t: "Planifier les navettes depuis Tours", r: "Estelle" },
+    { t: "Contacter les hôtels proches du Château de Jallanges pour un tarif groupe", r: "Estelle" },
+    { t: "Décider si on organise une navette de soir pour les invités (retour hôtel/gare)", r: "Keziah & Briac" },
+    { t: "Décider si on fait appel à une ou des babysitters pour le jour J", r: "Keziah & Briac" },
+    { t: "Planifier les navettes depuis Tours (arrivée au château)", r: "Estelle" },
   ]},
   { cat: "6 mois avant", tasks: [
     { t: "Envoyer les faire-part officiels", r: "Keziah & Briac" },
@@ -800,6 +1048,9 @@ const CHECKLIST_DATA = [
     { t: "Réserver les billets de lune de miel", r: "Keziah & Briac" },
     { t: "Démarrer le plan de table", r: "Estelle" },
     { t: "Réserver la voiture des mariés", r: "Briac / famille" },
+    { t: "Confirmer l'accord tarif groupe avec les hôtels et communiquer aux invités", r: "Estelle" },
+    { t: "Réserver la navette de soir si décidée", r: "Estelle" },
+    { t: "Réserver la/les babysitters si décidé", r: "Estelle" },
   ]},
   { cat: "3 mois avant", tasks: [
     { t: "Confirmer TOUS les prestataires par écrit", r: "Estelle" },
@@ -811,6 +1062,7 @@ const CHECKLIST_DATA = [
     { t: "Répéter le discours des témoins", r: "Témoins des mariés" },
     { t: "Préparer le sac de survie de la mariée", r: "Estelle" },
     { t: "Essayage final de la robe", r: "Keziah" },
+    { t: "Envoyer les infos hébergement et navettes aux invités", r: "Estelle" },
   ]},
   { cat: "1 mois avant", tasks: [
     { t: "Envoyer planning du jour J aux prestataires", r: "Estelle" },
@@ -818,6 +1070,8 @@ const CHECKLIST_DATA = [
     { t: "Confirmer le nombre d'invités au traiteur", r: "Estelle" },
     { t: "Récupérer alliances et tenues", r: "Keziah & Briac" },
     { t: "Vérifier validité des passeports", r: "Keziah & Briac" },
+    { t: "Confirmer le planning navette de soir avec le prestataire", r: "Estelle" },
+    { t: "Briefer la/les babysitters sur le déroulé de la journée", r: "Estelle" },
   ]},
   { cat: "Semaine du mariage", tasks: [
     { t: "Décoration du château (J-2)", r: "Estelle & équipe" },
@@ -915,6 +1169,7 @@ async function saveToFirebase() {
       roles: state.roles || [],
       filrougeRows: state.filrougeRows || [],
       urgenceContacts: state.urgenceContacts || [],
+      matrix: state.matrix || {},
     };
     Object.keys(state).filter(k => k.startsWith('vendor_')).forEach(k => { toSave[k] = state[k]; });
     await window.fbSetDoc(window.fbDoc(window.db, 'wedding', 'keziah-briac'), toSave, { merge: true });
@@ -934,6 +1189,7 @@ async function loadAllFromFirebase() {
       if (d.roles)            state.roles = d.roles;
       if (d.filrougeRows)     state.filrougeRows = d.filrougeRows;
       if (d.urgenceContacts)  state.urgenceContacts = d.urgenceContacts;
+      if (d.matrix)           state.matrix = d.matrix;
       Object.keys(d).filter(k => k.startsWith('vendor_')).forEach(k => { state[k] = d[k]; });
     }
   } catch(e) { console.warn('Firebase load error:', e); }
@@ -943,6 +1199,8 @@ async function loadAllFromFirebase() {
   renderChecklist();
   renderBudget();
   renderVendors();
+  renderGantt();
+  renderMatrix();
   renderRoles();
   renderFilRouge();
   renderUrgence();
@@ -1092,165 +1350,241 @@ function fmtEur(n) {
 }
 
 // ═══════════════════════════════════════
-// INVITÉS
+// INVITÉS — schéma complet
 // ═══════════════════════════════════════
 const GUESTS_COLLECTION_PATH = "wedding/keziah-briac/guests";
 
+const GUEST_DEFAULTS = {
+  prenom: "", nom: "", categorie: "", liste: "A",
+  adresse: "", email: "", tel: "",
+  type_invitation: "Journée complète",
+  rsvp: "⏳ En attente",
+  adulte_enfant: "Adulte", nb_foyer: 1,
+  regime: "", hebergement: "", table: "",
+  interets: "", notes: ""
+};
+
+// ── Firebase : chargement ──
 async function loadGuestsFromFirebase() {
   if (!window.db) return;
-
   try {
-    const snapshot = await window.fbGetDocs(
-      window.fbCollection(window.db, GUESTS_COLLECTION_PATH)
-    );
-
-    state.guests = snapshot.docs.map((docSnap) => ({
-      id: docSnap.id,
-      ...docSnap.data()
-    }));
-
+    const snapshot = await window.fbGetDocs(window.fbCollection(window.db, GUESTS_COLLECTION_PATH));
+    state.guests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     renderGuests();
-  } catch (error) {
-    console.error("Erreur chargement invités Firebase :", error);
-  }
+  } catch (e) { console.error("Erreur chargement invités :", e); }
 }
 
-async function addGuestToFirebase(guest) {
+// ── Firebase : sauvegarde (add ou update) ──
+async function saveGuestToFirebase(guest) {
   if (!window.db) return null;
-
+  const data = { ...GUEST_DEFAULTS, ...guest };
+  delete data.id;
+  data.updatedAt = window.fbServerTimestamp();
   try {
-    const docRef = await window.fbAddDoc(
-      window.fbCollection(window.db, GUESTS_COLLECTION_PATH),
-      {
-        name: guest.name || "",
-        link: guest.link || "",
-        email: guest.email || "",
-        liste: guest.liste || "A",
-        rep: guest.rep || "⏳ En attente",
-        regime: guest.regime || "",
-        notes: guest.notes || "",
-        createdAt: window.fbServerTimestamp()
-      }
-    );
-
-    return docRef.id;
-  } catch (error) {
-    console.error("Erreur ajout invité Firebase :", error);
-    return null;
-  }
+    if (guest.id) {
+      await window.fbSetDoc(window.fbDoc(window.db, GUESTS_COLLECTION_PATH, guest.id), data, { merge: true });
+      return guest.id;
+    } else {
+      data.createdAt = window.fbServerTimestamp();
+      const ref = await window.fbAddDoc(window.fbCollection(window.db, GUESTS_COLLECTION_PATH), data);
+      return ref.id;
+    }
+  } catch (e) { console.error("Erreur sauvegarde invité :", e); return null; }
 }
 
-async function updateGuestInFirebase(i, field, val) {
-  if (!window.db) return;
-  const guest = state.guests[i];
-  if (!guest || !guest.id) return;
-
+// ── Firebase : suppression ──
+async function deleteGuestFromFirebase(id) {
+  if (!window.db || !id) return;
   try {
-    await window.fbUpdateDoc(
-      window.fbDoc(window.db, GUESTS_COLLECTION_PATH, guest.id),
-      { [field]: val }
-    );
-  } catch (error) {
-    console.error("Erreur mise à jour invité Firebase :", error);
-  }
+    await window.fbDeleteDoc(window.fbDoc(window.db, GUESTS_COLLECTION_PATH, id));
+  } catch (e) { console.error("Erreur suppression invité :", e); }
 }
 
-async function removeGuestFromFirebase(i) {
-  if (!window.db) return;
-  const guest = state.guests[i];
-  if (!guest || !guest.id) return;
-
-  try {
-    await window.fbDeleteDoc(
-      window.fbDoc(window.db, GUESTS_COLLECTION_PATH, guest.id)
-    );
-  } catch (error) {
-    console.error("Erreur suppression invité Firebase :", error);
-  }
+// ── Helpers ──
+function escHtml(s) {
+  return (s == null ? '' : String(s))
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+function guestFullName(g) {
+  return [g.prenom, g.nom].filter(Boolean).join(' ') || g.name || '—';
+}
+
+// ── Rendu tableau ──
 function renderGuests() {
   const tbody = document.getElementById('guest-tbody');
-  const q = (document.getElementById('guest-search')?.value || '').toLowerCase();
+  if (!tbody) return;
+  const q    = (document.getElementById('guest-search')?.value || '').toLowerCase();
+  const fL   = document.getElementById('f-liste')?.value || '';
+  const fR   = document.getElementById('f-rsvp')?.value || '';
+  const fC   = document.getElementById('f-cat')?.value || '';
+
   tbody.innerHTML = '';
-  state.guests.filter(g => !q || g.name.toLowerCase().includes(q) || (g.link||'').toLowerCase().includes(q))
-    .forEach((g, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${i+1}</td>
-        <td><input value="${g.name||''}" onchange="updateGuest(${i},'name',this.value)" style="font-weight:600"></td>
-        <td><input value="${g.link||''}" onchange="updateGuest(${i},'link',this.value)"></td>
-        <td><input value="${g.email||''}" onchange="updateGuest(${i},'email',this.value)"></td>
-        <td><select onchange="updateGuest(${i},'liste',this.value)">
-          <option ${g.liste==='A'?'selected':''}>A</option>
-          <option ${g.liste==='B'?'selected':''}>B</option>
-          <option ${g.liste==='C'?'selected':''}>C</option>
-        </select></td>
-        <td><select onchange="updateGuest(${i},'rep',this.value)">
-          <option ${g.rep==='⏳ En attente'?'selected':''}>⏳ En attente</option>
-          <option ${g.rep==='✅ Oui'?'selected':''}>✅ Oui</option>
-          <option ${g.rep==='❌ Non'?'selected':''}>❌ Non</option>
-        </select></td>
-        <td><input value="${g.regime||''}" placeholder="végétarien…" onchange="updateGuest(${i},'regime',this.value)"></td>
-        <td><input value="${g.notes||''}" onchange="updateGuest(${i},'notes',this.value)"></td>
-        <td><button onclick="removeGuest(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem;">🗑️</button></td>`;
-      tbody.appendChild(tr);
-    });
+  let n = 0;
+  state.guests.forEach((g, idx) => {
+    if (fL && (g.liste || 'A') !== fL) return;
+    if (fR && (g.rsvp || '⏳ En attente') !== fR) return;
+    if (fC && (g.categorie || '') !== fC) return;
+    const name = guestFullName(g).toLowerCase();
+    if (q && !name.includes(q) && !(g.email||'').toLowerCase().includes(q)) return;
+    n++;
+    const rsvpColor = (g.rsvp === '✅ Confirmé') ? 'var(--green)'
+                    : (g.rsvp === '❌ Décliné')  ? 'var(--red)'
+                    : 'var(--orange)';
+    const lBadge = (g.liste || 'A') === 'A'
+      ? '<span class="badge-liste-a">A</span>'
+      : '<span class="badge-liste-b">B</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${n}</td>
+      <td style="font-weight:600;white-space:nowrap">${escHtml(guestFullName(g))}</td>
+      <td style="font-size:0.8rem">${escHtml(g.categorie||'')}</td>
+      <td>${lBadge}</td>
+      <td style="font-size:0.8rem">${escHtml(g.type_invitation||'')}</td>
+      <td style="white-space:nowrap"><span style="color:${rsvpColor};font-weight:600;font-size:0.82rem">${escHtml(g.rsvp||'⏳ En attente')}</span></td>
+      <td style="font-size:0.8rem">${escHtml(g.adulte_enfant||'Adulte')}</td>
+      <td style="text-align:center">${g.nb_foyer||1}</td>
+      <td style="font-size:0.8rem">${escHtml(g.regime||'')}</td>
+      <td style="font-size:0.8rem">${escHtml(g.hebergement||'')}</td>
+      <td style="font-size:0.8rem">${escHtml(g.table||'')}</td>
+      <td style="white-space:nowrap">
+        <button onclick="openGuestModal(${idx})" title="Modifier" style="background:none;border:none;cursor:pointer;font-size:1rem;padding:2px 4px">✏️</button>
+        <button onclick="removeGuest(${idx})" title="Supprimer" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;padding:2px 4px">🗑️</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
   updateGuestStats();
-}
-
-async function addGuest() {
-  const newGuest = {
-    name: "Nouveau / Nouvelle",
-    link: "",
-    email: "",
-    liste: "A",
-    rep: "⏳ En attente",
-    regime: "",
-    notes: ""
-  };
-
-  const newId = await addGuestToFirebase(newGuest);
-
-  if (newId) {
-    await loadGuestsFromFirebase();
-  }
-}
-async function removeGuest(i) {
-  if (confirm("Supprimer cet invité ?")) {
-    await removeGuestFromFirebase(i);
-    await loadGuestsFromFirebase();
-  }
-}
-
-async function updateGuest(i, field, val) {
-  state.guests[i][field] = val;
-  save();
-  updateGuestStats();
-  await updateGuestInFirebase(i, field, val);
 }
 
 function filterGuests() { renderGuests(); }
 
 function updateGuestStats() {
-  const total = state.guests.length;
-  const oui = state.guests.filter(g => g.rep === '✅ Oui').length;
-  const non = state.guests.filter(g => g.rep === '❌ Non').length;
-  const att = state.guests.filter(g => g.rep === '⏳ En attente').length;
-  document.getElementById('g-total').textContent = total;
-  document.getElementById('g-oui').textContent = oui;
-  document.getElementById('g-non').textContent = non;
-  document.getElementById('g-att').textContent = att;
-  document.getElementById('guest-count-display').textContent = `${total} invité(s)`;
-  document.getElementById('stat-guests').textContent = total;
+  const gs = state.guests;
+  const total   = gs.length;
+  const oui     = gs.filter(g => g.rsvp === '✅ Confirmé').length;
+  const non     = gs.filter(g => g.rsvp === '❌ Décliné').length;
+  const att     = gs.filter(g => (g.rsvp || '⏳ En attente') === '⏳ En attente').length;
+  const adultes = gs.filter(g => (g.adulte_enfant || 'Adulte') !== 'Enfant').length;
+  const enfants = gs.filter(g => g.adulte_enfant === 'Enfant').length;
+  const listea  = gs.filter(g => (g.liste || 'A') === 'A').length;
+  const listeb  = gs.filter(g => g.liste === 'B').length;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('g-total', total);   set('g-oui', oui);   set('g-non', non); set('g-att', att);
+  set('g-adultes', adultes); set('g-enfants', enfants);
+  set('g-listea', listea); set('g-listeb', listeb);
+  set('guest-count-display', `${total} invité(s)`);
+  set('stat-guests', total);
 }
 
-function exportGuests() {
-  const header = ['Nom','Lien','Email','Liste','Réponse','Régime','Notes'];
-  const rows = state.guests.map(g => [g.name,g.link,g.email,g.liste,g.rep,g.regime,g.notes].map(v => `"${(v||'').replace(/"/g,'""')}"`));
-  const csv = [header, ...rows].map(r => r.join(';')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'invites_mariage_keziah_briac.csv'; a.click();
+// ── Modal ──
+function openGuestModal(idx) {
+  document.getElementById('modal-guest-idx').value = idx;
+  document.getElementById('modal-title-text').textContent = idx >= 0 ? 'Modifier un invité' : 'Ajouter un invité';
+  const g = (idx >= 0 && state.guests[idx]) ? state.guests[idx] : GUEST_DEFAULTS;
+  const sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = (val == null ? '' : val); };
+  sv('m-prenom', g.prenom);       sv('m-nom', g.nom);
+  sv('m-cat', g.categorie);       sv('m-liste', g.liste || 'A');
+  sv('m-type-inv', g.type_invitation || 'Journée complète');
+  sv('m-rsvp', g.rsvp || '⏳ En attente');
+  sv('m-ae', g.adulte_enfant || 'Adulte');
+  sv('m-nb', g.nb_foyer || 1);
+  sv('m-regime', g.regime || '');
+  sv('m-heberg', g.hebergement || '');
+  sv('m-table', g.table);         sv('m-email', g.email);
+  sv('m-adresse', g.adresse);     sv('m-tel', g.tel);
+  sv('m-interets', g.interets);   sv('m-notes', g.notes);
+  document.getElementById('guest-modal').classList.remove('hidden');
+}
+
+function closeGuestModal() {
+  document.getElementById('guest-modal').classList.add('hidden');
+}
+
+async function saveGuestFromModal() {
+  const idx = parseInt(document.getElementById('modal-guest-idx').value);
+  const gv  = id => document.getElementById(id)?.value ?? '';
+  const updated = {
+    prenom: gv('m-prenom'),         nom: gv('m-nom'),
+    categorie: gv('m-cat'),         liste: gv('m-liste'),
+    type_invitation: gv('m-type-inv'),
+    rsvp: gv('m-rsvp'),
+    adulte_enfant: gv('m-ae'),      nb_foyer: parseInt(gv('m-nb')) || 1,
+    regime: gv('m-regime'),         hebergement: gv('m-heberg'),
+    table: gv('m-table'),           email: gv('m-email'),
+    adresse: gv('m-adresse'),       tel: gv('m-tel'),
+    interets: gv('m-interets'),     notes: gv('m-notes')
+  };
+  if (idx >= 0 && state.guests[idx]) {
+    const guest = { ...state.guests[idx], ...updated };
+    const id = await saveGuestToFirebase(guest);
+    if (id) state.guests[idx] = { ...guest, id };
+  } else {
+    const id = await saveGuestToFirebase(updated);
+    if (id) state.guests.push({ ...updated, id });
+  }
+  closeGuestModal();
+  renderGuests();
+}
+
+async function removeGuest(idx) {
+  if (!confirm('Supprimer cet invité ?')) return;
+  const guest = state.guests[idx];
+  if (guest?.id) await deleteGuestFromFirebase(guest.id);
+  state.guests.splice(idx, 1);
+  renderGuests();
+}
+
+// ── Export Excel ──
+function exportGuestsExcel() {
+  if (!window.XLSX) { alert('Bibliothèque Excel non chargée, réessayez dans quelques secondes.'); return; }
+  const COLS    = ['prenom','nom','categorie','liste','type_invitation','rsvp',
+                   'adulte_enfant','nb_foyer','regime','hebergement','table',
+                   'email','adresse','tel','interets','notes'];
+  const HEADERS = ['Prénom','Nom','Catégorie','Liste (A/B)','Type invitation','RSVP',
+                   'Adulte/Enfant','Nb foyer','Régime','Hébergement','Table',
+                   'Email','Adresse','Téléphone',"Centres d'intérêts",'Notes'];
+  const WIDTHS  = [12,14,18,8,22,14,12,8,14,14,8,24,30,14,20,22];
+  const rows = [HEADERS, ...state.guests.map(g => COLS.map(c => g[c] ?? ''))];
+  const ws = window.XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = WIDTHS.map(w => ({ wch: w }));
+  const wb = window.XLSX.utils.book_new();
+  window.XLSX.utils.book_append_sheet(wb, ws, 'Invités');
+  window.XLSX.writeFile(wb, 'invites_mariage_keziah_briac.xlsx');
+}
+
+// ── Import Excel ──
+async function importGuestsExcel(input) {
+  if (!input.files?.length) return;
+  if (!window.XLSX) { alert('Bibliothèque Excel non chargée.'); return; }
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const wb   = window.XLSX.read(e.target.result, { type: 'array' });
+    const ws   = wb.Sheets[wb.SheetNames[0]];
+    const rows = window.XLSX.utils.sheet_to_json(ws, { defval: '' });
+    const MAP  = {
+      'Prénom':'prenom','Nom':'nom','Catégorie':'categorie',
+      'Liste (A/B)':'liste','Type invitation':'type_invitation',
+      'RSVP':'rsvp','Adulte/Enfant':'adulte_enfant','Nb foyer':'nb_foyer',
+      'Régime':'regime','Hébergement':'hebergement','Table':'table',
+      'Email':'email','Adresse':'adresse','Téléphone':'tel',
+      "Centres d'intérêts":'interets','Notes':'notes'
+    };
+    let added = 0;
+    for (const row of rows) {
+      const g = { ...GUEST_DEFAULTS };
+      for (const [xk, jk] of Object.entries(MAP)) {
+        if (row[xk] !== undefined && row[xk] !== '') g[jk] = row[xk];
+      }
+      if (!g.prenom && !g.nom) continue;
+      const id = await saveGuestToFirebase(g);
+      if (id) { state.guests.push({ ...g, id }); added++; }
+    }
+    renderGuests();
+    alert(`✅ ${added} invité(s) importé(s) avec succès !`);
+  };
+  reader.readAsArrayBuffer(file);
+  input.value = '';
 }
 
 // ═══════════════════════════════════════
@@ -1302,6 +1636,271 @@ function updateDashboard() {
   if (el2) el2.textContent = total - done;
   if (bar) bar.style.width = pct + '%';
   if (pctEl) pctEl.textContent = pct + '%';
+}
+
+// ═══════════════════════════════════════
+// GANTT
+// ═══════════════════════════════════════
+const GANTT_PHASES = [
+  { label: "15+ mois avant",  cat: "15+ mois avant",  start: "2026-04-06", end: "2026-06-30", color: "var(--pink)" },
+  { label: "12 mois avant",   cat: "12 mois avant",   start: "2026-07-01", end: "2026-12-31", color: "#E91E8C" },
+  { label: "9 mois avant",    cat: "9 mois avant",    start: "2026-10-01", end: "2027-01-31", color: "#AD1457" },
+  { label: "6 mois avant",    cat: "6 mois avant",    start: "2027-01-01", end: "2027-03-31", color: "#880E4F" },
+  { label: "3 mois avant",    cat: "3 mois avant",    start: "2027-04-01", end: "2027-06-09", color: "#6A1B9A" },
+  { label: "1 mois avant",    cat: "1 mois avant",    start: "2027-06-10", end: "2027-07-02", color: "#4527A0" },
+  { label: "Semaine du mariage", cat: "Semaine du mariage", start: "2027-07-03", end: "2027-07-10", color: "#1565C0" },
+  { label: "Jour J ✨",       cat: "Jour J ✨",        start: "2027-07-10", end: "2027-07-10", color: "#FFD700" },
+];
+
+function renderGantt() {
+  const container = document.getElementById('gantt-container');
+  if (!container) return;
+
+  const GANTT_START = new Date('2026-04-01');
+  const GANTT_END   = new Date('2027-08-01');
+  const totalDays   = (GANTT_END - GANTT_START) / 86400000;
+  const today       = new Date();
+
+  // Calcul du % fait par phase depuis la checklist
+  const phaseDone = {};
+  CHECKLIST_DATA.forEach((section, si) => {
+    const done  = section.tasks.filter((_, ti) => state.checks[`${si}-${ti}`]).length;
+    phaseDone[section.cat] = section.tasks.length > 0 ? Math.round(done / section.tasks.length * 100) : 0;
+  });
+
+  // Mois à afficher
+  const months = [];
+  let d = new Date(GANTT_START);
+  while (d < GANTT_END) {
+    months.push(new Date(d));
+    d.setMonth(d.getMonth() + 1);
+  }
+
+  let html = `<div style="position:relative;min-width:900px;padding:8px 0">`;
+
+  // ── En-tête mois
+  html += `<div style="display:flex;margin-left:200px;border-bottom:2px solid var(--light-pink);padding-bottom:4px;margin-bottom:8px">`;
+  months.forEach(m => {
+    const pct = 100 / months.length;
+    const label = m.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+    html += `<div style="flex:0 0 ${pct}%;font-size:0.72rem;color:var(--grey);text-align:center;font-weight:600">${label}</div>`;
+  });
+  html += `</div>`;
+
+  // ── Ligne "Aujourd'hui"
+  const todayPct = Math.max(0, Math.min(100, (today - GANTT_START) / (GANTT_END - GANTT_START) * 100));
+  html += `<div style="position:absolute;left:calc(200px + ${todayPct}% * (100% - 200px) / 100);top:32px;bottom:8px;width:2px;background:#FFD700;z-index:10;pointer-events:none">
+    <div style="position:absolute;top:-18px;left:-20px;background:#FFD700;color:#333;font-size:0.65rem;font-weight:700;padding:2px 5px;border-radius:4px;white-space:nowrap">Auj.</div>
+  </div>`;
+
+  // ── Barres de phase
+  GANTT_PHASES.forEach(phase => {
+    const ps    = new Date(phase.start);
+    const pe    = new Date(phase.end < phase.start ? phase.start : phase.end);
+    const left  = Math.max(0, (ps - GANTT_START) / (GANTT_END - GANTT_START) * 100);
+    const width = Math.max(0.5, (pe - ps) / (GANTT_END - GANTT_START) * 100);
+    const done  = phaseDone[phase.cat] ?? 0;
+    const isFuture = ps > today;
+    const isDone   = done >= 80;
+
+    const barColor = isDone ? 'var(--green)' : (done > 0 ? phase.color : 'var(--light-grey)');
+    const textColor = (isFuture && done === 0) ? 'var(--grey)' : 'white';
+    const border    = (isFuture && done === 0) ? '1px solid #ddd' : 'none';
+
+    html += `<div style="display:flex;align-items:center;margin-bottom:10px">
+      <div style="width:200px;flex-shrink:0;font-size:0.82rem;font-weight:600;color:var(--dark);padding-right:12px;text-align:right">${phase.label}</div>
+      <div style="flex:1;position:relative;height:32px">
+        <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${barColor};border-radius:6px;border:${border};display:flex;align-items:center;padding:0 8px;overflow:hidden;transition:all 0.3s">
+          <span style="font-size:0.75rem;font-weight:700;color:${textColor};white-space:nowrap">${done}%</span>
+        </div>
+      </div>
+      <div style="width:45px;flex-shrink:0;text-align:right;font-size:0.78rem;color:${isDone ? 'var(--green)' : 'var(--grey)'};font-weight:${isDone ? 700 : 400}">${done}%</div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// MATRICE DE DÉCISION
+// ═══════════════════════════════════════
+const MATRIX_CATEGORIES = [
+  "Lieu de réception", "Traiteur", "Photographe", "Vidéaste",
+  "DJ / Musiciens", "Fleuriste", "Coiffeur", "Maquilleur",
+  "Gâteau / Pâtissier", "Voiture des mariés", "Officiant laïque"
+];
+
+const MATRIX_CRITERIA = [
+  { key: "prix",     label: "Prix",          weight: 25, help: "Budget vs devis proposé" },
+  { key: "qualite",  label: "Qualité",        weight: 30, help: "Références, portfolio, avis" },
+  { key: "dispo",    label: "Disponibilité",  weight: 20, help: "Libre le 10 juillet 2027" },
+  { key: "feeling",  label: "Feeling",        weight: 15, help: "Feeling humain, confiance" },
+  { key: "reactivite", label: "Réactivité",   weight: 10, help: "Rapidité des réponses" },
+];
+
+function getMatrixState() {
+  if (!state.matrix) state.matrix = {};
+  return state.matrix;
+}
+
+function saveMatrix() {
+  save();
+}
+
+function renderMatrixWeights() {
+  const cont = document.getElementById('weights-container');
+  if (!cont) return;
+  const m = getMatrixState();
+  const weights = m.weights || {};
+  cont.innerHTML = MATRIX_CRITERIA.map(c => {
+    const w = weights[c.key] !== undefined ? weights[c.key] : c.weight;
+    return `<div>
+      <label style="font-size:0.8rem;color:var(--grey);display:block;margin-bottom:4px">${c.label} <span style="font-size:0.72rem">(${c.help})</span></label>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="number" min="0" max="100" value="${w}"
+          style="width:60px;border:1px solid #ddd;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:0.9rem;font-weight:700;color:var(--pink)"
+          onchange="updateWeight('${c.key}',this.value)">
+        <span style="font-size:0.85rem;color:var(--grey)">%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateWeight(key, val) {
+  const m = getMatrixState();
+  if (!m.weights) m.weights = {};
+  m.weights[key] = parseInt(val) || 0;
+  saveMatrix();
+  renderMatrixScore();
+}
+
+function getWeights() {
+  const m = getMatrixState();
+  const w = m.weights || {};
+  return MATRIX_CRITERIA.map(c => ({ ...c, weight: w[c.key] !== undefined ? w[c.key] : c.weight }));
+}
+
+function getCatKey() {
+  const sel = document.getElementById('matrix-cat-select');
+  return sel ? sel.value : MATRIX_CATEGORIES[0];
+}
+
+function addMatrixCandidate() {
+  const cat = getCatKey();
+  const m = getMatrixState();
+  if (!m[cat]) m[cat] = [];
+  m[cat].push({ name: 'Nouveau candidat', notes: '', scores: {} });
+  saveMatrix();
+  renderMatrix();
+}
+
+function removeMatrixCandidate(cat, i) {
+  const m = getMatrixState();
+  m[cat].splice(i, 1);
+  saveMatrix();
+  renderMatrix();
+}
+
+function updateMatrixField(cat, i, field, val) {
+  const m = getMatrixState();
+  if (!m[cat]) m[cat] = [];
+  if (field.startsWith('score_')) {
+    if (!m[cat][i].scores) m[cat][i].scores = {};
+    m[cat][i].scores[field.replace('score_', '')] = parseFloat(val) || 0;
+  } else {
+    m[cat][i][field] = val;
+  }
+  saveMatrix();
+  renderMatrixScore();
+}
+
+function calcScore(candidate) {
+  const weights = getWeights();
+  const totalWeight = weights.reduce((a, c) => a + c.weight, 0);
+  if (totalWeight === 0) return 0;
+  const scores = candidate.scores || {};
+  const weighted = weights.reduce((a, c) => a + (scores[c.key] || 0) * c.weight, 0);
+  return (weighted / totalWeight).toFixed(2);
+}
+
+function renderMatrix() {
+  const sel = document.getElementById('matrix-cat-select');
+  if (!sel) return;
+
+  // Peupler le sélecteur
+  if (sel.options.length === 0) {
+    MATRIX_CATEGORIES.forEach(cat => {
+      const o = document.createElement('option');
+      o.value = o.textContent = cat;
+      sel.appendChild(o);
+    });
+  }
+
+  renderMatrixWeights();
+  renderMatrixScore();
+}
+
+function renderMatrixScore() {
+  const cat = getCatKey();
+  const m = getMatrixState();
+  const candidates = m[cat] || [];
+  const weights = getWeights();
+
+  const thead = document.getElementById('matrix-thead');
+  const tbody = document.getElementById('matrix-tbody');
+  if (!thead || !tbody) return;
+
+  // Calcul du meilleur score
+  const scores = candidates.map(c => parseFloat(calcScore(c)));
+  const best   = Math.max(...scores, 0);
+
+  // Header
+  thead.innerHTML = `<tr>
+    <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;border-radius:8px 0 0 0;min-width:160px">Candidat</th>
+    ${weights.map(c => `<th style="background:var(--pink);color:white;padding:10px 10px;text-align:center;min-width:90px">
+      ${c.label}<br><span style="font-size:0.72rem;opacity:0.8">(${c.weight}%)</span>
+    </th>`).join('')}
+    <th style="background:var(--dark-pink);color:white;padding:10px 14px;text-align:center;min-width:80px;border-radius:0 8px 0 0">Score ★</th>
+    <th style="background:var(--dark-pink);color:white;padding:10px 14px;text-align:center;min-width:60px"></th>
+  </tr>`;
+
+  if (candidates.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${weights.length + 3}" style="text-align:center;padding:30px;color:var(--grey);font-style:italic">
+      Aucun candidat — cliquez sur "+ Ajouter un candidat"
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = candidates.map((c, i) => {
+    const score = parseFloat(calcScore(c));
+    const isBest = score === best && score > 0;
+    const rowBg = isBest ? 'var(--light-green)' : (i % 2 === 0 ? '#fafafa' : 'white');
+    return `<tr>
+      <td style="padding:10px 12px;background:${rowBg};border-bottom:1px solid #f0f0f0">
+        <input value="${c.name}" onchange="updateMatrixField('${cat}',${i},'name',this.value)"
+          style="width:100%;border:1px solid #e0e0e0;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:0.87rem;font-weight:700">
+        <input value="${c.notes||''}" placeholder="Notes…" onchange="updateMatrixField('${cat}',${i},'notes',this.value)"
+          style="width:100%;border:1px solid #e0e0e0;border-radius:6px;padding:4px 8px;font-family:inherit;font-size:0.78rem;color:var(--grey);margin-top:4px">
+      </td>
+      ${weights.map(cr => `
+        <td style="padding:8px;background:${rowBg};border-bottom:1px solid #f0f0f0;text-align:center">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <input type="range" min="0" max="5" step="0.5" value="${(c.scores||{})[cr.key]||0}"
+              oninput="this.nextElementSibling.textContent=this.value;updateMatrixField('${cat}',${i},'score_${cr.key}',this.value)"
+              style="width:70px;accent-color:var(--pink)">
+            <span style="font-size:0.85rem;font-weight:700;color:var(--pink)">${(c.scores||{})[cr.key]||0}</span>
+          </div>
+        </td>`).join('')}
+      <td style="padding:10px;background:${rowBg};border-bottom:1px solid #f0f0f0;text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:${isBest ? 'var(--green)' : 'var(--dark)'}">${score}</div>
+        ${isBest ? '<div style="font-size:0.7rem;color:var(--green);font-weight:700">✅ Recommandé</div>' : ''}
+      </td>
+      <td style="padding:8px;background:${rowBg};border-bottom:1px solid #f0f0f0;text-align:center">
+        <button onclick="removeMatrixCandidate('${cat}',${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════
@@ -1515,6 +2114,8 @@ renderChecklist();
 renderBudget();
 renderGuests();
 renderVendors();
+renderGantt();
+renderMatrix();
 renderRoles();
 renderFilRouge();
 renderUrgence();
@@ -1565,3 +2166,4 @@ updateDashboard();
 </script>
 </body>
 </html>
+
