@@ -147,7 +147,7 @@
 
   .budget-input { display: grid; grid-template-columns: 1fr; gap: 0; }
   .budget-row {
-    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 120px;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 110px 36px;
     gap: 0; border-bottom: 1px solid #f0f0f0;
     align-items: center;
   }
@@ -307,6 +307,43 @@
   .new-task-form input[type=date] { min-width: 130px; }
 
   @media print { .nav { display: none; } .section { display: block !important; } }
+
+  /* ── PLAN DE TABLE ── */
+  .table-visual-card {
+    background: white; border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08); overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .table-visual-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
+  .table-visual-header {
+    padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px;
+  }
+  .table-circle-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+  }
+  .table-name { font-weight: 700; font-size: 1rem; color: var(--dark); }
+  .table-capacity { font-size: 0.8rem; color: var(--grey); margin-top: 2px; }
+  .table-guest-list { padding: 0 16px 8px; display: flex; flex-direction: column; gap: 4px; }
+  .table-guest-chip {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px;
+    padding: 6px 10px; font-size: 0.85rem; transition: background 0.1s;
+  }
+  .table-guest-chip:hover { background: #fff0f5; }
+  .table-add-btn {
+    margin: 0 16px 16px; width: calc(100% - 32px); background: transparent;
+    border: 2px dashed #ddd; border-radius: 8px; padding: 8px;
+    color: var(--grey); cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+  }
+  .table-add-btn:hover { border-color: var(--pink); color: var(--pink); background: var(--light-pink); }
+  .guest-chip-unassigned {
+    display: flex; align-items: center; gap: 8px;
+    background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px;
+    padding: 8px 12px; font-size: 0.88rem; cursor: pointer; transition: all 0.15s;
+  }
+  .guest-chip-unassigned:hover { background: var(--light-pink); border-color: var(--pink); color: var(--pink); }
   @media (max-width: 768px) {
     .hero h1 { font-size: 1.8rem; }
     .budget-row { grid-template-columns: 1fr; }
@@ -357,10 +394,86 @@
   .guest-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
   .guest-table tr:nth-child(even) td { background: var(--light-grey); }
   .guest-table tr:hover td { background: var(--light-pink); }
+
+  /* ── AUTHENTIFICATION ── */
+  #auth-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, var(--dark-pink) 0%, var(--pink) 50%, #E91E8C 100%);
+    z-index: 9999; display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  #auth-overlay::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .auth-card {
+    background: white; border-radius: 24px; padding: 36px 32px;
+    width: 90%; max-width: 400px; box-shadow: 0 40px 100px rgba(0,0,0,0.35);
+    position: relative; z-index: 1;
+  }
+  .auth-logo { font-size: 2.8rem; margin-bottom: 6px; text-align: center; }
+  .auth-title { font-size: 1.5rem; font-weight: 800; color: var(--dark-pink); text-align: center; margin-bottom: 3px; }
+  .auth-subtitle { font-size: 0.82rem; color: var(--grey); text-align: center; margin-bottom: 22px; font-style: italic; }
+  .auth-tabs { display: flex; border-bottom: 2px solid #f0f0f0; margin-bottom: 22px; }
+  .auth-tab {
+    flex: 1; padding: 10px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600;
+    color: var(--grey); border-bottom: 3px solid transparent; margin-bottom: -2px;
+    transition: all 0.2s; text-align: center;
+  }
+  .auth-tab.active { color: var(--pink); border-color: var(--pink); }
+  .auth-tab:hover:not(.active) { color: var(--dark); }
+  .auth-input {
+    width: 100%; padding: 12px 14px; border: 1.5px solid #eee; border-radius: 10px;
+    font-size: 0.95rem; font-family: inherit; margin-bottom: 11px;
+    transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
+  }
+  .auth-input:focus { outline: none; border-color: var(--pink); box-shadow: 0 0 0 3px var(--light-pink); }
+  .auth-error {
+    background: #FFEBEE; color: var(--red); border-radius: 8px;
+    padding: 10px 14px; font-size: 0.85rem; margin-bottom: 12px; display: none;
+    border-left: 3px solid var(--red);
+  }
+  .auth-btn {
+    width: 100%; padding: 13px; margin-top: 4px;
+    background: linear-gradient(135deg, var(--dark-pink), var(--pink));
+    color: white; border: none; border-radius: 10px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .auth-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(194,24,91,0.4); }
+  .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  #nav-user { display: flex; align-items: center; gap: 8px; margin-left: auto; padding: 2px 0; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
+
+<!-- ══ OVERLAY AUTHENTIFICATION ══ -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">💍</div>
+    <div class="auth-title">Keziah &amp; Briac</div>
+    <div class="auth-subtitle">Château de Jallanges · 10 juillet 2027</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Se connecter</div>
+      <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Créer un compte</div>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <!-- Connexion -->
+    <div id="form-login">
+      <input type="email" id="login-email" class="auth-input" placeholder="Adresse e-mail" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="login-password" class="auth-input" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="auth-btn" id="login-btn" onclick="doLogin()">Se connecter</button>
+    </div>
+    <!-- Inscription -->
+    <div id="form-register" style="display:none">
+      <input type="text" id="reg-name" class="auth-input" placeholder="Prénom et nom (ex : Marie Dupont)" onkeydown="if(event.key==='Enter')doRegister()">
+      <input type="email" id="reg-email" class="auth-input" placeholder="Adresse e-mail" onkeydown="if(event.key==='Enter')doRegister()">
+      <input type="password" id="reg-password" class="auth-input" placeholder="Mot de passe (6 caractères minimum)" onkeydown="if(event.key==='Enter')doRegister()">
+      <button class="auth-btn" id="register-btn" onclick="doRegister()">Créer mon compte</button>
+    </div>
+  </div>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -384,6 +497,16 @@
   <a href="#" onclick="showSection('gantt',this)">📊 Gantt</a>
   <a href="#" onclick="showSection('matrix',this)">⚖️ Décisions</a>
   <a href="#" onclick="showSection('filrouge',this)">📋 Fil rouge Jour J</a>
+  <a href="#" onclick="showSection('plantable',this)">🪑 Plan de table</a>
+  <a href="#" onclick="showSection('evjf',this)">🎉 EVJF</a>
+  <a href="#" onclick="showSection('tenues',this)">👗 Tenues</a>
+  <a href="#" onclick="showSection('fairepart',this)">💌 Faire-part</a>
+  <a href="#" onclick="showSection('lunedeMiel',this)">✈️ Lune de miel</a>
+  <a href="#" onclick="showSection('docsLegaux',this)">📄 Documents</a>
+  <a href="#" onclick="showSection('kitUrgence',this)">🧰 Kit urgence</a>
+  <a href="#" onclick="showSection('ambiance',this)">🎨 Ambiance</a>
+  <a href="#" id="nav-admin-link" style="display:none;color:#E65100 !important" onclick="showSection('administration',this)">⚙️ Administration</a>
+  <div id="nav-user"></div>
 </nav>
 
 <div class="container">
@@ -429,6 +552,7 @@
     <div class="progress-bar-wrap" style="height:16px;">
       <div class="progress-bar" id="main-progress" style="width:0%"></div>
     </div>
+    <div id="last-modified-info" style="margin-top:10px;font-size:0.8rem;color:var(--grey);text-align:right;font-style:italic"></div>
   </div>
 
   <div class="card">
@@ -448,7 +572,7 @@
       </div>
       <div class="info-box">
         <h4>💐 Organisatrice</h4>
-        <p><strong>Estelle</strong><br>mariage.keziah.briac@gmail.com</p>
+        <p><strong>Estelle</strong><br>ehuguet@cfmrobotique.com</p>
       </div>
     </div>
   </div>
@@ -595,11 +719,15 @@
 
     <div class="budget-input">
       <div class="budget-row header-row">
-        <div>Poste</div><div>Estimation</div><div>Montant prévu</div><div>Acompte versé</div><div>Statut</div>
+        <div>Poste</div><div>Estimation</div><div>Montant prévu</div><div>Acompte versé</div><div>Statut</div><div></div>
       </div>
       <div id="budget-rows"></div>
       <div class="budget-row total-row" id="budget-total-row">
-        <div>TOTAL</div><div id="bt-est">0 €</div><div id="bt-prev">0 €</div><div id="bt-acomp">0 €</div><div></div>
+        <div>TOTAL</div><div id="bt-est">0 €</div><div id="bt-prev">0 €</div><div id="bt-acomp">0 €</div><div></div><div></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-pink" onclick="addBudgetRow()">+ Ajouter une ligne</button>
+        <span style="font-size:0.82rem;color:var(--grey);font-style:italic">Cliquez sur × pour supprimer une ligne</span>
       </div>
     </div>
   </div>
@@ -1073,6 +1201,313 @@
 
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- PLAN DE TABLE                                                 -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="plantable" class="section">
+
+  <!-- Stats -->
+  <div class="stats-grid" id="table-stats" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px"></div>
+
+  <!-- Toolbar -->
+  <div class="card" style="padding:14px 20px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-weight:700;font-size:1rem;color:var(--pink)">🪑 Plan de table — Mariage de Keziah &amp; Briac</div>
+      <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="table-guest-search" type="text" placeholder="🔍 Chercher un invité…"
+          oninput="renderSeatingChart()"
+          style="padding:8px 12px;border:1px solid #eee;border-radius:8px;font-size:0.88rem;width:200px">
+        <button class="btn btn-pink" onclick="openAddTableModal()">+ Ajouter une table</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-column layout: unassigned panel + tables grid -->
+  <div style="display:grid;grid-template-columns:270px 1fr;gap:20px;align-items:start">
+
+    <!-- Left: non placés -->
+    <div class="card" style="position:sticky;top:80px;max-height:calc(100vh - 140px);display:flex;flex-direction:column">
+      <div class="card-title" style="margin-bottom:12px">
+        👤 Non placés
+        <span id="unassigned-count" style="background:var(--pink);color:white;border-radius:10px;padding:1px 8px;font-size:0.78rem;margin-left:6px">0</span>
+      </div>
+      <p style="font-size:0.8rem;color:var(--grey);margin-bottom:10px">Cliquez sur un invité pour l'assigner à une table.</p>
+      <div id="unassigned-list" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:5px"></div>
+    </div>
+
+    <!-- Right: tables -->
+    <div>
+      <div id="tables-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px"></div>
+      <div id="tables-empty" style="display:none;text-align:center;padding:70px 20px;color:var(--grey);background:white;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07)">
+        <div style="font-size:3.5rem;margin-bottom:14px">🪑</div>
+        <p style="font-size:1.1rem;font-weight:700;color:var(--dark)">Aucune table créée</p>
+        <p style="font-size:0.9rem;margin-top:8px">Cliquez sur <strong>+ Ajouter une table</strong> pour commencer votre plan de table.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal: ajouter / éditer une table -->
+  <div id="table-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:white;border-radius:16px;padding:28px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.25)">
+      <h3 id="table-modal-title" style="color:var(--pink);margin-bottom:20px;font-size:1.1rem">Ajouter une table</h3>
+      <input type="hidden" id="table-modal-id">
+      <div style="margin-bottom:14px">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px">Nom de la table</label>
+        <input id="table-modal-name" type="text" placeholder="ex : Table des mariés, Table Roses…"
+          style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px">Nombre de places</label>
+        <input id="table-modal-capacity" type="number" min="1" max="30" value="10"
+          style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem">
+      </div>
+      <div style="margin-bottom:22px">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:8px">Couleur</label>
+        <div id="table-color-picker" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="closeTableModal()">Annuler</button>
+        <button class="btn btn-pink" onclick="saveTableFromModal()">💾 Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: assigner un invité -->
+  <div id="assign-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:white;border-radius:16px;padding:28px;width:90%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.25)">
+      <h3 style="color:var(--pink);margin-bottom:6px;font-size:1.1rem">Assigner</h3>
+      <p id="assign-modal-subtitle" style="font-size:0.95rem;color:var(--dark);margin-bottom:16px;font-weight:600"></p>
+      <div id="assign-list" style="display:flex;flex-direction:column;gap:7px;max-height:320px;overflow-y:auto;margin-bottom:18px"></div>
+      <button class="btn btn-outline" style="width:100%" onclick="closeAssignModal()">Annuler</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ EVJF ══ -->
+<div id="evjf" class="section">
+  <div class="card">
+    <div class="card-title">🎉 EVJF — Enterrement de Vie de Jeune Fille</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">📅 Date prévue</label>
+        <input type="date" id="evjf-date" onchange="saveEvjfField('date',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">📍 Lieu / Ville</label>
+        <input type="text" id="evjf-lieu" placeholder="ex : Paris, Côte d'Azur…" onchange="saveEvjfField('lieu',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">✨ Thème / Style</label>
+        <input type="text" id="evjf-theme" placeholder="ex : Spa & Glam, Atelier cocktail…" onchange="saveEvjfField('theme',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">👩‍👩‍👧 Participantes</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+        <thead><tr style="background:var(--pink);color:white">
+          <th style="padding:10px 12px;text-align:left">Prénom</th><th style="padding:10px 12px;text-align:left">Rôle</th>
+          <th style="padding:10px 12px;text-align:left">Tél</th><th style="padding:10px 12px;text-align:left">RSVP</th><th style="padding:10px 12px;width:36px"></th>
+        </tr></thead>
+        <tbody id="evjf-participantes-body"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-pink" style="margin-top:12px" onclick="addEvjfParticipante()">+ Ajouter une participante</button>
+  </div>
+  <div class="card">
+    <div class="card-title">⏱️ Programme de la journée</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+        <thead><tr style="background:var(--pink);color:white">
+          <th style="padding:10px 12px;text-align:left;width:90px">Horaire</th><th style="padding:10px 12px;text-align:left">Activité</th>
+          <th style="padding:10px 12px;text-align:left;width:140px">Lieu</th><th style="padding:10px 12px;text-align:left">Notes</th><th style="padding:10px 12px;width:36px"></th>
+        </tr></thead>
+        <tbody id="evjf-programme-body"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-pink" style="margin-top:12px" onclick="addEvjfProgramme()">+ Ajouter un moment</button>
+  </div>
+  <div class="card">
+    <div class="card-title">💰 Budget EVJF</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+        <thead><tr style="background:var(--pink);color:white">
+          <th style="padding:10px 12px;text-align:left">Poste</th><th style="padding:10px 12px;text-align:right">Montant (€)</th>
+          <th style="padding:10px 12px;text-align:left">Statut</th><th style="padding:10px 12px;width:36px"></th>
+        </tr></thead>
+        <tbody id="evjf-budget-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-pink" onclick="addEvjfBudget()">+ Ajouter une dépense</button>
+      <span style="font-size:0.9rem;color:var(--grey)">Total : <strong id="evjf-budget-total" style="color:var(--pink)">0 €</strong></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Checklist organisation EVJF</div>
+    <div id="evjf-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎁 Idées cadeaux pour la mariée</div>
+    <textarea id="evjf-cadeaux" rows="5" placeholder="Notez ici vos idées de cadeaux, surprises, attentions particulières pour Keziah…" onchange="saveEvjfField('cadeaux',this.value)" style="width:100%;padding:12px;border:1px solid #eee;border-radius:8px;font-size:0.9rem;font-family:inherit;resize:vertical"></textarea>
+  </div>
+</div>
+
+<!-- ══ TENUES ══ -->
+<div id="tenues" class="section">
+  <div class="card">
+    <div class="card-title">👗 Tenues du mariage</div>
+    <p style="font-size:0.85rem;color:var(--grey);margin-bottom:16px">Suivez l'état de toutes les tenues : mariés, cortège, famille.</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+        <thead><tr style="background:var(--pink);color:white">
+          <th style="padding:10px 12px;text-align:left">Personne</th><th style="padding:10px 12px;text-align:left">Type de tenue</th>
+          <th style="padding:10px 12px;text-align:left">Couleur</th><th style="padding:10px 12px;text-align:left">Prestataire</th>
+          <th style="padding:10px 12px;text-align:left;width:130px">État</th><th style="padding:10px 12px;text-align:left">Notes</th><th style="padding:10px 12px;width:36px"></th>
+        </tr></thead>
+        <tbody id="tenues-body"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-pink" style="margin-top:14px" onclick="addTenue()">+ Ajouter une tenue</button>
+  </div>
+</div>
+
+<!-- ══ FAIRE-PART ══ -->
+<div id="fairepart" class="section">
+  <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px" id="fp-stats"></div>
+  <div class="card">
+    <div class="card-title">💌 Suivi des invités</div>
+    <div class="tip-box" style="margin-bottom:16px">💡 Les données RSVP et adresses proviennent de la section <strong>Invités</strong>. Mettez-les à jour là-bas.</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+        <thead><tr style="background:var(--pink);color:white">
+          <th style="padding:10px 12px;text-align:left">Invité(e)</th><th style="padding:10px 12px;text-align:left">Adresse</th>
+          <th style="padding:10px 12px;text-align:left">Type invitation</th><th style="padding:10px 12px;text-align:left">RSVP</th>
+        </tr></thead>
+        <tbody id="fp-guests-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Checklist Papeterie</div>
+    <div id="fp-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Notes & Informations</div>
+    <textarea id="fp-notes" rows="5" placeholder="Texte du faire-part, imprimeur choisi, date d'envoi cible…" onchange="savePaperieNotes(this.value)" style="width:100%;padding:12px;border:1px solid #eee;border-radius:8px;font-size:0.9rem;font-family:inherit;resize:vertical"></textarea>
+  </div>
+</div>
+
+<!-- ══ LUNE DE MIEL ══ -->
+<div id="lunedeMiel" class="section">
+  <div class="card">
+    <div class="card-title">✈️ Lune de miel</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">🌍 Destination(s)</label>
+        <input type="text" id="ldm-destination" placeholder="ex : Bali, Maldives, Italie…" onchange="saveLuneDeMielField('destination',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">📅 Date de départ</label>
+        <input type="date" id="ldm-depart" onchange="saveLuneDeMielField('dateDepart',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">📅 Date de retour</label>
+        <input type="date" id="ldm-retour" onchange="saveLuneDeMielField('dateRetour',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+      <div><label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">💶 Budget estimé (€)</label>
+        <input type="number" id="ldm-budget" placeholder="0" onchange="saveLuneDeMielField('budget',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Checklist lune de miel</div>
+    <div id="ldm-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Notes & Idées</div>
+    <textarea id="ldm-notes" rows="5" placeholder="Idées d'activités, hôtels repérés, liens de réservation…" onchange="saveLuneDeMielField('notes',this.value)" style="width:100%;padding:12px;border:1px solid #eee;border-radius:8px;font-size:0.9rem;font-family:inherit;resize:vertical"></textarea>
+  </div>
+</div>
+
+<!-- ══ DOCUMENTS LÉGAUX ══ -->
+<div id="docsLegaux" class="section">
+  <div class="card">
+    <div class="card-title">📄 Documents légaux & démarches administratives</div>
+    <div class="tip-box" style="margin-bottom:18px">⚖️ Ces démarches sont obligatoires pour la validité du mariage civil en France. Les délais varient selon les mairies — renseignez-vous auprès de la mairie de Vernon-sur-Brenne.</div>
+    <div id="docs-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</div>
+
+<!-- ══ KIT D'URGENCE ══ -->
+<div id="kitUrgence" class="section">
+  <div class="card">
+    <div class="card-title">🧰 Kit d'urgence — Sac de survie du Jour J</div>
+    <p style="font-size:0.85rem;color:var(--grey);margin-bottom:18px">Tout ce qu'Estelle doit avoir dans son sac le 10 juillet 2027. Cochez les articles au fur et à mesure que vous les rassemblez.</p>
+    <div id="kit-checklist" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px"></div>
+  </div>
+</div>
+
+<!-- ══ TABLEAU D'AMBIANCE ══ -->
+<div id="ambiance" class="section">
+  <div class="card">
+    <div class="card-title">🎨 Tableau d'ambiance & Identité visuelle</div>
+    <div style="margin-bottom:24px">
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:12px">🎨 Palette de couleurs</div>
+      <div id="ambiance-palette" style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end"></div>
+      <button class="btn btn-outline" style="margin-top:14px" onclick="addAmbianceColor()">+ Ajouter une couleur</button>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px">✨ Mots-clés du style</div>
+      <input type="text" id="ambiance-keywords" placeholder="ex : Romantique, Naturel, Château, Fleurs sauvages, Élégant…" onchange="saveAmbianceField('keywords',this.value)" style="width:100%;padding:10px;border:1px solid #eee;border-radius:8px;font-size:0.95rem">
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px">📌 Liens inspiration (Pinterest, Instagram…)</div>
+      <textarea id="ambiance-pinterest" rows="4" placeholder="Collez ici vos liens d'inspiration, tableaux Pinterest…" onchange="saveAmbianceField('pinterest',this.value)" style="width:100%;padding:12px;border:1px solid #eee;border-radius:8px;font-size:0.9rem;font-family:inherit;resize:vertical"></textarea>
+    </div>
+    <div>
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px">📝 Description du style & Notes</div>
+      <textarea id="ambiance-notes" rows="5" placeholder="Décrivez l'atmosphère souhaitée, les éléments décoratifs clés, les matières, les fleurs…" onchange="saveAmbianceField('notes',this.value)" style="width:100%;padding:12px;border:1px solid #eee;border-radius:8px;font-size:0.9rem;font-family:inherit;resize:vertical"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMINISTRATION ══ -->
+<div id="administration" class="section">
+
+  <div class="card">
+    <div class="card-title">⚙️ Administration — Gestion des utilisateurs</div>
+    <div class="tip-box" style="margin-bottom:20px">
+      🔐 Seul(e) toi (l'administratrice) vois cette page. Crée ici les comptes de chaque proche — ils pourront ensuite se connecter avec leur email et leur mot de passe temporaire, qu'ils pourront changer depuis leur profil.
+    </div>
+
+    <!-- Créer un utilisateur -->
+    <div style="background:var(--light-pink);border-radius:12px;padding:20px;margin-bottom:24px">
+      <div style="font-weight:700;font-size:1rem;color:var(--dark-pink);margin-bottom:14px">➕ Créer un nouveau compte</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px">
+        <div>
+          <label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">Prénom et nom</label>
+          <input type="text" id="new-user-name" placeholder="ex : Marie Dupont" class="auth-input" style="margin:0">
+        </div>
+        <div>
+          <label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">Adresse e-mail</label>
+          <input type="email" id="new-user-email" placeholder="marie@email.com" class="auth-input" style="margin:0">
+        </div>
+        <div>
+          <label style="font-size:0.82rem;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">Mot de passe temporaire</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="new-user-password" placeholder="min. 6 caractères" class="auth-input" style="margin:0;flex:1">
+            <button onclick="generateTempPassword()" title="Générer un mot de passe"
+              style="background:white;border:1px solid #ddd;border-radius:8px;padding:10px 12px;cursor:pointer;font-size:0.85rem;white-space:nowrap;transition:all 0.2s"
+              onmouseover="this.style.borderColor='var(--pink)'" onmouseout="this.style.borderColor='#ddd'">🎲 Générer</button>
+          </div>
+        </div>
+      </div>
+      <div id="admin-create-error" style="background:#FFEBEE;color:var(--red);border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:12px;display:none;border-left:3px solid var(--red)"></div>
+      <div id="admin-create-success" style="background:#E8F5E9;color:var(--green);border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-bottom:12px;display:none;border-left:3px solid var(--green)"></div>
+      <button class="btn btn-pink" id="create-user-btn" onclick="adminCreateUser()">Créer le compte</button>
+    </div>
+
+    <!-- Liste des membres -->
+    <div style="font-weight:700;font-size:1rem;color:var(--dark);margin-bottom:12px">👥 Membres inscrits</div>
+    <div id="members-list" style="display:flex;flex-direction:column;gap:10px">
+      <p style="color:var(--grey);font-style:italic;font-size:0.88rem">Chargement des membres…</p>
+    </div>
+    <button class="btn btn-outline" style="margin-top:14px" onclick="loadMembers()">🔄 Actualiser la liste</button>
+  </div>
+
+</div>
+
 <div class="footer">💕 Fait avec amour pour Keziah & Briac — Juillet 2027 — Château de Jallanges, Touraine</div>
 
 <script>
@@ -1251,6 +1686,10 @@ const BUDGET_DATA = [
   { cat: "Alliances", est: 1500, prev: 0, acomp: 0 },
   { cat: "Cadeaux invités / dragées", est: 500, prev: 0, acomp: 0 },
   { cat: "Lune de miel", est: 4000, prev: 0, acomp: 0 },
+  { cat: "Alcool & Champagne", est: 1200, prev: 0, acomp: 0 },
+  { cat: "Photobooth (à confirmer)", est: 800, prev: 0, acomp: 0 },
+  { cat: "Manucure & soins pré-mariage", est: 200, prev: 0, acomp: 0 },
+  { cat: "Timbres faire-part", est: 150, prev: 0, acomp: 0 },
   { cat: "Brunch du lendemain (traiteur / buffet)", est: 1500, prev: 0, acomp: 0 },
   { cat: "Vaisselle brunch (location)", est: 300, prev: 0, acomp: 0 },
   { cat: "Divers & imprévus (10%)", est: 3500, prev: 0, acomp: 0 },
@@ -1275,13 +1714,40 @@ const VENDORS_DATA = [
 // ═══════════════════════════════════════
 // ÉTAT & STORAGE
 // ═══════════════════════════════════════
+// ── Administrateurs (emails autorisés) ──
+const ADMIN_EMAILS = ['mariage.keziah.briac@gmail.com'];
+function isAdmin() { return window.currentUser && ADMIN_EMAILS.includes(window.currentUser.email); }
+
+// Palette de couleurs pour les tables
+const TABLE_COLORS = [
+  { bg:'#FCE4EC', color:'#C2185B', label:'Rose' },
+  { bg:'#E3F2FD', color:'#1565C0', label:'Bleu' },
+  { bg:'#E8F5E9', color:'#2E7D32', label:'Vert' },
+  { bg:'#FFF3E0', color:'#E65100', label:'Orange' },
+  { bg:'#F3E5F5', color:'#7B1FA2', label:'Violet' },
+  { bg:'#FFFDE7', color:'#F57F17', label:'Jaune' },
+  { bg:'#E0F2F1', color:'#00695C', label:'Turquoise' },
+  { bg:'#EFEBE9', color:'#4E342E', label:'Brun' },
+];
+let _selectedTableColorIdx = 0;
+let _assignModalGuestId = null;
+let _assignModalTargetTable = null;
+
 let state = {
   checks: {},
   taskEdits: {},      // { "si-ti": { r, date, c } } — overrides pour tâches par défaut
   customTasks: [],    // [ { id, phase, t, r, c, date } ] — tâches ajoutées par l'utilisateur
   budget: JSON.parse(JSON.stringify(BUDGET_DATA)),
   guests: [],
-  budgetTotal: 30000
+  budgetTotal: 30000,
+  tables: [],         // [ { id, name, capacity, color:{bg,color} } ]
+  evjf: { date:'', lieu:'', theme:'', notes:'', participantes:[], programme:[], budget:[], checklist:{}, cadeaux:'' },
+  tenues: [],
+  papeterie: { checklist:{}, notes:'' },
+  lunedeMiel: { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} },
+  docsLegaux: { checklist:{} },
+  kitUrgence: { checklist:{} },
+  ambiance: { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' },
 };
 
 // Sauvegarde locale (fallback) + Firebase
@@ -1300,6 +1766,14 @@ function load() {
     if (!state.taskEdits)   state.taskEdits = {};
     if (!state.customTasks) state.customTasks = [];
     if (!state.budgetTotal) state.budgetTotal = 30000;
+    if (!state.tables)      state.tables = [];
+    if (!state.evjf)        state.evjf = { date:'', lieu:'', theme:'', notes:'', participantes:[], programme:[], budget:[], checklist:{}, cadeaux:'' };
+    if (!state.tenues)      state.tenues = [];
+    if (!state.papeterie)   state.papeterie = { checklist:{}, notes:'' };
+    if (!state.lunedeMiel)  state.lunedeMiel = { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} };
+    if (!state.docsLegaux)  state.docsLegaux = { checklist:{} };
+    if (!state.kitUrgence)  state.kitUrgence = { checklist:{} };
+    if (!state.ambiance)    state.ambiance = { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' };
   } catch(e) {}
 }
 
@@ -1317,6 +1791,16 @@ async function saveToFirebase() {
       filrougeRows: state.filrougeRows || [],
       urgenceContacts: state.urgenceContacts || [],
       matrix: state.matrix || {},
+      tables: state.tables || [],
+      evjf: state.evjf || {},
+      tenues: state.tenues || [],
+      papeterie: state.papeterie || {},
+      lunedeMiel: state.lunedeMiel || {},
+      docsLegaux: state.docsLegaux || {},
+      kitUrgence: state.kitUrgence || {},
+      ambiance: state.ambiance || {},
+      lastModifiedBy: window.currentUser ? (window.currentUser.displayName || window.currentUser.email) : 'Anonyme',
+      lastModifiedAt: window.fbServerTimestamp(),
     };
     Object.keys(state).filter(k => k.startsWith('vendor_')).forEach(k => { toSave[k] = state[k]; });
     await window.fbSetDoc(window.fbDoc(window.db, 'wedding', 'keziah-briac'), toSave, { merge: true });
@@ -1333,12 +1817,26 @@ async function loadAllFromFirebase() {
       if (d.checks)           state.checks = d.checks;
       if (d.taskEdits)        state.taskEdits = d.taskEdits;
       if (d.customTasks)      state.customTasks = d.customTasks;
-      if (d.budget)           state.budget = d.budget;
+      if (d.budget) {
+        state.budget = d.budget;
+        const existingCats = new Set(state.budget.map(b => b.cat));
+        BUDGET_DATA.forEach(b => { if (!existingCats.has(b.cat)) state.budget.push(JSON.parse(JSON.stringify(b))); });
+      }
       if (d.budgetTotal)      state.budgetTotal = d.budgetTotal;
       if (d.roles)            state.roles = d.roles;
       if (d.filrougeRows)     state.filrougeRows = d.filrougeRows;
       if (d.urgenceContacts)  state.urgenceContacts = d.urgenceContacts;
       if (d.matrix)           state.matrix = d.matrix;
+      if (d.tables)           state.tables = d.tables;
+      if (d.evjf)        state.evjf = { ...state.evjf, ...d.evjf };
+      if (d.tenues)      state.tenues = d.tenues;
+      if (d.papeterie)   state.papeterie = { ...state.papeterie, ...d.papeterie };
+      if (d.lunedeMiel)  state.lunedeMiel = { ...state.lunedeMiel, ...d.lunedeMiel };
+      if (d.docsLegaux)  state.docsLegaux = { ...state.docsLegaux, ...d.docsLegaux };
+      if (d.kitUrgence)  state.kitUrgence = { ...state.kitUrgence, ...d.kitUrgence };
+      if (d.ambiance)    state.ambiance = { ...state.ambiance, ...d.ambiance };
+      if (d.lastModifiedBy) state.lastModifiedBy = d.lastModifiedBy;
+      if (d.lastModifiedAt) state.lastModifiedAt = d.lastModifiedAt;
       Object.keys(d).filter(k => k.startsWith('vendor_')).forEach(k => { state[k] = d[k]; });
     }
   } catch(e) { console.warn('Firebase load error:', e); }
@@ -1353,6 +1851,14 @@ async function loadAllFromFirebase() {
   renderRoles();
   renderFilRouge();
   renderUrgence();
+  renderSeatingChart();
+  renderEvjf();
+  renderTenues();
+  renderFairePart();
+  renderLuneDeMiel();
+  renderDocsLegaux();
+  renderKitUrgence();
+  renderAmbiance();
   updateDashboard();
 }
 window.loadAllFromFirebase = loadAllFromFirebase;
@@ -1365,6 +1871,7 @@ function showSection(id, link) {
   document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (link) link.classList.add('active');
+  if (id === 'administration' && isAdmin()) loadMembers();
   updateDashboard();
 }
 
@@ -1630,7 +2137,8 @@ function renderBudget() {
         <option ${!item.status||item.status==='⏳ À contacter'?'selected':''}>⏳ À contacter</option>
         <option ${item.status==='🔄 En négo.'?'selected':''}>🔄 En négo.</option>
         <option ${item.status==='✅ Signé'?'selected':''}>✅ Signé</option>
-      </select></div>`;
+      </select></div>
+      <div style="text-align:center"><button onclick="deleteBudgetRow(${i})" title="Supprimer" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem;line-height:1;padding:4px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></div>`;
     container.appendChild(row);
   });
   updateBudget();
@@ -1639,6 +2147,18 @@ function renderBudget() {
 function updateBudgetItem(i, field, val) {
   state.budget[i][field] = field === 'status' ? val : (parseFloat(val) || 0);
   save(); updateBudget();
+}
+function deleteBudgetRow(i) {
+  if (!confirm('Supprimer "' + (state.budget[i]?.cat || '') + '" du budget ?')) return;
+  state.budget.splice(i, 1);
+  save(); renderBudget();
+}
+function addBudgetRow() {
+  const cat = prompt('Nom du poste budgétaire :');
+  if (!cat || !cat.trim()) return;
+  const est = parseFloat(prompt('Montant estimé (€) :', '0') || '0') || 0;
+  state.budget.push({ cat: cat.trim(), est, prev: 0, acomp: 0 });
+  save(); renderBudget();
 }
 
 function updateBudget() {
@@ -1954,6 +2474,11 @@ function updateDashboard() {
   if (el2) el2.textContent = total - done;
   if (bar) bar.style.width = pct + '%';
   if (pctEl) pctEl.textContent = pct + '%';
+  // Dernière modification
+  const lmEl = document.getElementById('last-modified-info');
+  if (lmEl && state.lastModifiedBy) {
+    lmEl.textContent = '✏️ Dernière modification par ' + state.lastModifiedBy;
+  }
 }
 
 // ═══════════════════════════════════════
@@ -2429,6 +2954,864 @@ function exportFilRouge() {
 }
 
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// ADMINISTRATION
+// ═══════════════════════════════════════
+const FIREBASE_API_KEY = 'AIzaSyCYFt12IsMtPEUOlaV0TauBTjWtg1uNkRk';
+
+function generateTempPassword() {
+  const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let pwd = '';
+  for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('new-user-password').value = pwd;
+}
+
+async function adminCreateUser() {
+  if (!isAdmin()) { alert('Accès refusé.'); return; }
+  const name  = document.getElementById('new-user-name').value.trim();
+  const email = document.getElementById('new-user-email').value.trim();
+  const pwd   = document.getElementById('new-user-password').value.trim();
+  const errEl = document.getElementById('admin-create-error');
+  const okEl  = document.getElementById('admin-create-success');
+  const btn   = document.getElementById('create-user-btn');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+
+  if (!name || !email || !pwd) { errEl.textContent = 'Veuillez remplir tous les champs.'; errEl.style.display = 'block'; return; }
+  if (pwd.length < 6) { errEl.textContent = 'Le mot de passe doit faire au moins 6 caractères.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Création…';
+
+  try {
+    // Créer l'utilisateur via REST API (ne déconnecte PAS l'admin)
+    const res1 = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pwd, returnSecureToken: true })
+    });
+    const d1 = await res1.json();
+    if (d1.error) throw new Error(d1.error.message);
+
+    // Mettre à jour le displayName
+    const res2 = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=${FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken: d1.idToken, displayName: name, returnSecureToken: false })
+    });
+    const d2 = await res2.json();
+    if (d2.error) throw new Error(d2.error.message);
+
+    // Enregistrer dans Firestore membres
+    if (window.fbSetDoc && window.fbDoc && window.db) {
+      await window.fbSetDoc(
+        window.fbDoc(window.db, 'wedding', 'keziah-briac', 'members', d1.localId),
+        {
+          displayName: name,
+          email: email,
+          createdAt: window.fbServerTimestamp(),
+          createdBy: window.currentUser?.displayName || 'Admin',
+          lastSeen: null,
+        }
+      );
+    }
+
+    okEl.innerHTML = `✅ Compte créé pour <strong>${escHtml(name)}</strong> (${escHtml(email)})<br>
+      <span style="font-size:0.82rem">Mot de passe temporaire : <code style="background:#f0f0f0;padding:2px 6px;border-radius:4px">${escHtml(pwd)}</code> — à communiquer à la personne</span>`;
+    okEl.style.display = 'block';
+    document.getElementById('new-user-name').value = '';
+    document.getElementById('new-user-email').value = '';
+    document.getElementById('new-user-password').value = '';
+    loadMembers();
+
+  } catch(e) {
+    const msgs = {
+      'EMAIL_EXISTS':      'Un compte avec cet e-mail existe déjà.',
+      'INVALID_EMAIL':     'Adresse e-mail invalide.',
+      'WEAK_PASSWORD':     'Mot de passe trop faible.',
+      'TOO_MANY_ATTEMPTS_TRY_LATER': 'Trop de tentatives. Réessayez plus tard.',
+    };
+    errEl.textContent = msgs[e.message] || ('Erreur : ' + e.message);
+    errEl.style.display = 'block';
+  }
+  btn.disabled = false; btn.textContent = 'Créer le compte';
+}
+
+async function loadMembers() {
+  if (!isAdmin()) return;
+  const el = document.getElementById('members-list');
+  if (!el) return;
+  el.innerHTML = '<p style="color:var(--grey);font-style:italic;font-size:0.88rem">Chargement…</p>';
+  try {
+    const snap = await window.fbGetDocs(window.fbCollection(window.db, 'wedding', 'keziah-briac', 'members'));
+    const members = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (members.length === 0) {
+      el.innerHTML = '<p style="color:var(--grey);font-style:italic;font-size:0.88rem">Aucun membre inscrit pour l\'instant.</p>';
+      return;
+    }
+    el.innerHTML = members.map(m => {
+      const isCurrentAdmin = ADMIN_EMAILS.includes(m.email);
+      const lastSeen = m.lastSeen?.toDate ? m.lastSeen.toDate().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      const createdAt = m.createdAt?.toDate ? m.createdAt.toDate().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+      return `<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:#fafafa;border-radius:12px;border:1px solid #f0f0f0;flex-wrap:wrap">
+        <div style="width:42px;height:42px;border-radius:50%;background:${isCurrentAdmin ? '#FFF3E0' : 'var(--light-pink)'};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">
+          ${isCurrentAdmin ? '⚙️' : '👤'}
+        </div>
+        <div style="flex:1;min-width:150px">
+          <div style="font-weight:700;font-size:0.95rem">${escHtml(m.displayName||'—')}
+            ${isCurrentAdmin ? '<span style="background:#FFF3E0;color:#E65100;border-radius:10px;padding:1px 8px;font-size:0.72rem;font-weight:700;margin-left:6px">Admin</span>' : ''}
+          </div>
+          <div style="font-size:0.82rem;color:var(--grey)">${escHtml(m.email||'—')}</div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--grey);text-align:right;min-width:140px">
+          <div>Inscrit le ${createdAt}</div>
+          <div>Dernière visite : ${lastSeen}</div>
+          ${m.createdBy ? `<div style="font-style:italic">Créé par ${escHtml(m.createdBy)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<p style="color:var(--red)">Erreur de chargement : ${e.message}</p>`;
+  }
+}
+
+// ═══════════════════════════════════════
+// PLAN DE TABLE
+// ═══════════════════════════════════════
+
+function renderSeatingChart() {
+  const tableStatsEl   = document.getElementById('table-stats');
+  const tablesGridEl   = document.getElementById('tables-grid');
+  const tablesEmptyEl  = document.getElementById('tables-empty');
+  const unassignedEl   = document.getElementById('unassigned-list');
+  const unassignedCnt  = document.getElementById('unassigned-count');
+  if (!tableStatsEl) return;
+
+  const tables  = state.tables  || [];
+  const guests  = state.guests  || [];
+  const search  = (document.getElementById('table-guest-search')?.value || '').toLowerCase().trim();
+  const tableNames = new Set(tables.map(t => t.name));
+
+  // Compute subsets
+  const assignedGuests   = guests.filter(g => g.table && tableNames.has(g.table));
+  const unassignedGuests = guests.filter(g => !g.table || !tableNames.has(g.table));
+  const totalCapacity    = tables.reduce((s, t) => s + (parseInt(t.capacity) || 0), 0);
+
+  // Stats
+  tableStatsEl.innerHTML = `
+    <div class="stat-card"><div class="val">${tables.length}</div><div class="lbl">Tables créées</div></div>
+    <div class="stat-card"><div class="val">${totalCapacity}</div><div class="lbl">Places totales</div></div>
+    <div class="stat-card" style="border-color:var(--green)"><div class="val" style="color:var(--green)">${assignedGuests.length}</div><div class="lbl">Invités placés</div></div>
+    <div class="stat-card" style="border-color:${unassignedGuests.length > 0 ? 'var(--orange)' : 'var(--green)'}">
+      <div class="val" style="color:${unassignedGuests.length > 0 ? 'var(--orange)' : 'var(--green)'}">${unassignedGuests.length}</div>
+      <div class="lbl">Non placés</div>
+    </div>`;
+
+  // Unassigned guests panel
+  if (unassignedCnt) unassignedCnt.textContent = unassignedGuests.length;
+  const filtered = unassignedGuests.filter(g => !search || guestFullName(g).toLowerCase().includes(search));
+  if (unassignedEl) {
+    unassignedEl.innerHTML = filtered.length === 0
+      ? `<p style="text-align:center;color:var(--grey);font-size:0.82rem;padding:20px 0;font-style:italic">${search ? 'Aucun résultat' : '🎉 Tous les invités sont placés !'}</p>`
+      : filtered.map(g => {
+          const gid = escHtml(g.id || guestFullName(g));
+          return `<div class="guest-chip-unassigned" onclick="openAssignModal('${gid}')">
+            <span>👤</span>
+            <span style="flex:1">${escHtml(guestFullName(g))}</span>
+            ${g.categorie ? `<span style="font-size:0.75rem;color:var(--grey)">${escHtml(g.categorie)}</span>` : ''}
+          </div>`;
+        }).join('');
+  }
+
+  // Tables grid
+  if (tables.length === 0) {
+    tablesGridEl.innerHTML = '';
+    tablesEmptyEl.style.display = 'block';
+    return;
+  }
+  tablesEmptyEl.style.display = 'none';
+
+  tablesGridEl.innerHTML = tables.map(table => {
+    const tc       = table.color || TABLE_COLORS[0];
+    const tGuests  = guests.filter(g => g.table === table.name);
+    const cap      = parseInt(table.capacity) || 10;
+    const isFull   = tGuests.length >= cap;
+    const pct      = Math.min(100, Math.round(tGuests.length / cap * 100));
+    const tid      = escHtml(table.id);
+    const tname    = escHtml(table.name);
+
+    return `<div class="table-visual-card">
+      <div class="table-visual-header" style="background:${tc.bg}40;border-bottom:1px solid ${tc.bg}">
+        <div class="table-circle-icon" style="background:${tc.bg};color:${tc.color}">🪑</div>
+        <div style="flex:1;min-width:0">
+          <div class="table-name" style="color:${tc.color}">${tname}</div>
+          <div class="table-capacity">${tGuests.length} / ${cap} places
+            ${isFull ? '<span style="color:var(--green);font-weight:700;margin-left:4px">✓ Complet</span>' : ''}
+          </div>
+          <div style="margin-top:5px;background:#eee;border-radius:4px;height:4px;width:100%">
+            <div style="background:${isFull ? 'var(--green)' : tc.color};height:4px;border-radius:4px;width:${pct}%;transition:width 0.3s"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:2px;flex-shrink:0">
+          <button onclick="openEditTableModal('${tid}')" style="background:none;border:none;cursor:pointer;font-size:1rem;padding:4px 6px;border-radius:6px;transition:background 0.15s" title="Modifier" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">✏️</button>
+          <button onclick="deleteTable('${tid}')" style="background:none;border:none;cursor:pointer;font-size:1rem;padding:4px 6px;border-radius:6px;transition:background 0.15s" title="Supprimer" onmouseover="this.style.background='#fff0f5'" onmouseout="this.style.background='none'">🗑️</button>
+        </div>
+      </div>
+      <div class="table-guest-list">
+        ${tGuests.length === 0
+          ? `<p style="text-align:center;color:#bbb;font-size:0.82rem;padding:10px 0;font-style:italic">Table vide</p>`
+          : tGuests.map(g => {
+              const gid = escHtml(g.id || guestFullName(g));
+              return `<div class="table-guest-chip">
+                <span style="flex:1">${escHtml(guestFullName(g))}</span>
+                ${g.regime ? `<span style="font-size:0.7rem;color:var(--grey);margin-right:4px">${escHtml(g.regime)}</span>` : ''}
+                <button onclick="unassignGuest('${gid}')" title="Retirer de la table"
+                  style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.9rem;padding:0 0 0 6px;line-height:1" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">✕</button>
+              </div>`;
+            }).join('')
+        }
+      </div>
+      ${!isFull
+        ? `<button class="table-add-btn" onclick="openAssignModalForTable('${tname}')">+ Ajouter un invité</button>`
+        : '<div style="height:12px"></div>'}
+    </div>`;
+  }).join('');
+}
+
+// ── Modals table ──
+function openAddTableModal() {
+  document.getElementById('table-modal-title').textContent = 'Ajouter une table';
+  document.getElementById('table-modal-id').value = '';
+  document.getElementById('table-modal-name').value = 'Table ' + ((state.tables || []).length + 1);
+  document.getElementById('table-modal-capacity').value = '10';
+  _selectedTableColorIdx = (state.tables || []).length % TABLE_COLORS.length;
+  renderTableColorPicker();
+  document.getElementById('table-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('table-modal-name').select(), 50);
+}
+
+function openEditTableModal(id) {
+  const t = (state.tables || []).find(t => t.id === id);
+  if (!t) return;
+  document.getElementById('table-modal-title').textContent = 'Modifier la table';
+  document.getElementById('table-modal-id').value = t.id;
+  document.getElementById('table-modal-name').value = t.name;
+  document.getElementById('table-modal-capacity').value = t.capacity;
+  _selectedTableColorIdx = TABLE_COLORS.findIndex(c => c.bg === (t.color || TABLE_COLORS[0]).bg);
+  if (_selectedTableColorIdx < 0) _selectedTableColorIdx = 0;
+  renderTableColorPicker();
+  document.getElementById('table-modal').style.display = 'flex';
+}
+
+function renderTableColorPicker() {
+  document.getElementById('table-color-picker').innerHTML = TABLE_COLORS.map((c, i) =>
+    `<div onclick="selectTableColor(${i})" title="${c.label}"
+      style="width:32px;height:32px;border-radius:50%;background:${c.bg};
+        border:3px solid ${i === _selectedTableColorIdx ? c.color : 'transparent'};
+        cursor:pointer;transition:all 0.15s;box-shadow:${i === _selectedTableColorIdx ? '0 0 0 2px ' + c.color + '44' : 'none'}"
+      data-idx="${i}"></div>`
+  ).join('');
+}
+
+function selectTableColor(idx) {
+  _selectedTableColorIdx = idx;
+  renderTableColorPicker();
+}
+
+function closeTableModal() {
+  document.getElementById('table-modal').style.display = 'none';
+}
+
+function saveTableFromModal() {
+  const id       = document.getElementById('table-modal-id').value.trim();
+  const name     = document.getElementById('table-modal-name').value.trim();
+  const capacity = parseInt(document.getElementById('table-modal-capacity').value) || 10;
+  const color    = TABLE_COLORS[_selectedTableColorIdx] || TABLE_COLORS[0];
+  if (!name) { alert('Veuillez saisir un nom de table.'); return; }
+  if (!state.tables) state.tables = [];
+
+  if (id) {
+    const oldTable = state.tables.find(t => t.id === id);
+    const oldName  = oldTable?.name;
+    const idx      = state.tables.findIndex(t => t.id === id);
+    state.tables[idx] = { id, name, capacity, color };
+    // Si le nom a changé, mettre à jour les invités
+    if (oldName && oldName !== name) {
+      const toUpdate = state.guests.filter(g => g.table === oldName);
+      toUpdate.forEach(g => { g.table = name; saveGuestToFirebase(g); });
+    }
+  } else {
+    const newId = 'tbl_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    state.tables.push({ id: newId, name, capacity, color });
+  }
+  closeTableModal();
+  save();
+  renderSeatingChart();
+}
+
+function deleteTable(id) {
+  const t = (state.tables || []).find(t => t.id === id);
+  if (!t) return;
+  const nb = (state.guests || []).filter(g => g.table === t.name).length;
+  const msg = nb > 0
+    ? `Supprimer "${t.name}" ? Les ${nb} invité(s) assigné(s) seront replacés dans les non placés.`
+    : `Supprimer la table "${t.name}" ?`;
+  if (!confirm(msg)) return;
+  state.guests.forEach(g => { if (g.table === t.name) { g.table = ''; saveGuestToFirebase(g); } });
+  state.tables = state.tables.filter(t => t.id !== id);
+  save();
+  renderSeatingChart();
+}
+
+// ── Modals assignation ──
+function openAssignModal(guestId) {
+  _assignModalGuestId     = guestId;
+  _assignModalTargetTable = null;
+  const g = findGuestById(guestId);
+  document.getElementById('assign-modal-subtitle').textContent = g ? guestFullName(g) : guestId;
+  renderAssignList('guest');
+  document.getElementById('assign-modal').style.display = 'flex';
+}
+
+function openAssignModalForTable(tableName) {
+  _assignModalGuestId     = null;
+  _assignModalTargetTable = tableName;
+  document.getElementById('assign-modal-subtitle').textContent = 'Ajouter à : ' + tableName;
+  renderAssignList('table');
+  document.getElementById('assign-modal').style.display = 'flex';
+}
+
+function renderAssignList(mode) {
+  const el = document.getElementById('assign-list');
+  if (mode === 'guest') {
+    // List of tables to pick from
+    const tables = state.tables || [];
+    if (!tables.length) { el.innerHTML = '<p style="color:var(--grey);font-size:0.88rem;text-align:center">Aucune table créée.</p>'; return; }
+    el.innerHTML = tables.map(t => {
+      const cnt    = (state.guests || []).filter(g => g.table === t.name).length;
+      const isFull = cnt >= (parseInt(t.capacity) || 10);
+      const tc     = t.color || TABLE_COLORS[0];
+      return `<div onclick="${isFull ? '' : `doAssignGuest('${escHtml(t.name)}')`}"
+        style="padding:11px 14px;border:2px solid ${tc.bg};border-radius:10px;
+          cursor:${isFull ? 'not-allowed' : 'pointer'};font-size:0.88rem;
+          background:${tc.bg}60;opacity:${isFull ? 0.5 : 1};
+          display:flex;align-items:center;gap:10px;transition:all 0.15s"
+        ${isFull ? '' : `onmouseover="this.style.borderColor='${tc.color}'" onmouseout="this.style.borderColor='${tc.bg}'"`}>
+        <div style="width:12px;height:12px;border-radius:50%;background:${tc.color};flex-shrink:0"></div>
+        <span style="flex:1;font-weight:600">${escHtml(t.name)}</span>
+        <span style="font-size:0.8rem;color:${isFull ? 'var(--green)' : 'var(--grey)'}">
+          ${cnt}/${t.capacity}${isFull ? ' ✓' : ''}
+        </span>
+      </div>`;
+    }).join('');
+  } else {
+    // List of unassigned guests to pick from
+    const tableNames   = new Set((state.tables || []).map(t => t.name));
+    const unassigned   = (state.guests || []).filter(g => !g.table || !tableNames.has(g.table));
+    if (!unassigned.length) { el.innerHTML = '<p style="color:var(--grey);font-size:0.88rem;text-align:center">Tous les invités sont déjà placés !</p>'; return; }
+    el.innerHTML = unassigned.map(g => {
+      const gid = escHtml(g.id || guestFullName(g));
+      return `<div onclick="doAssignFromTable('${gid}')"
+        style="padding:10px 14px;border:1px solid #eee;border-radius:10px;cursor:pointer;font-size:0.88rem;
+          display:flex;align-items:center;gap:8px;transition:all 0.15s"
+        onmouseover="this.style.background='var(--light-pink)';this.style.borderColor='var(--pink)'"
+        onmouseout="this.style.background='';this.style.borderColor='#eee'">
+        <span>👤</span>
+        <span style="flex:1">${escHtml(guestFullName(g))}</span>
+        ${g.categorie ? `<span style="font-size:0.75rem;color:var(--grey)">${escHtml(g.categorie)}</span>` : ''}
+      </div>`;
+    }).join('');
+  }
+}
+
+async function doAssignGuest(tableName) {
+  const g = findGuestById(_assignModalGuestId);
+  if (!g) return;
+  g.table = tableName;
+  await saveGuestToFirebase(g);
+  closeAssignModal();
+  renderSeatingChart();
+}
+
+async function doAssignFromTable(guestId) {
+  const g = findGuestById(guestId);
+  if (!g) return;
+  g.table = _assignModalTargetTable;
+  await saveGuestToFirebase(g);
+  closeAssignModal();
+  renderSeatingChart();
+}
+
+async function unassignGuest(guestId) {
+  const g = findGuestById(guestId);
+  if (!g) return;
+  g.table = '';
+  await saveGuestToFirebase(g);
+  renderSeatingChart();
+}
+
+function findGuestById(idOrName) {
+  return (state.guests || []).find(g => g.id === idOrName || guestFullName(g) === idOrName);
+}
+
+function closeAssignModal() {
+  document.getElementById('assign-modal').style.display = 'none';
+  _assignModalGuestId = null;
+  _assignModalTargetTable = null;
+}
+
+// ═══════════════════════════════════════
+// AUTHENTIFICATION
+// ═══════════════════════════════════════
+window.currentUser = null;
+
+function switchAuthTab(tab) {
+  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-password').value;
+  const btn   = document.getElementById('login-btn');
+  if (!email || !pw) { showAuthError('Veuillez remplir tous les champs.'); return; }
+  btn.disabled = true; btn.textContent = 'Connexion…';
+  document.getElementById('auth-error').style.display = 'none';
+  try {
+    await window.fbSignIn(window.fbAuth, email, pw);
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found':     'Aucun compte avec cet e-mail.',
+      'auth/wrong-password':     'Mot de passe incorrect.',
+      'auth/invalid-credential': 'E-mail ou mot de passe incorrect.',
+      'auth/invalid-email':      'Adresse e-mail invalide.',
+      'auth/too-many-requests':  'Trop de tentatives — réessayez dans quelques minutes.',
+    };
+    showAuthError(msgs[e.code] || 'Erreur de connexion (' + e.code + ')');
+    btn.disabled = false; btn.textContent = 'Se connecter';
+  }
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pw    = document.getElementById('reg-password').value;
+  const btn   = document.getElementById('register-btn');
+  if (!name || !email || !pw) { showAuthError('Veuillez remplir tous les champs.'); return; }
+  if (pw.length < 6) { showAuthError('Le mot de passe doit faire au moins 6 caractères.'); return; }
+  btn.disabled = true; btn.textContent = 'Création…';
+  document.getElementById('auth-error').style.display = 'none';
+  try {
+    const cred = await window.fbSignUp(window.fbAuth, email, pw);
+    await window.fbUpdateProfile(cred.user, { displayName: name });
+  } catch(e) {
+    const msgs = {
+      'auth/email-already-in-use': 'Un compte avec cet e-mail existe déjà.',
+      'auth/invalid-email':        'Adresse e-mail invalide.',
+      'auth/weak-password':        'Mot de passe trop faible (6 caractères minimum).',
+    };
+    showAuthError(msgs[e.code] || 'Erreur lors de la création du compte (' + e.code + ')');
+    btn.disabled = false; btn.textContent = 'Créer mon compte';
+  }
+}
+
+async function doSignOut() {
+  if (!confirm('Se déconnecter ?')) return;
+  try { await window.fbSignOut(window.fbAuth); } catch(e) { console.error(e); }
+}
+
+function updateNavUser(user) {
+  const el = document.getElementById('nav-user');
+  const adminLink = document.getElementById('nav-admin-link');
+  if (!el) return;
+  if (user) {
+    const name = user.displayName || user.email.split('@')[0];
+    const admin = ADMIN_EMAILS.includes(user.email);
+    el.innerHTML = `
+      ${admin ? '<span style="background:#FFF3E0;color:#E65100;border-radius:20px;padding:4px 10px;font-size:0.75rem;font-weight:700;white-space:nowrap">⚙️ Admin</span>' : ''}
+      <span style="background:var(--light-pink);color:var(--pink);border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:700;white-space:nowrap">
+        👤 ${escHtml(name)}
+      </span>
+      <button onclick="doSignOut()" title="Se déconnecter"
+        style="background:none;border:1px solid #ddd;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:0.78rem;color:var(--grey);transition:all 0.2s;white-space:nowrap;font-family:inherit"
+        onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'"
+        onmouseout="this.style.borderColor='#ddd';this.style.color='var(--grey)'">Déconnexion</button>`;
+    // Afficher ou masquer le lien Admin dans le nav
+    if (adminLink) adminLink.style.display = admin ? '' : 'none';
+    // Enregistrer le membre dans Firestore
+    registerMemberInFirestore(user);
+  } else {
+    el.innerHTML = '';
+    if (adminLink) adminLink.style.display = 'none';
+  }
+}
+
+async function registerMemberInFirestore(user) {
+  if (!window.fbSetDoc || !window.fbDoc || !window.db) return;
+  try {
+    await window.fbSetDoc(
+      window.fbDoc(window.db, 'wedding', 'keziah-briac', 'members', user.uid),
+      {
+        displayName: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        lastSeen: window.fbServerTimestamp(),
+      },
+      { merge: true }
+    );
+  } catch(e) { console.warn('Erreur enregistrement membre:', e); }
+}
+
+// ═══════════════════════════════════════
+// EVJF
+// ═══════════════════════════════════════
+const EVJF_CHECKLIST_DEFAULT = [
+  "Définir la date et vérifier les disponibilités de toutes",
+  "Choisir l'activité principale (spa, escape game, cours de cuisine, atelier cocktail…)",
+  "Réserver le lieu / l'activité principale",
+  "Confirmer les participantes et collecter leurs contacts",
+  "Organiser le transport (covoiturage, train, taxi…)",
+  "Prévoir l'hébergement si nuit sur place",
+  "Préparer la décoration EVJF (sash, accessoires, banderoles)",
+  "Commander les accessoires pour la mariée (sash, voile rigolo, badges…)",
+  "Prévoir le repas / réserver un restaurant",
+  "Préparer une surprise ou un jeu spécial pour la mariée",
+  "Préparer le discours / album souvenir pour Keziah",
+  "Organiser la collecte pour le cadeau commun",
+  "Acheter / commander le cadeau de groupe",
+  "Préparer un kit survie humoristique pour la mariée",
+  "Prendre des photos et vidéos souvenirs !",
+];
+
+function renderEvjf() {
+  const evjf = state.evjf || {};
+  const f = id => document.getElementById(id);
+  if (f('evjf-date'))    f('evjf-date').value    = evjf.date    || '';
+  if (f('evjf-lieu'))    f('evjf-lieu').value    = evjf.lieu    || '';
+  if (f('evjf-theme'))   f('evjf-theme').value   = evjf.theme   || '';
+  if (f('evjf-cadeaux')) f('evjf-cadeaux').value = evjf.cadeaux || '';
+
+  // Participantes
+  const pb = f('evjf-participantes-body');
+  if (pb) {
+    const parts = evjf.participantes || [];
+    pb.innerHTML = parts.length === 0
+      ? `<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucune participante — cliquez sur + pour ajouter</td></tr>`
+      : parts.map((p, i) => `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
+          <td style="padding:7px 10px"><input value="${escHtml(p.prenom||'')}" onchange="updateEvjfP(${i},'prenom',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><input value="${escHtml(p.role||'')}" onchange="updateEvjfP(${i},'role',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><input value="${escHtml(p.tel||'')}" onchange="updateEvjfP(${i},'tel',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><select onchange="updateEvjfP(${i},'rsvp',this.value)" style="border:none;background:transparent;font-size:0.85rem;font-family:inherit">
+            <option ${!p.rsvp||p.rsvp==='⏳ En attente'?'selected':''}>⏳ En attente</option>
+            <option ${p.rsvp==='✅ Confirmée'?'selected':''}>✅ Confirmée</option>
+            <option ${p.rsvp==='❌ Indisponible'?'selected':''}>❌ Indisponible</option>
+          </select></td>
+          <td style="text-align:center"><button onclick="deleteEvjfP(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></td>
+        </tr>`).join('');
+  }
+
+  // Programme
+  const progb = f('evjf-programme-body');
+  if (progb) {
+    const prog = evjf.programme || [];
+    progb.innerHTML = prog.length === 0
+      ? `<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucun moment — cliquez sur + pour ajouter</td></tr>`
+      : prog.map((p, i) => `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
+          <td style="padding:7px 10px"><input value="${escHtml(p.heure||'')}" placeholder="10h00" onchange="updateEvjfProg(${i},'heure',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><input value="${escHtml(p.activite||'')}" onchange="updateEvjfProg(${i},'activite',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><input value="${escHtml(p.lieu||'')}" onchange="updateEvjfProg(${i},'lieu',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><input value="${escHtml(p.notes||'')}" onchange="updateEvjfProg(${i},'notes',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="text-align:center"><button onclick="deleteEvjfProg(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></td>
+        </tr>`).join('');
+  }
+
+  // Budget EVJF
+  const bb = f('evjf-budget-body');
+  if (bb) {
+    const budg = evjf.budget || [];
+    const total = budg.reduce((s,b) => s+(parseFloat(b.montant)||0), 0);
+    const te = f('evjf-budget-total'); if (te) te.textContent = fmtEur(total);
+    bb.innerHTML = budg.length === 0
+      ? `<tr><td colspan="4" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucune dépense — cliquez sur + pour ajouter</td></tr>`
+      : budg.map((b, i) => `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
+          <td style="padding:7px 10px"><input value="${escHtml(b.poste||'')}" onchange="updateEvjfBudget(${i},'poste',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px;text-align:right"><input type="number" value="${b.montant||0}" onchange="updateEvjfBudget(${i},'montant',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit;text-align:right"></td>
+          <td style="padding:7px 10px"><select onchange="updateEvjfBudget(${i},'statut',this.value)" style="border:none;background:transparent;font-size:0.85rem;font-family:inherit">
+            <option ${!b.statut||b.statut==='⏳ À payer'?'selected':''}>⏳ À payer</option>
+            <option ${b.statut==='✅ Payé'?'selected':''}>✅ Payé</option>
+          </select></td>
+          <td style="text-align:center"><button onclick="deleteEvjfBudget(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></td>
+        </tr>`).join('');
+  }
+
+  // Checklist
+  const cl = f('evjf-checklist');
+  if (cl) {
+    const checks = evjf.checklist || {};
+    cl.innerHTML = EVJF_CHECKLIST_DEFAULT.map((item, i) => {
+      const k = 'evjf_' + i;
+      return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:#fafafa;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--light-pink)'" onmouseout="this.style.background='#fafafa'">
+        <input type="checkbox" ${checks[k]?'checked':''} onchange="toggleEvjfCheck('${k}',this.checked)" style="width:16px;height:16px;accent-color:var(--pink)">
+        <span style="${checks[k]?'text-decoration:line-through;color:var(--grey)':''}">${item}</span>
+      </label>`;
+    }).join('');
+  }
+}
+function saveEvjfField(field, val) { if (!state.evjf) state.evjf={}; state.evjf[field]=val; save(); }
+function addEvjfParticipante() { if (!state.evjf.participantes) state.evjf.participantes=[]; state.evjf.participantes.push({prenom:'',role:'Participante',tel:'',rsvp:'⏳ En attente'}); save(); renderEvjf(); }
+function updateEvjfP(i,f,v) { state.evjf.participantes[i][f]=v; save(); }
+function deleteEvjfP(i) { state.evjf.participantes.splice(i,1); save(); renderEvjf(); }
+function addEvjfProgramme() { if (!state.evjf.programme) state.evjf.programme=[]; state.evjf.programme.push({heure:'',activite:'',lieu:'',notes:''}); save(); renderEvjf(); }
+function updateEvjfProg(i,f,v) { state.evjf.programme[i][f]=v; save(); }
+function deleteEvjfProg(i) { state.evjf.programme.splice(i,1); save(); renderEvjf(); }
+function addEvjfBudget() { if (!state.evjf.budget) state.evjf.budget=[]; state.evjf.budget.push({poste:'',montant:0,statut:'⏳ À payer'}); save(); renderEvjf(); }
+function updateEvjfBudget(i,f,v) { state.evjf.budget[i][f]= f==='montant'?(parseFloat(v)||0):v; save(); renderEvjf(); }
+function deleteEvjfBudget(i) { state.evjf.budget.splice(i,1); save(); renderEvjf(); }
+function toggleEvjfCheck(k,v) { if (!state.evjf.checklist) state.evjf.checklist={}; state.evjf.checklist[k]=v; save(); renderEvjf(); }
+
+// ═══════════════════════════════════════
+// TENUES
+// ═══════════════════════════════════════
+const TENUES_DEFAULT = [
+  { id:'t1', personne:'Keziah', type:'Robe de mariée', couleur:'Ivoire', prestataire:'', statut:'🔍 À choisir', notes:'' },
+  { id:'t2', personne:'Briac', type:'Costume / Smoking', couleur:'Marine ou Gris', prestataire:'', statut:'🔍 À choisir', notes:'' },
+  { id:'t3', personne:'Estelle (témoin)', type:'Robe demoiselle d\'honneur', couleur:'', prestataire:'', statut:'🔍 À choisir', notes:'' },
+  { id:'t4', personne:'Garçons d\'honneur', type:'Costume', couleur:'', prestataire:'', statut:'🔍 À choisir', notes:'' },
+  { id:'t5', personne:'Enfants d\'honneur', type:'Tenue cortège', couleur:'', prestataire:'', statut:'🔍 À choisir', notes:'' },
+];
+const TENUE_STATUTS = ['🔍 À choisir','📦 Commandé','🧵 En essayage','✅ Prêt','🔄 À louer'];
+
+function renderTenues() {
+  const tbody = document.getElementById('tenues-body');
+  if (!tbody) return;
+  if (!state.tenues || state.tenues.length === 0) state.tenues = JSON.parse(JSON.stringify(TENUES_DEFAULT));
+  tbody.innerHTML = state.tenues.map((t, i) => `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
+    <td style="padding:7px 10px"><input value="${escHtml(t.personne||'')}" onchange="updateTenue(${i},'personne',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit;font-weight:600"></td>
+    <td style="padding:7px 10px"><input value="${escHtml(t.type||'')}" onchange="updateTenue(${i},'type',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+    <td style="padding:7px 10px"><input value="${escHtml(t.couleur||'')}" onchange="updateTenue(${i},'couleur',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+    <td style="padding:7px 10px"><input value="${escHtml(t.prestataire||'')}" onchange="updateTenue(${i},'prestataire',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+    <td style="padding:7px 10px"><select onchange="updateTenue(${i},'statut',this.value)" style="border:none;background:transparent;font-size:0.85rem;font-family:inherit">
+      ${TENUE_STATUTS.map(s=>`<option ${t.statut===s?'selected':''}>${s}</option>`).join('')}
+    </select></td>
+    <td style="padding:7px 10px"><input value="${escHtml(t.notes||'')}" onchange="updateTenue(${i},'notes',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+    <td style="text-align:center"><button onclick="deleteTenue(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></td>
+  </tr>`).join('');
+}
+function updateTenue(i,f,v) { if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT)); state.tenues[i][f]=v; save(); }
+function deleteTenue(i) { if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT)); state.tenues.splice(i,1); save(); renderTenues(); }
+function addTenue() { if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT)); state.tenues.push({id:'tenue_'+Date.now(),personne:'',type:'',couleur:'',prestataire:'',statut:'🔍 À choisir',notes:''}); save(); renderTenues(); }
+
+// ═══════════════════════════════════════
+// FAIRE-PART & PAPETERIE
+// ═══════════════════════════════════════
+const FP_CHECKLIST_DEFAULT = [
+  "Choisir le design / style des faire-part",
+  "Choisir l'imprimeur (en ligne ou local)",
+  "Rédiger le texte du faire-part",
+  "Commander les enveloppes",
+  "Recueillir toutes les adresses postales des invités",
+  "Imprimer les faire-part",
+  "Mettre sous enveloppe et affranchir",
+  "Envoyer les faire-part (6 mois avant le mariage)",
+  "Préparer et envoyer les Save the Date (12 mois avant)",
+  "Créer et imprimer le livret de cérémonie",
+  "Imprimer les plans / informations pratiques pour les invités",
+  "Commander les menus pour les tables",
+  "Commander les marque-places",
+  "Commander le livre d'or",
+  "Commander les étiquettes cadeaux invités",
+];
+
+function renderFairePart() {
+  const statsEl = document.getElementById('fp-stats');
+  if (statsEl) {
+    const guests = state.guests || [];
+    const conf = guests.filter(g => (g.rsvp||'').includes('Confirmé')).length;
+    const att  = guests.filter(g => (g.rsvp||'').includes('attente')).length;
+    const ref  = guests.filter(g => (g.rsvp||'').includes('Refusé')).length;
+    statsEl.innerHTML = `
+      <div class="stat-card"><div class="val">${guests.length}</div><div class="lbl">Invités total</div></div>
+      <div class="stat-card" style="border-color:var(--green)"><div class="val" style="color:var(--green)">${conf}</div><div class="lbl">RSVP ✅ Confirmés</div></div>
+      <div class="stat-card" style="border-color:var(--yellow)"><div class="val" style="color:var(--yellow)">${att}</div><div class="lbl">⏳ En attente</div></div>
+      <div class="stat-card" style="border-color:var(--red)"><div class="val" style="color:var(--red)">${ref}</div><div class="lbl">❌ Refusés</div></div>`;
+  }
+  const tbody = document.getElementById('fp-guests-body');
+  if (tbody) {
+    const guests = state.guests || [];
+    tbody.innerHTML = guests.length === 0
+      ? `<tr><td colspan="4" style="text-align:center;color:var(--grey);padding:20px;font-style:italic">Aucun invité — ajoutez-les dans la section Invités</td></tr>`
+      : guests.map((g, i) => {
+          const rsvpC = (g.rsvp||'').includes('Confirmé') ? 'var(--green)' : (g.rsvp||'').includes('Refusé') ? 'var(--red)' : 'var(--orange)';
+          return `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
+            <td style="padding:8px 12px;font-weight:600">${escHtml(guestFullName(g))}</td>
+            <td style="padding:8px 12px;font-size:0.85rem;color:${g.adresse?'var(--dark)':'var(--grey)'}">${g.adresse?escHtml(g.adresse):'—'}</td>
+            <td style="padding:8px 12px;font-size:0.85rem">${escHtml(g.type_invitation||'—')}</td>
+            <td style="padding:8px 12px;font-size:0.85rem;color:${rsvpC};font-weight:600">${escHtml(g.rsvp||'⏳ En attente')}</td>
+          </tr>`;
+        }).join('');
+  }
+  const clEl = document.getElementById('fp-checklist');
+  if (clEl) {
+    const cl = (state.papeterie||{}).checklist||{};
+    clEl.innerHTML = FP_CHECKLIST_DEFAULT.map((item, i) => {
+      const k = 'fp_'+i;
+      return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:#fafafa;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--light-pink)'" onmouseout="this.style.background='#fafafa'">
+        <input type="checkbox" ${cl[k]?'checked':''} onchange="toggleFpCheck('${k}',this.checked)" style="width:16px;height:16px;accent-color:var(--pink)">
+        <span style="${cl[k]?'text-decoration:line-through;color:var(--grey)':''}">${item}</span>
+      </label>`;
+    }).join('');
+  }
+  const notesEl = document.getElementById('fp-notes');
+  if (notesEl) notesEl.value = (state.papeterie||{}).notes||'';
+}
+function toggleFpCheck(k,v) { if(!state.papeterie) state.papeterie={checklist:{},notes:''}; if(!state.papeterie.checklist) state.papeterie.checklist={}; state.papeterie.checklist[k]=v; save(); renderFairePart(); }
+function savePaperieNotes(v) { if(!state.papeterie) state.papeterie={checklist:{},notes:''}; state.papeterie.notes=v; save(); }
+
+// ═══════════════════════════════════════
+// LUNE DE MIEL
+// ═══════════════════════════════════════
+const LDM_CHECKLIST_DEFAULT = [
+  "Choisir la destination",
+  "Définir le budget lune de miel",
+  "Réserver les billets d'avion / train",
+  "Réserver l'hébergement (hôtel, villa…)",
+  "Souscrire une assurance voyage",
+  "Vérifier la validité des passeports (> 6 mois après la date de retour)",
+  "Vérifier si un visa est nécessaire",
+  "Vérifier les vaccins recommandés / obligatoires",
+  "Prévenir la banque des voyages à l'étranger",
+  "Préparer la liste de bagages",
+  "Télécharger les billets et réservations",
+  "Prévenir un proche des coordonnées de l'hébergement",
+  "Prévoir des activités / excursions sur place",
+];
+
+function renderLuneDeMiel() {
+  const ldm = state.lunedeMiel||{};
+  const f = id => document.getElementById(id);
+  if(f('ldm-destination')) f('ldm-destination').value = ldm.destination||'';
+  if(f('ldm-depart'))      f('ldm-depart').value      = ldm.dateDepart||'';
+  if(f('ldm-retour'))      f('ldm-retour').value      = ldm.dateRetour||'';
+  if(f('ldm-budget'))      f('ldm-budget').value      = ldm.budget||'';
+  if(f('ldm-notes'))       f('ldm-notes').value       = ldm.notes||'';
+  const clEl = f('ldm-checklist');
+  if (clEl) {
+    const cl = ldm.checklist||{};
+    clEl.innerHTML = LDM_CHECKLIST_DEFAULT.map((item, i) => {
+      const k = 'ldm_'+i;
+      return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:#fafafa;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='#E8EAF6'" onmouseout="this.style.background='#fafafa'">
+        <input type="checkbox" ${cl[k]?'checked':''} onchange="toggleLdmCheck('${k}',this.checked)" style="width:16px;height:16px;accent-color:#3F51B5">
+        <span style="${cl[k]?'text-decoration:line-through;color:var(--grey)':''}">${item}</span>
+      </label>`;
+    }).join('');
+  }
+}
+function saveLuneDeMielField(f,v) { if(!state.lunedeMiel) state.lunedeMiel={}; state.lunedeMiel[f]=v; save(); }
+function toggleLdmCheck(k,v) { if(!state.lunedeMiel) state.lunedeMiel={}; if(!state.lunedeMiel.checklist) state.lunedeMiel.checklist={}; state.lunedeMiel.checklist[k]=v; save(); renderLuneDeMiel(); }
+
+// ═══════════════════════════════════════
+// DOCUMENTS LÉGAUX
+// ═══════════════════════════════════════
+const DOCS_LEGAUX_DEFAULT = [
+  { key:'dl0',  label:'Retirer le dossier de mariage civil à la mairie de Vernon-sur-Brenne', detail:'Demander la liste complète des pièces à fournir' },
+  { key:'dl1',  label:'Obtenir les actes de naissance (< 3 mois avant le dépôt)', detail:'Mairie de naissance de chaque futur époux' },
+  { key:'dl2',  label:'Photocopies des pièces d\'identité en cours de validité', detail:'Carte d\'identité ou passeport' },
+  { key:'dl3',  label:'Justificatifs de domicile (< 3 mois)', detail:'Facture EDF, quittance de loyer…' },
+  { key:'dl4',  label:'Choisir les témoins (2 à 4 personnes majeures)', detail:'Prévoir leurs pièces d\'identité' },
+  { key:'dl5',  label:'Déposer le dossier complet à la mairie', detail:'Recommandé : 2 mois avant la cérémonie (minimum 30 jours)' },
+  { key:'dl6',  label:'Publication des bans à la mairie', detail:'Affichage obligatoire 10 jours avant la cérémonie civile' },
+  { key:'dl7',  label:'Décider si un contrat de mariage est souhaité', detail:'À signer chez un notaire AVANT le mariage' },
+  { key:'dl8',  label:'Si contrat de mariage : signature chez le notaire', detail:'Prévoir plusieurs semaines à l\'avance' },
+  { key:'dl9',  label:'Audition à la mairie si demandée', detail:'Parfois obligatoire selon les mairies' },
+  { key:'dl10', label:'Mise à jour de la carte d\'identité (après le mariage)', detail:'Nouveau nom ou mention du mariage' },
+  { key:'dl11', label:'Mise à jour du passeport', detail:'Après le mariage si changement de nom' },
+  { key:'dl12', label:'Déclaration de changement de nom à l\'employeur', detail:'' },
+  { key:'dl13', label:'Mise à jour Sécurité Sociale / Mutuelle', detail:'' },
+  { key:'dl14', label:'Mise à jour des comptes bancaires', detail:'' },
+  { key:'dl15', label:'Mise à jour du permis de conduire', detail:'Si changement de nom' },
+];
+
+function renderDocsLegaux() {
+  const el = document.getElementById('docs-checklist');
+  if (!el) return;
+  const cl = (state.docsLegaux||{}).checklist||{};
+  el.innerHTML = DOCS_LEGAUX_DEFAULT.map(item => `
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:10px;background:#fafafa;cursor:pointer;border:1px solid transparent;transition:all 0.15s" onmouseover="this.style.background='#E8F5E9';this.style.borderColor='#A5D6A7'" onmouseout="this.style.background='#fafafa';this.style.borderColor='transparent'">
+      <input type="checkbox" ${cl[item.key]?'checked':''} onchange="toggleDocCheck('${item.key}',this.checked)" style="width:16px;height:16px;margin-top:2px;accent-color:var(--green);flex-shrink:0">
+      <div>
+        <span style="${cl[item.key]?'text-decoration:line-through;color:var(--grey)':'font-weight:600'}">${item.label}</span>
+        ${item.detail?`<div style="font-size:0.8rem;color:var(--grey);margin-top:2px">${item.detail}</div>`:''}
+      </div>
+    </label>`).join('');
+}
+function toggleDocCheck(k,v) { if(!state.docsLegaux) state.docsLegaux={checklist:{}}; if(!state.docsLegaux.checklist) state.docsLegaux.checklist={}; state.docsLegaux.checklist[k]=v; save(); renderDocsLegaux(); }
+
+// ═══════════════════════════════════════
+// KIT D'URGENCE
+// ═══════════════════════════════════════
+const KIT_URGENCE_DEFAULT = [
+  { cat:'💊 Santé',    items:[{k:'k0',l:'Doliprane / Ibuprofène'},{k:'k1',l:'Anti-diarrhée / Smecta'},{k:'k2',l:'Anti-nausée'},{k:'k3',l:'Sparadraps & pansements'},{k:'k4',l:'Gel hydroalcoolique'}] },
+  { cat:'🧵 Couture',  items:[{k:'k5',l:'Aiguilles et fil (blanc, ivoire, noir)'},{k:'k6',l:'Épingles à nourrice (grandes & petites)'},{k:'k7',l:'Ciseaux de couture'},{k:'k8',l:'Colle à tissu double-face'},{k:'k9',l:'Scotch double-face'}] },
+  { cat:'💄 Beauté',   items:[{k:'k10',l:'Fond de teint de secours'},{k:'k11',l:'Rouge à lèvres / gloss de secours'},{k:'k12',l:'Poudre compacte'},{k:'k13',l:'Lingettes démaquillantes'},{k:'k14',l:'Déodorant discret'},{k:'k15',l:'Brosse à cheveux & épingles'},{k:'k16',l:'Laque / spray fixateur'}] },
+  { cat:'📱 Tech',     items:[{k:'k17',l:'Chargeurs de téléphone (+ câbles)'},{k:'k18',l:'Batterie externe chargée'},{k:'k19',l:'Lecteur de cartes mémoire'}] },
+  { cat:'🍬 Divers',   items:[{k:'k20',l:'Chewing-gum / bonbons à la menthe'},{k:'k21',l:'Snacks (biscuits, fruits secs — pour le matin)'},{k:'k22',l:'Bouteille d\'eau'},{k:'k23',l:'Mouchoirs en papier'},{k:'k24',l:'Stylo (pour signer les registres !)'},{k:'k25',l:'Petite monnaie / argent liquide'},{k:'k26',l:'Programme du jour J imprimé'},{k:'k27',l:'Parapluie de secours (mini)'},{k:'k28',l:'Mini coussin gonflable (pour les pieds !)'}] },
+];
+
+function renderKitUrgence() {
+  const el = document.getElementById('kit-checklist');
+  if (!el) return;
+  const cl = (state.kitUrgence||{}).checklist||{};
+  el.innerHTML = KIT_URGENCE_DEFAULT.map(cat => `
+    <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+      <div style="font-weight:700;font-size:0.9rem;margin-bottom:10px;color:var(--dark)">${cat.cat}</div>
+      ${cat.items.map(item => `<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer">
+        <input type="checkbox" ${cl[item.k]?'checked':''} onchange="toggleKitCheck('${item.k}',this.checked)" style="width:15px;height:15px;accent-color:var(--pink);flex-shrink:0">
+        <span style="font-size:0.88rem;${cl[item.k]?'text-decoration:line-through;color:#bbb':''}">${item.l}</span>
+      </label>`).join('')}
+    </div>`).join('');
+}
+function toggleKitCheck(k,v) { if(!state.kitUrgence) state.kitUrgence={checklist:{}}; if(!state.kitUrgence.checklist) state.kitUrgence.checklist={}; state.kitUrgence.checklist[k]=v; save(); renderKitUrgence(); }
+
+// ═══════════════════════════════════════
+// TABLEAU D'AMBIANCE
+// ═══════════════════════════════════════
+function renderAmbiance() {
+  const amb = state.ambiance||{};
+  const f = id => document.getElementById(id);
+  if(f('ambiance-keywords')) f('ambiance-keywords').value = amb.keywords||'';
+  if(f('ambiance-pinterest')) f('ambiance-pinterest').value = amb.pinterest||'';
+  if(f('ambiance-notes'))    f('ambiance-notes').value    = amb.notes||'';
+  const palEl = f('ambiance-palette');
+  if (palEl) {
+    const colors = (amb.colors&&amb.colors.length>0) ? amb.colors : ['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'];
+    palEl.innerHTML = colors.map((c, i) => `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="width:64px;height:64px;border-radius:50%;background:${escHtml(c)};box-shadow:0 3px 12px rgba(0,0,0,0.15);border:3px solid white;cursor:pointer;transition:transform 0.15s" onclick="editAmbianceColor(${i})" title="Cliquer pour modifier" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"></div>
+        <input type="text" value="${escHtml(c)}" onchange="updateAmbianceColor(${i},this.value)" style="width:72px;text-align:center;border:1px solid #eee;border-radius:6px;padding:4px;font-size:0.75rem;font-family:monospace">
+        <button onclick="deleteAmbianceColor(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.85rem" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">× retirer</button>
+      </div>`).join('');
+  }
+}
+function saveAmbianceField(f,v) { if(!state.ambiance) state.ambiance={}; state.ambiance[f]=v; save(); }
+function editAmbianceColor(i) {
+  const colors = state.ambiance?.colors||['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'];
+  const v = prompt('Code couleur hex (ex: #C2185B) :', colors[i]||'#000000');
+  if (v&&v.trim()) { updateAmbianceColor(i, v.trim()); }
+}
+function updateAmbianceColor(i,v) { if(!state.ambiance) state.ambiance={}; if(!state.ambiance.colors) state.ambiance.colors=[]; state.ambiance.colors[i]=v; save(); renderAmbiance(); }
+function deleteAmbianceColor(i) { if(!state.ambiance||!state.ambiance.colors) return; state.ambiance.colors.splice(i,1); save(); renderAmbiance(); }
+function addAmbianceColor() {
+  if(!state.ambiance) state.ambiance={};
+  if(!state.ambiance.colors) state.ambiance.colors=[];
+  const v = prompt('Code couleur hex (ex: #FFE0B2) :', '#FFFFFF');
+  if (v&&v.trim()) { state.ambiance.colors.push(v.trim()); save(); renderAmbiance(); }
+}
+
 // INIT
 // ═══════════════════════════════════════
 load();
@@ -2442,22 +3825,26 @@ renderMatrix();
 renderRoles();
 renderFilRouge();
 renderUrgence();
+renderSeatingChart();
+renderEvjf();
+renderTenues();
+renderFairePart();
+renderLuneDeMiel();
+renderDocsLegaux();
+renderKitUrgence();
+renderAmbiance();
 updateDashboard();
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
   import {
-    getFirestore,
-    collection,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    setDoc,
-    getDoc,
-    serverTimestamp
+    getFirestore, collection, getDocs, addDoc, updateDoc,
+    deleteDoc, doc, setDoc, getDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+  import {
+    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+    signOut, onAuthStateChanged, updateProfile
+  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCYFt12IsMtPEUOlaV0TauBTjWtg1uNkRk",
@@ -2469,25 +3856,50 @@ updateDashboard();
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const db  = getFirestore(app);
+  const auth = getAuth(app);
 
+  // Expose Firestore
   window.db = db;
-  window.fbCollection = collection;
-  window.fbGetDocs = getDocs;
-  window.fbAddDoc = addDoc;
-  window.fbUpdateDoc = updateDoc;
-  window.fbDeleteDoc = deleteDoc;
-  window.fbDoc = doc;
-  window.fbSetDoc = setDoc;
-  window.fbGetDoc = getDoc;
+  window.fbCollection = collection; window.fbGetDocs = getDocs;
+  window.fbAddDoc = addDoc;         window.fbUpdateDoc = updateDoc;
+  window.fbDeleteDoc = deleteDoc;   window.fbDoc = doc;
+  window.fbSetDoc = setDoc;         window.fbGetDoc = getDoc;
   window.fbServerTimestamp = serverTimestamp;
 
-  console.log("Firebase connecté 🚀");
+  // Expose Auth
+  window.fbAuth = auth;
+  window.fbSignIn = signInWithEmailAndPassword;
+  window.fbSignUp = createUserWithEmailAndPassword;
+  window.fbSignOut = signOut;
+  window.fbUpdateProfile = updateProfile;
 
-  // Chargement initial de toutes les données depuis Firebase
-  window.loadAllFromFirebase();
+  // ── Gestion de l'état d'authentification ──
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Connecté → masquer l'overlay
+      window.currentUser = user;
+      const overlay = document.getElementById('auth-overlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => { overlay.style.display = 'none'; }, 400);
+      // Afficher le nom dans le nav
+      if (typeof updateNavUser === 'function') updateNavUser(user);
+      // Charger les données Firebase
+      window.loadAllFromFirebase();
+    } else {
+      // Déconnecté → afficher l'overlay
+      window.currentUser = null;
+      const overlay = document.getElementById('auth-overlay');
+      overlay.style.display = 'flex';
+      overlay.style.opacity = '1';
+      if (typeof updateNavUser === 'function') updateNavUser(null);
+      // Remettre le bouton de login
+      const btn = document.getElementById('login-btn');
+      if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+    }
+  });
+
+  console.log("Firebase + Auth connectés 🚀");
 </script>
 </body>
 </html>
-
-
