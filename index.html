@@ -345,7 +345,34 @@
   }
   .guest-chip-unassigned:hover { background: var(--light-pink); border-color: var(--pink); color: var(--pink); }
   @media (max-width: 768px) {
-    .hero h1 { font-size: 1.8rem; }
+    /* ── Hero compact sur mobile ── */
+    .hero { padding: 16px 16px 14px; }
+    .hero .emoji { font-size: 1.6rem; margin-bottom: 4px; }
+    .hero h1 { font-size: 1.5rem; }
+    .hero h2 { font-size: 0.95rem; margin-top: 4px; }
+    .hero .sub { display: none; }
+    .hero .venue { font-size: 0.82rem; padding: 5px 12px; margin-top: 8px; }
+
+    /* ── Nav en scroll horizontal (une seule ligne) ── */
+    .nav {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: flex-start;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 6px 8px;
+      gap: 4px;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a {
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+    }
+    #nav-user { flex-shrink: 0; }
+
+    /* ── Budget ── */
     .budget-row { grid-template-columns: 1fr; }
     .budget-row.header-row { display: none; }
   }
