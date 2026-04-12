@@ -2852,6 +2852,34 @@ function gererCategories() {
   }
 }
 
+// Constantes nécessaires à l'initialisation (doivent être déclarées avant load/render)
+const JOURJ_DEFAULT = [
+  { id:'jj0',  ordre:10,  heure:'8h00',   titre:'Coiffure & Maquillage',               details:"Keziah, Estelle et l'équipe de la mariée — Espace préparation du château" },
+  { id:'jj1',  ordre:20,  heure:'10h30',  titre:'Habillage & Photos préparatifs',      details:'Keziah + photographe — Chambres du château' },
+  { id:'jj2',  ordre:30,  heure:'11h30',  titre:'⚖️ Cérémonie civile à la mairie',      details:'Mariés + famille proche + témoins — Mairie de Vernon-sur-Brenne' },
+  { id:'jj3',  ordre:40,  heure:'14h30',  titre:'✝️ Cérémonie religieuse',              details:'Tous les invités — Église à Vernon-sur-Brenne' },
+  { id:'jj4',  ordre:50,  heure:'16h00',  titre:"📸 Sortie de l'église & photos",      details:'Lancé de pétales · Photos de couple et de groupe devant l\'église' },
+  { id:'jj5',  ordre:60,  heure:'16h30',  titre:'🏰 Arrivée au Château de Jallanges',  details:'Tous les invités accueillis dans les allées du château' },
+  { id:'jj6',  ordre:70,  heure:'17h00',  titre:'🥂 Cocktail & Photos de couple',      details:'Cocktail dans les jardins du domaine — Photographe & vidéaste' },
+  { id:'jj7',  ordre:80,  heure:'19h30',  titre:'Entrée dans la salle de réception',   details:'Entrée des mariés en musique — Discours des témoins' },
+  { id:'jj8',  ordre:90,  heure:'20h00',  titre:'🍽️ Dîner de gala',                    details:'Tous les invités — Menu gastronomique, ambiance musicale douce' },
+  { id:'jj9',  ordre:100, heure:'22h30',  titre:'💃 Ouverture du bal & Pièce montée',  details:'Keziah & Briac ouvrent le bal — Découpe de la pièce montée' },
+  { id:'jj10', ordre:110, heure:'23h00',  titre:'🎵 Soirée dansante',                  details:"Tous les invités — DJ jusqu'à l'aube !" },
+  { id:'jj11', ordre:120, heure:'2h00+',  titre:'Fin de soirée & Bouquet de la mariée',details:'Les plus courageux… et Estelle !' },
+];
+
+const VENUE_INFOS_DEFAULT = {
+  localisation: "Château de Jallanges\nVernon-sur-Brenne\n37210, Indre-et-Loire\nTouraine — Val de Loire\n\nwww.jallanges.com",
+  acces: "À 20 min de Tours (A10)\nÀ 30 min d'Amboise\nÀ 2h30 de Paris (TGV Tours + voiture)\n\nPrévoir navettes depuis la gare de Tours pour les invités sans voiture.",
+  pointsForts: "🌹 Domaine viticole & château Renaissance\n🛏️ Chambres d'hôtes sur place\n🌳 Jardins à la française\n🍷 Vins du domaine disponibles\n📷 Cadre exceptionnel pour les photos\n🎪 Grande salle de réception\n🌞 Espaces extérieurs pour le cocktail",
+  questions: "• Traiteur libre ou liste imposée ?\n• Nombre de chambres disponibles ?\n• Horaire limite pour la musique ?\n• Parking : combien de places ?\n• Plan B en cas de pluie ?\n• Accès PMR (personnes à mobilité réduite) ?\n• Montant et modalités de l'acompte ?",
+  decoNote: "Le Château de Jallanges est entouré de vignes et de jardins à la française. Un thème floral champêtre et romantique avec des pivoines, roses et hortensias en rose et blanc sera parfaitement en harmonie avec le cadre de la Touraine en juillet.",
+  ceremonieDemarches: "• Contacter le curé / pasteur dès maintenant (12+ mois avant)\n• Choisir l'église : à Vernon-sur-Brenne ou dans la paroisse de Keziah ou Briac\n• Retirer et déposer le dossier de mariage religieux\n• Participer aux sessions de préparation au mariage (obligatoires, 3 à 5 séances)\n• Confirmer la date et l'heure de la messe avec le prêtre",
+  ceremonieMusique: "• Organiste ou chantre à réserver séparément\n• Chants recommandés en juillet (été) : Ave Maria, Magnificat, chants de louange…\n• Chant d'entrée · Psaume · Alleluia · Chant d'offertoire · Notre Père chanté · Chant de sortie\n• Répétition avec le musicien recommandée avant le jour J",
+  ceremonieDeroulement: "🎶 Entrée en musique des mariés\n📖 Liturgie de la Parole (3 lectures + psaume)\n💍 Rite du mariage (consentement, échange des alliances)\n🙏 Liturgie eucharistique (communion)\n🌹 Bénédiction solennelle des époux\n🎵 Sortie en musique",
+  ceremonieLectures: "• 1 Co 13 : «L'amour est patient, l'amour est serviable…»\n• Rt 1,16 : «Où tu iras, j'irai…»\n• Gn 2,18-24 : La création de la femme\n• Jn 2,1-11 : Les noces de Cana\n• Ep 5,2a.25-32 : L'amour mutuel des époux\n• Sg 8,7 : La tempérance, la prudence, la justice",
+};
+
 // INIT
 // ═══════════════════════════════════════
 load();
@@ -2915,20 +2943,7 @@ function getMemberOptions(currentVal) {
 // ═══════════════════════════════════════
 // JOUR J — PROGRAMME DYNAMIQUE
 // ═══════════════════════════════════════
-const JOURJ_DEFAULT = [
-  { id:'jj0',  ordre:10,  heure:'8h00',   titre:'Coiffure & Maquillage',               details:"Keziah, Estelle et l'équipe de la mariée — Espace préparation du château" },
-  { id:'jj1',  ordre:20,  heure:'10h30',  titre:'Habillage & Photos préparatifs',      details:'Keziah + photographe — Chambres du château' },
-  { id:'jj2',  ordre:30,  heure:'11h30',  titre:'⚖️ Cérémonie civile à la mairie',      details:'Mariés + famille proche + témoins — Mairie de Vernon-sur-Brenne' },
-  { id:'jj3',  ordre:40,  heure:'14h30',  titre:'✝️ Cérémonie religieuse',              details:'Tous les invités — Église à Vernon-sur-Brenne' },
-  { id:'jj4',  ordre:50,  heure:'16h00',  titre:"📸 Sortie de l'église & photos",      details:'Lancé de pétales · Photos de couple et de groupe devant l\'église' },
-  { id:'jj5',  ordre:60,  heure:'16h30',  titre:'🏰 Arrivée au Château de Jallanges',  details:'Tous les invités accueillis dans les allées du château' },
-  { id:'jj6',  ordre:70,  heure:'17h00',  titre:'🥂 Cocktail & Photos de couple',      details:'Cocktail dans les jardins du domaine — Photographe & vidéaste' },
-  { id:'jj7',  ordre:80,  heure:'19h30',  titre:'Entrée dans la salle de réception',   details:'Entrée des mariés en musique — Discours des témoins' },
-  { id:'jj8',  ordre:90,  heure:'20h00',  titre:'🍽️ Dîner de gala',                    details:'Tous les invités — Menu gastronomique, ambiance musicale douce' },
-  { id:'jj9',  ordre:100, heure:'22h30',  titre:'💃 Ouverture du bal & Pièce montée',  details:'Keziah & Briac ouvrent le bal — Découpe de la pièce montée' },
-  { id:'jj10', ordre:110, heure:'23h00',  titre:'🎵 Soirée dansante',                  details:"Tous les invités — DJ jusqu'à l'aube !" },
-  { id:'jj11', ordre:120, heure:'2h00+',  titre:'Fin de soirée & Bouquet de la mariée',details:'Les plus courageux… et Estelle !' },
-];
+// (JOURJ_DEFAULT déclaré avant le bloc INIT)
 
 function getJourJItems() {
   if (!state.jourJItems || state.jourJItems.length === 0)
@@ -2993,17 +3008,7 @@ function addJourJItem() {
 // ═══════════════════════════════════════
 // CHÂTEAU — INFO BOXES MODIFIABLES
 // ═══════════════════════════════════════
-const VENUE_INFOS_DEFAULT = {
-  localisation: "Château de Jallanges\nVernon-sur-Brenne\n37210, Indre-et-Loire\nTouraine — Val de Loire\n\nwww.jallanges.com",
-  acces: "À 20 min de Tours (A10)\nÀ 30 min d'Amboise\nÀ 2h30 de Paris (TGV Tours + voiture)\n\nPrévoir navettes depuis la gare de Tours pour les invités sans voiture.",
-  pointsForts: "🌹 Domaine viticole & château Renaissance\n🛏️ Chambres d'hôtes sur place\n🌳 Jardins à la française\n🍷 Vins du domaine disponibles\n📷 Cadre exceptionnel pour les photos\n🎪 Grande salle de réception\n🌞 Espaces extérieurs pour le cocktail",
-  questions: "• Traiteur libre ou liste imposée ?\n• Nombre de chambres disponibles ?\n• Horaire limite pour la musique ?\n• Parking : combien de places ?\n• Plan B en cas de pluie ?\n• Accès PMR (personnes à mobilité réduite) ?\n• Montant et modalités de l'acompte ?",
-  decoNote: "Le Château de Jallanges est entouré de vignes et de jardins à la française. Un thème floral champêtre et romantique avec des pivoines, roses et hortensias en rose et blanc sera parfaitement en harmonie avec le cadre de la Touraine en juillet.",
-  ceremonieDemarches: "• Contacter le curé / pasteur dès maintenant (12+ mois avant)\n• Choisir l'église : à Vernon-sur-Brenne ou dans la paroisse de Keziah ou Briac\n• Retirer et déposer le dossier de mariage religieux\n• Participer aux sessions de préparation au mariage (obligatoires, 3 à 5 séances)\n• Confirmer la date et l'heure de la messe avec le prêtre",
-  ceremonieMusique: "• Organiste ou chantre à réserver séparément\n• Chants recommandés en juillet (été) : Ave Maria, Magnificat, chants de louange…\n• Chant d'entrée · Psaume · Alleluia · Chant d'offertoire · Notre Père chanté · Chant de sortie\n• Répétition avec le musicien recommandée avant le jour J",
-  ceremonieDeroulement: "🎶 Entrée en musique des mariés\n📖 Liturgie de la Parole (3 lectures + psaume)\n💍 Rite du mariage (consentement, échange des alliances)\n🙏 Liturgie eucharistique (communion)\n🌹 Bénédiction solennelle des époux\n🎵 Sortie en musique",
-  ceremonieLectures: "• 1 Co 13 : «L'amour est patient, l'amour est serviable…»\n• Rt 1,16 : «Où tu iras, j'irai…»\n• Gn 2,18-24 : La création de la femme\n• Jn 2,1-11 : Les noces de Cana\n• Ep 5,2a.25-32 : L'amour mutuel des époux\n• Sg 8,7 : La tempérance, la prudence, la justice",
-};
+// (VENUE_INFOS_DEFAULT déclaré avant le bloc INIT)
 
 function getVenueInfo(key) {
   return (state.venueInfos && state.venueInfos[key] !== undefined) ? state.venueInfos[key] : (VENUE_INFOS_DEFAULT[key] || '');
