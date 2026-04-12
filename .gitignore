@@ -1,2 +1,8 @@
 serviceAccount.json
 node_modules/
+backups/
+package-lock.json
+package.json
+explore-db.js
+backup.js
+restore.js
