@@ -1,8 +1,10 @@
 serviceAccount.json
 node_modules/
 backups/
+exports/
 package-lock.json
 package.json
 explore-db.js
 backup.js
 restore.js
+export.js
