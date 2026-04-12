@@ -763,16 +763,15 @@
             <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left">Moment / Action</th>
             <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;width:180px">Responsable</th>
             <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left">Points de vigilance / Notes</th>
-            <th style="background:var(--pink);color:white;padding:10px 14px;width:36px"></th>
           </tr>
         </thead>
         <tbody id="filrouge-tbody"></tbody>
       </table>
     </div>
 
-    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-pink" onclick="addFilRougeRow()">+ Ajouter une ligne</button>
-      <button class="btn btn-outline" onclick="exportFilRouge()">📥 Exporter PDF (impression)</button>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <p style="font-size:0.84rem;color:var(--grey);margin:0">💡 Les moments sont gérés depuis l'onglet <strong style="color:var(--pink);cursor:pointer" onclick="showSection('daytimeline')">Jour J</strong>. Complétez ici les responsables et points de vigilance.</p>
+      <button class="btn btn-outline" onclick="exportFilRouge()" style="margin-left:auto">📥 Exporter PDF (impression)</button>
     </div>
   </div>
 

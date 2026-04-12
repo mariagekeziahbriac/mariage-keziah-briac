@@ -1410,36 +1410,38 @@ function renderFilRouge() {
   if (!tbody) return;
   tbody.innerHTML = '';
   memberDatalistHtml(); // refresh datalist
-  const rows = state.filrougeRows || FILROUGE_ROWS_DEFAULT.map(r => ({...r}));
-  rows.forEach((row, i) => {
-    const bg = i % 2 === 0 ? '#fafafa' : 'white';
+  const items = getJourJItems().slice().sort((a,b) => (a.ordre||0)-(b.ordre||0));
+  if (items.length === 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="4" style="padding:20px;text-align:center;color:var(--grey);font-style:italic">
+      Aucun moment — ajoutez des moments depuis l'onglet "Jour J"
+    </td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+  items.forEach((item, idx) => {
+    const bg = idx % 2 === 0 ? '#fafafa' : 'white';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg};font-weight:700;color:var(--pink);white-space:nowrap">
-        <input value="${escHtml(row.heure||'')}" onchange="saveFilRouge(${i},'heure',this.value)"
-          style="width:70px;border:1px solid #e0e0e0;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:0.85rem;font-weight:700;color:var(--pink)">
+        ${escHtml(item.heure||'—')}
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg};font-weight:600;font-size:0.87rem">
+        ${escHtml(item.titre||'—')}
       </td>
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
-        <input value="${escHtml(row.action||'')}" onchange="saveFilRouge(${i},'action',this.value)"
-          style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.87rem;font-weight:600">
-      </td>
-      <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
-        <input value="${escHtml(row.resp||'')}" placeholder="À définir…"
+        <input value="${escHtml(item.resp||'')}" placeholder="À définir…"
           list="members-datalist"
-          onchange="saveFilRouge(${i},'resp',this.value)"
+          onchange="saveJourJItem('${item.id}','resp',this.value)"
           style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.85rem;color:var(--pink);font-weight:600">
       </td>
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
-        <input value="${escHtml(row.notes||'')}" placeholder="Notes…" onchange="saveFilRouge(${i},'notes',this.value)"
+        <input value="${escHtml(item.vigilance||'')}" placeholder="Points d'attention…"
+          onchange="saveJourJItem('${item.id}','vigilance',this.value)"
           style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.82rem;color:var(--grey)">
-      </td>
-      <td style="padding:4px;border-bottom:1px solid #f0f0f0;background:${bg};text-align:center">
-        <button onclick="deleteFilRouge(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem"
-          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
       </td>`;
     tbody.appendChild(tr);
   });
-  if (!state.filrougeRows) { state.filrougeRows = FILROUGE_ROWS_DEFAULT.map(r => ({...r})); save(); }
 }
 
 function saveFilRouge(i, field, val) {
@@ -2880,6 +2882,27 @@ const VENUE_INFOS_DEFAULT = {
   ceremonieLectures: "• 1 Co 13 : «L'amour est patient, l'amour est serviable…»\n• Rt 1,16 : «Où tu iras, j'irai…»\n• Gn 2,18-24 : La création de la femme\n• Jn 2,1-11 : Les noces de Cana\n• Ep 5,2a.25-32 : L'amour mutuel des époux\n• Sg 8,7 : La tempérance, la prudence, la justice",
 };
 
+// ═══════════════════════════════════════
+// MIGRATION : fil rouge → jourJ items
+// Copie resp/notes de filrougeRows vers les jourJItems correspondants (match sur heure)
+// Exécutée une seule fois au démarrage si filrougeRows existe
+// ═══════════════════════════════════════
+function migrateFilRougeToJourJ() {
+  if (!state.filrougeRows || state.filrougeRows.length === 0) return;
+  if (state._filrougeMigrated) return; // déjà fait
+  const items = getJourJItems();
+  state.filrougeRows.forEach(row => {
+    // Chercher un item jourJ avec la même heure
+    const match = items.find(it => it.heure && row.heure && it.heure.trim() === row.heure.trim());
+    if (match) {
+      if (!match.resp      && row.resp)   match.resp       = row.resp;
+      if (!match.vigilance && row.notes)  match.vigilance  = row.notes;
+    }
+  });
+  state._filrougeMigrated = true;
+  save();
+}
+
 // INIT
 // ═══════════════════════════════════════
 load();
@@ -2891,6 +2914,7 @@ renderVendors();
 renderGantt();
 renderMatrix();
 renderRoles();
+migrateFilRougeToJourJ();
 renderFilRouge();
 renderUrgence();
 renderSeatingChart();
@@ -2995,13 +3019,13 @@ function saveJourJItem(id, field, val) {
 function deleteJourJItem(id) {
   if (!confirm('Supprimer ce moment du programme ?')) return;
   state.jourJItems = getJourJItems().filter(i => i.id !== id);
-  save(); renderJourJ();
+  save(); renderJourJ(); renderFilRouge();
 }
 
 function addJourJItem() {
   const items = getJourJItems();
   const maxOrdre = items.reduce((m,i) => Math.max(m, i.ordre||0), 0);
-  items.push({ id:'jj_'+Date.now(), ordre:maxOrdre+10, heure:'', titre:'', details:'' });
+  items.push({ id:'jj_'+Date.now(), ordre:maxOrdre+10, heure:'', titre:'', details:'', resp:'', vigilance:'' });
   save(); renderJourJ();
 }
 
