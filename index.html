@@ -2127,7 +2127,7 @@ let state = {
 // Sauvegarde locale (fallback) + Firebase
 function save() {
   try { localStorage.setItem('wedding_state', JSON.stringify(state)); } catch(e) {}
-  saveToFirebase();
+  saveToFirebase().catch(e => console.warn('Firebase sync error:', e));
 }
 
 function load() {
@@ -3643,7 +3643,7 @@ function closeTableModal() {
   document.getElementById('table-modal').style.display = 'none';
 }
 
-function saveTableFromModal() {
+async function saveTableFromModal() {
   const id       = document.getElementById('table-modal-id').value.trim();
   const name     = document.getElementById('table-modal-name').value.trim();
   const capacity = parseInt(document.getElementById('table-modal-capacity').value) || 10;
@@ -3659,7 +3659,7 @@ function saveTableFromModal() {
     // Si le nom a changé, mettre à jour les invités
     if (oldName && oldName !== name) {
       const toUpdate = state.guests.filter(g => g.table === oldName);
-      toUpdate.forEach(g => { g.table = name; saveGuestToFirebase(g); });
+      await Promise.all(toUpdate.map(g => { g.table = name; return saveGuestToFirebase(g); }));
     }
   } else {
     const newId = 'tbl_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
@@ -3670,7 +3670,7 @@ function saveTableFromModal() {
   renderSeatingChart();
 }
 
-function deleteTable(id) {
+async function deleteTable(id) {
   const t = (state.tables || []).find(t => t.id === id);
   if (!t) return;
   const nb = (state.guests || []).filter(g => g.table === t.name).length;
@@ -3678,7 +3678,7 @@ function deleteTable(id) {
     ? `Supprimer "${t.name}" ? Les ${nb} invité(s) assigné(s) seront replacés dans les non placés.`
     : `Supprimer la table "${t.name}" ?`;
   if (!confirm(msg)) return;
-  state.guests.forEach(g => { if (g.table === t.name) { g.table = ''; saveGuestToFirebase(g); } });
+  await Promise.all(state.guests.filter(g => g.table === t.name).map(g => { g.table = ''; return saveGuestToFirebase(g); }));
   state.tables = state.tables.filter(t => t.id !== id);
   save();
   renderSeatingChart();
