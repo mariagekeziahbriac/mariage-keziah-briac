@@ -246,6 +246,13 @@ let state = {
   idees: { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] },
   playlist: { songs: [], spotifyClientId: '' },
   auditLog: [],   // [ { id, action, section, description, user, ts } ]
+  infosClés: {
+    lieu:   { nom: 'Château de Jallanges', detail1: 'Vernon-sur-Brenne, Touraine', detail2: 'Val de Loire', url: 'jallanges.com' },
+    mariee: { nom: 'Keziah',  tel: '', email: '' },
+    marie:  { nom: 'Briac',   tel: '', email: '' },
+    orga:   { nom: 'Estelle', tel: '', email: 'ehuguet@cfmrobotique.com' },
+    date:   { date: '10 juillet 2027', heure: '', note: '' },
+  },
 };
 
 // Sauvegarde locale (fallback) + Firebase
@@ -284,6 +291,13 @@ function load() {
     if (!state.playlist)         state.playlist = { songs: [], spotifyClientId: '' };
     if (!state.playlist.songs)   state.playlist.songs = [];
     if (!state.auditLog)         state.auditLog = [];
+    if (!state.infosClés) state.infosClés = {
+      lieu:   { nom: 'Château de Jallanges', detail1: 'Vernon-sur-Brenne, Touraine', detail2: 'Val de Loire', url: 'jallanges.com' },
+      mariee: { nom: 'Keziah',  tel: '', email: '' },
+      marie:  { nom: 'Briac',   tel: '', email: '' },
+      orga:   { nom: 'Estelle', tel: '', email: 'ehuguet@cfmrobotique.com' },
+      date:   { date: '10 juillet 2027', heure: '', note: '' },
+    };
   } catch(e) {}
 }
 
@@ -325,6 +339,7 @@ async function saveToFirebase() {
       idees: state.idees || { categories:[], items:[] },
       playlist: state.playlist || { songs:[], spotifyClientId:'' },
       auditLog: (state.auditLog || []).slice(0, 150),
+      infosClés: state.infosClés || {},
       lastModifiedBy: window.currentUser ? (window.currentUser.displayName || window.currentUser.email) : 'Anonyme',
       lastModifiedAt: window.fbServerTimestamp(),
     };
@@ -369,6 +384,7 @@ async function loadAllFromFirebase() {
       if (d.lastModifiedBy) state.lastModifiedBy = d.lastModifiedBy;
       if (d.lastModifiedAt) state.lastModifiedAt = d.lastModifiedAt;
       if (d.auditLog)       state.auditLog = d.auditLog;
+      if (d.infosClés)      state.infosClés = { ...state.infosClés, ...d.infosClés };
       Object.keys(d).filter(k => k.startsWith('vendor_')).forEach(k => { state[k] = d[k]; });
     }
   } catch(e) { console.warn('Firebase load error:', e); }
@@ -396,6 +412,7 @@ async function loadAllFromFirebase() {
   renderAmbiance();
   renderIdees();
   renderPlaylist();
+  renderInfosClés();
   // Spotify callback après chargement des données
   if (window._spotifyCode) setTimeout(handleSpotifyCallback, 200);
   updateDashboard();
@@ -459,6 +476,7 @@ function showSection(id, link) {
   document.getElementById(id).classList.add('active');
   if (link) link.classList.add('active');
   if (id === 'administration' && isAdmin()) { loadMembers(); renderAuditLog(); }
+  if (id === 'dashboard') renderInfosClés();
   updateDashboard();
 }
 
@@ -3016,6 +3034,110 @@ function migrateFilRougeToJourJ() {
   save();
 }
 
+// ═══════════════════════════════════════
+// INFOS CLÉS DU TABLEAU DE BORD
+// ═══════════════════════════════════════
+let _editInfosCles = false;
+
+function saveInfosCle(section, field, val) {
+  if (!state.infosClés) state.infosClés = {};
+  if (!state.infosClés[section]) state.infosClés[section] = {};
+  state.infosClés[section][field] = val;
+  save();
+}
+
+function renderInfosClés() {
+  const el = document.getElementById('infoscles-container');
+  if (!el) return;
+  const ic = state.infosClés || {};
+  const lieu   = { nom:'Château de Jallanges', detail1:'Vernon-sur-Brenne, Touraine', detail2:'Val de Loire', url:'jallanges.com', ...ic.lieu   };
+  const mariee = { nom:'Keziah',  tel:'', email:'', ...ic.mariee };
+  const marie  = { nom:'Briac',   tel:'', email:'', ...ic.marie  };
+  const orga   = { nom:'Estelle', tel:'', email:'ehuguet@cfmrobotique.com', ...ic.orga };
+  const date   = { date:'10 juillet 2027', heure:'', note:'', ...ic.date };
+  const admin  = isAdmin();
+
+  function viewBox(icon, titre, content) {
+    return `<div class="info-box">
+      <h4>${icon} ${titre}</h4>
+      <div style="font-size:0.88rem;line-height:1.6;color:var(--dark)">${content}</div>
+    </div>`;
+  }
+  function editBox(icon, titre, content) {
+    return `<div class="info-box" style="border:2px solid var(--light-pink);background:#fff9fb">
+      <h4 style="margin-bottom:10px">${icon} ${titre}</h4>
+      <div style="display:flex;flex-direction:column;gap:6px">${content}</div>
+    </div>`;
+  }
+  function field(label, section, key, val, ph) {
+    return `<div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font-size:0.72rem;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.4px">${label}</span>
+      <input value="${escHtml(val)}" placeholder="${ph||''}"
+        onchange="saveInfosCle('${section}','${key}',this.value)"
+        style="border:1px solid #e0e0e0;border-radius:6px;padding:5px 8px;font-family:inherit;font-size:0.86rem;width:100%">
+    </div>`;
+  }
+
+  let lienLieu = lieu.url ? `<a href="${lieu.url.startsWith('http')?lieu.url:'https://'+lieu.url}" target="_blank" style="color:var(--pink);text-decoration:none">${escHtml(lieu.url)}</a>` : '';
+  let lienLieuText = [lieu.detail1, lieu.detail2, lieu.url].filter(Boolean);
+
+  const lieuView   = `<strong>${escHtml(lieu.nom)}</strong><br>${lienLieuText.slice(0,2).map(escHtml).join('<br>')}${lieu.url?'<br>'+lienLieu:''}`;
+  const marieeView = `<strong>${escHtml(mariee.nom)}</strong>${mariee.tel?'<br>📞 '+escHtml(mariee.tel):''}${mariee.email?'<br>✉️ '+escHtml(mariee.email):''}`;
+  const marieView  = `<strong>${escHtml(marie.nom)}</strong>${marie.tel?'<br>📞 '+escHtml(marie.tel):''}${marie.email?'<br>✉️ '+escHtml(marie.email):''}`;
+  const orgaView   = `<strong>${escHtml(orga.nom)}</strong>${orga.tel?'<br>📞 '+escHtml(orga.tel):''}${orga.email?'<br>✉️ '+escHtml(orga.email):''}`;
+  const dateView   = `<strong>${escHtml(date.date)}</strong>${date.heure?'<br>🕐 '+escHtml(date.heure):''}${date.note?'<br><em>'+escHtml(date.note)+'</em>':''}`;
+
+  let editBtn = '';
+  let boxesHtml = '';
+  if (admin) {
+    editBtn = `<button onclick="_editInfosCles=!_editInfosCles;renderInfosClés()"
+      style="font-size:0.8rem;padding:5px 12px;border:1px solid ${_editInfosCles?'var(--pink)':'#ddd'};border-radius:8px;cursor:pointer;background:${_editInfosCles?'var(--light-pink)':'white'};color:${_editInfosCles?'var(--pink)':'var(--grey)'};float:right;margin-top:-4px;font-family:inherit">
+      ${_editInfosCles?'✅ Terminer':'✏️ Modifier'}
+    </button>`;
+  }
+
+  if (!admin || !_editInfosCles) {
+    boxesHtml = `
+      ${viewBox('📅','Date du mariage', dateView)}
+      ${viewBox('🏰','Lieu', lieuView)}
+      ${viewBox('👰','Mariée', marieeView)}
+      ${viewBox('🤵','Marié', marieView)}
+      ${viewBox('💐','Organisatrice', orgaView)}`;
+  } else {
+    boxesHtml = `
+      ${editBox('📅','Date du mariage', [
+          field('Date',  'date','date',  date.date,  'ex : 10 juillet 2027'),
+          field('Heure', 'date','heure', date.heure, 'ex : 15h00'),
+          field('Note',  'date','note',  date.note,  'Info complémentaire'),
+        ].join(''))}
+      ${editBox('🏰','Lieu', [
+          field('Nom du lieu',  'lieu','nom',     lieu.nom,     'Nom du château / salle'),
+          field('Ville',        'lieu','detail1', lieu.detail1, 'ex : Vernon-sur-Brenne, Touraine'),
+          field('Région',       'lieu','detail2', lieu.detail2, 'ex : Val de Loire'),
+          field('Site web',     'lieu','url',     lieu.url,     'ex : jallanges.com'),
+        ].join(''))}
+      ${editBox('👰','Mariée', [
+          field('Prénom / Nom', 'mariee','nom',   mariee.nom,   'Prénom'),
+          field('Téléphone',    'mariee','tel',   mariee.tel,   '06 XX XX XX XX'),
+          field('Email',        'mariee','email', mariee.email, 'adresse@mail.com'),
+        ].join(''))}
+      ${editBox('🤵','Marié', [
+          field('Prénom / Nom', 'marie','nom',   marie.nom,   'Prénom'),
+          field('Téléphone',    'marie','tel',   marie.tel,   '06 XX XX XX XX'),
+          field('Email',        'marie','email', marie.email, 'adresse@mail.com'),
+        ].join(''))}
+      ${editBox('💐','Organisatrice', [
+          field('Prénom / Nom', 'orga','nom',   orga.nom,   'Prénom'),
+          field('Téléphone',    'orga','tel',   orga.tel,   '06 XX XX XX XX'),
+          field('Email',        'orga','email', orga.email, 'adresse@mail.com'),
+        ].join(''))}`;
+  }
+
+  el.innerHTML = `
+    <div class="card-title">💡 Infos clés${editBtn}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:${admin&&_editInfosCles?'8px':'4px'}">${boxesHtml}</div>`;
+}
+
 // INIT
 // ═══════════════════════════════════════
 load();
@@ -3041,6 +3163,7 @@ renderAmbiance();
 renderIdees();
 renderJourJ();
 renderVenue();
+renderInfosClés();
 
 // ═══════════════════════════════════════
 // MEMBRES — CACHE ET HELPERS
