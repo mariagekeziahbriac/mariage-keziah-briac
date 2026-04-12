@@ -564,6 +564,7 @@ function renderChecklist() {
   });
 
   updateCheckProgress();
+  updateDashboard();
 }
 
 function escH(s) {
@@ -988,17 +989,19 @@ function saveVendor(i, field, val) {
 // DASHBOARD
 // ═══════════════════════════════════════
 function updateDashboard() {
-  const total = CHECKLIST_DATA.reduce((a,s) => a+s.tasks.length, 0);
-  const done = Object.values(state.checks).filter(Boolean).length;
-  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  const defTotal  = CHECKLIST_DATA.reduce((a,s) => a + s.tasks.length, 0);
+  const custTotal = (state.customTasks || []).length;
+  const total = defTotal + custTotal;
+  const done  = Object.values(state.checks).filter(Boolean).length;
+  const pct   = total > 0 ? Math.round(done / total * 100) : 0;
   const el1 = document.getElementById('stat-tasks-done');
   const el2 = document.getElementById('stat-tasks-left');
   const bar = document.getElementById('main-progress');
   const pctEl = document.getElementById('progress-pct');
   if (el1) el1.textContent = done;
-  if (el2) el2.textContent = total - done;
-  if (bar) bar.style.width = pct + '%';
-  if (pctEl) pctEl.textContent = pct + '%';
+  if (el2) el2.textContent = Math.max(0, total - done);
+  if (bar) bar.style.width = Math.min(100, pct) + '%';
+  if (pctEl) pctEl.textContent = Math.min(100, pct) + '%';
   // Dernière modification
   const lmEl = document.getElementById('last-modified-info');
   if (lmEl && state.lastModifiedBy) {

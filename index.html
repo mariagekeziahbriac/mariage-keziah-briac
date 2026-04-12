@@ -144,11 +144,11 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card" onclick="showSection('checklist',document.querySelector('.nav a[onclick*=checklist]'))" style="cursor:pointer" title="Aller à la checklist">
       <div class="val" id="stat-tasks-done">0</div>
       <div class="lbl">Tâches complétées</div>
     </div>
-    <div class="stat-card" style="border-top-color:var(--orange)">
+    <div class="stat-card" onclick="showSection('checklist',document.querySelector('.nav a[onclick*=checklist]'))" style="border-top-color:var(--orange);cursor:pointer" title="Aller à la checklist">
       <div class="val" style="color:var(--orange)" id="stat-tasks-left">0</div>
       <div class="lbl">Tâches restantes</div>
     </div>
