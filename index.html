@@ -1164,6 +1164,9 @@
   <div class="card">
     <div class="card-title">📋 Carnet des prestataires</div>
     <div class="prest-grid" id="vendors-grid"></div>
+    <div style="margin-top:16px">
+      <button class="btn btn-pink" onclick="addVendor()">+ Ajouter un prestataire</button>
+    </div>
   </div>
 </div>
 
@@ -1174,59 +1177,9 @@
     <div style="background:var(--light-blue);border-left:4px solid var(--blue);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:0.9rem;color:var(--dark)">
       ✝️ <strong>Programme :</strong> Cérémonie civile (mairie) → Cérémonie religieuse (église) → Cocktail & réception au Château de Jallanges
     </div>
-    <div class="day-timeline">
-      <div class="day-item">
-        <div class="day-time">8h00</div>
-        <div class="day-content"><strong>Coiffure & Maquillage</strong><div class="who">Keziah, Estelle et l'équipe de la mariée — Espace préparation du château</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">10h30</div>
-        <div class="day-content"><strong>Habillage de la mariée & Photos préparatifs</strong><div class="who">Keziah + photographe — Chambres du château</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">11h30</div>
-        <div class="day-content"><strong>⚖️ Cérémonie civile à la mairie</strong><div class="who">Mariés + famille proche + témoins — Mairie de Vernon-sur-Brenne</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">14h30</div>
-        <div class="day-content"><strong>✝️ Cérémonie religieuse (messe de mariage)</strong><div class="who">Tous les invités — Église à Vernon-sur-Brenne ou église choisie<br><em style="color:var(--grey);font-size:0.8rem">Entrée en musique · Lectures · Échange des vœux et alliances · Bénédiction · Chants liturgiques</em></div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">16h00</div>
-        <div class="day-content"><strong>📸 Sortie de l'église & photos</strong><div class="who">Lancé de pétales de roses ou confettis — Photos de couple et de groupe devant l'église</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">16h30</div>
-        <div class="day-content"><strong>🏰 Arrivée au Château de Jallanges</strong><div class="who">Tous les invités accueillis dans les allées du château</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">17h00</div>
-        <div class="day-content"><strong>🥂 Cocktail & Photos de couple</strong><div class="who">Cocktail dans les jardins du domaine — Photographe & vidéaste</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">19h30</div>
-        <div class="day-content"><strong>Entrée dans la salle de réception</strong><div class="who">Entrée des mariés en musique — Discours des témoins</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">20h00</div>
-        <div class="day-content"><strong>🍽️ Dîner de gala</strong><div class="who">Tous les invités — Menu gastronomique, ambiance musicale douce</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">22h30</div>
-        <div class="day-content"><strong>💃 Ouverture du bal & Pièce montée</strong><div class="who">Keziah & Briac ouvrent le bal — Découpe de la pièce montée</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">23h00</div>
-        <div class="day-content"><strong>🎵 Soirée dansante</strong><div class="who">Tous les invités — DJ jusqu'à l'aube !</div></div>
-      </div>
-      <div class="day-item">
-        <div class="day-time">2h00+</div>
-        <div class="day-content"><strong>Fin de soirée & Bouquet de la mariée</strong><div class="who">Les plus courageux… et Estelle !</div></div>
-      </div>
-    </div>
-
-    <div class="tip-box" style="margin-top:24px">
-      💡 <strong>Sac de survie d'Estelle :</strong> Rouge à lèvres, épingles à cheveux, double face, pansements, chargeur, médicaments, copie du planning + numéros de tous les prestataires.
+    <div id="jourj-list" style="margin-bottom:16px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-pink" onclick="addJourJItem()">+ Ajouter un moment</button>
     </div>
   </div>
 </div>
@@ -1235,7 +1188,8 @@
 <div id="venue" class="section">
   <div class="card">
     <div class="card-title">🏰 Château de Jallanges — Vernon-sur-Brenne, Touraine</div>
-    <div class="venue-info">
+    <div id="venue-container"><!-- chargé par renderVenue() --></div>
+    <div class="venue-info" style="display:none">
       <div>
         <div class="info-box">
           <h4>📍 Localisation</h4>
@@ -1365,6 +1319,18 @@
       💡 <strong>Comment ça marche :</strong> Pour chaque catégorie de prestataire, ajoutez les candidats et notez-les de 1 à 5 sur chaque critère. Le score final pondéré vous aide à prendre une décision rationnelle, loin du coup de cœur seul.
     </div>
 
+    <!-- Gestion des catégories -->
+    <div style="background:var(--light-grey);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+      <div style="font-weight:700;font-size:0.88rem;color:var(--dark);margin-bottom:10px">📑 Catégories de prestataires</div>
+      <div id="matrix-cat-tags" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="matrix-new-cat" type="text" placeholder="Nouvelle catégorie…"
+          style="flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-family:inherit;font-size:0.88rem"
+          onkeydown="if(event.key==='Enter')addMatrixCategory()">
+        <button class="btn btn-pink" onclick="addMatrixCategory()" style="padding:7px 14px;font-size:0.85rem">+ Ajouter</button>
+      </div>
+    </div>
+
     <!-- Sélecteur de catégorie -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
       <label style="font-weight:700;color:var(--dark)">Catégorie :</label>
@@ -1420,8 +1386,9 @@
           <tr>
             <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;width:90px">Horaire</th>
             <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left">Moment / Action</th>
-            <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;width:160px">Responsable</th>
+            <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left;width:180px">Responsable</th>
             <th style="background:var(--pink);color:white;padding:10px 14px;text-align:left">Points de vigilance / Notes</th>
+            <th style="background:var(--pink);color:white;padding:10px 14px;width:36px"></th>
           </tr>
         </thead>
         <tbody id="filrouge-tbody"></tbody>
@@ -1544,10 +1511,13 @@
   </div>
   <div class="card">
     <div class="card-title">👩‍👩‍👧 Participantes</div>
+    <p style="font-size:0.83rem;color:var(--grey);margin-bottom:10px">Si la participante a un profil sur l'app, sélectionnez-la dans la liste. Sinon, saisissez son prénom manuellement.</p>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
         <thead><tr style="background:var(--pink);color:white">
-          <th style="padding:10px 12px;text-align:left">Prénom</th><th style="padding:10px 12px;text-align:left">Rôle</th>
+          <th style="padding:10px 12px;text-align:left">Prénom</th>
+          <th style="padding:10px 12px;text-align:left;width:140px">Profil app</th>
+          <th style="padding:10px 12px;text-align:left">Rôle</th>
           <th style="padding:10px 12px;text-align:left">Tél</th><th style="padding:10px 12px;text-align:left">RSVP</th><th style="padding:10px 12px;width:36px"></th>
         </tr></thead>
         <tbody id="evjf-participantes-body"></tbody>
@@ -1556,12 +1526,13 @@
     <button class="btn btn-pink" style="margin-top:12px" onclick="addEvjfParticipante()">+ Ajouter une participante</button>
   </div>
   <div class="card">
-    <div class="card-title">⏱️ Programme de la journée</div>
+    <div class="card-title">⏱️ Programme — par journée</div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
         <thead><tr style="background:var(--pink);color:white">
-          <th style="padding:10px 12px;text-align:left;width:90px">Horaire</th><th style="padding:10px 12px;text-align:left">Activité</th>
-          <th style="padding:10px 12px;text-align:left;width:140px">Lieu</th><th style="padding:10px 12px;text-align:left">Notes</th><th style="padding:10px 12px;width:36px"></th>
+          <th style="padding:10px 12px;text-align:left;width:110px">Journée</th>
+          <th style="padding:10px 12px;text-align:left;width:80px">Horaire</th><th style="padding:10px 12px;text-align:left">Activité</th>
+          <th style="padding:10px 12px;text-align:left;width:120px">Lieu</th><th style="padding:10px 12px;text-align:left">Notes</th><th style="padding:10px 12px;width:36px"></th>
         </tr></thead>
         <tbody id="evjf-programme-body"></tbody>
       </table>
@@ -1585,8 +1556,20 @@
     </div>
   </div>
   <div class="card">
+    <div class="card-title">💡 Projets EVJF — Idées à comparer</div>
+    <p style="font-size:0.85rem;color:var(--grey);margin-bottom:16px">Listez vos idées pour l'EVJF et comparez-les. Supprimez les projets non retenus une fois votre choix fait !</p>
+    <div id="evjf-projets-list"></div>
+    <button class="btn btn-pink" onclick="addEvjfProjet()" style="margin-top:8px">+ Nouveau projet</button>
+  </div>
+  <div class="card">
     <div class="card-title">✅ Checklist organisation EVJF</div>
     <div id="evjf-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+      <input id="evjf-custom-check-input" type="text" placeholder="Ajouter un élément personnalisé…"
+        style="flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.9rem"
+        onkeydown="if(event.key==='Enter')addEvjfCustomCheck()">
+      <button class="btn btn-pink" onclick="addEvjfCustomCheck()" style="padding:8px 16px;font-size:0.85rem">+ Ajouter</button>
+    </div>
   </div>
   <div class="card">
     <div class="card-title">🎁 Idées cadeaux pour la mariée</div>
@@ -1632,6 +1615,12 @@
   <div class="card">
     <div class="card-title">✅ Checklist Papeterie</div>
     <div id="fp-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+      <input id="fp-custom-input" type="text" placeholder="Ajouter un élément personnalisé…"
+        style="flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.9rem"
+        onkeydown="if(event.key==='Enter')addFpCustomItem()">
+      <button class="btn btn-pink" onclick="addFpCustomItem()" style="padding:8px 16px;font-size:0.85rem">+ Ajouter</button>
+    </div>
   </div>
   <div class="card">
     <div class="card-title">📝 Notes & Informations</div>
@@ -2120,9 +2109,12 @@ let state = {
   guests: [],
   budgetTotal: 30000,
   tables: [],         // [ { id, name, capacity, color:{bg,color} } ]
-  evjf: { date:'', lieu:'', theme:'', notes:'', participantes:[], programme:[], budget:[], checklist:{}, cadeaux:'' },
+  evjf: { date:'', lieu:'', theme:'', notes:'', participantes:[], programme:[], budget:[], checklist:{}, cadeaux:'', customChecklist:[], projets:[] },
   tenues: [],
-  papeterie: { checklist:{}, notes:'' },
+  papeterie: { checklist:{}, notes:'', customItems:[] },
+  jourJItems: [],
+  venueInfos: {},
+  vendors: [],
   lunedeMiel: { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} },
   docsLegaux: { checklist:{} },
   kitUrgence: { checklist:{} },
@@ -2148,9 +2140,15 @@ function load() {
     if (!state.customTasks) state.customTasks = [];
     if (!state.budgetTotal) state.budgetTotal = 30000;
     if (!state.tables)      state.tables = [];
-    if (!state.evjf)        state.evjf = { date:'', lieu:'', theme:'', notes:'', participantes:[], programme:[], budget:[], checklist:{}, cadeaux:'' };
+    if (!state.evjf)        state.evjf = { date:'', lieu:'', theme:'', notes:'', participantes:[], programme:[], budget:[], checklist:{}, cadeaux:'', customChecklist:[], projets:[] };
+    if (!state.evjf.customChecklist) state.evjf.customChecklist = [];
+    if (!state.evjf.projets)         state.evjf.projets = [];
     if (!state.tenues)      state.tenues = [];
-    if (!state.papeterie)   state.papeterie = { checklist:{}, notes:'' };
+    if (!state.papeterie)   state.papeterie = { checklist:{}, notes:'', customItems:[] };
+    if (!state.papeterie.customItems) state.papeterie.customItems = [];
+    if (!state.jourJItems)  state.jourJItems = [];
+    if (!state.venueInfos)  state.venueInfos = {};
+    if (!state.vendors)     state.vendors = [];
     if (!state.lunedeMiel)  state.lunedeMiel = { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} };
     if (!state.docsLegaux)  state.docsLegaux = { checklist:{} };
     if (!state.kitUrgence)  state.kitUrgence = { checklist:{} };
@@ -2181,6 +2179,9 @@ async function saveToFirebase() {
       evjf: state.evjf || {},
       tenues: state.tenues || [],
       papeterie: state.papeterie || {},
+      jourJItems: state.jourJItems || [],
+      venueInfos: state.venueInfos || {},
+      vendors: state.vendors || [],
       lunedeMiel: state.lunedeMiel || {},
       docsLegaux: state.docsLegaux || {},
       kitUrgence: state.kitUrgence || {},
@@ -2219,6 +2220,9 @@ async function loadAllFromFirebase() {
       if (d.evjf)        state.evjf = { ...state.evjf, ...d.evjf };
       if (d.tenues)      state.tenues = d.tenues;
       if (d.papeterie)   state.papeterie = { ...state.papeterie, ...d.papeterie };
+      if (d.jourJItems)  state.jourJItems = d.jourJItems;
+      if (d.venueInfos)  state.venueInfos = { ...state.venueInfos, ...d.venueInfos };
+      if (d.vendors && d.vendors.length > 0) state.vendors = d.vendors;
       if (d.lunedeMiel)  state.lunedeMiel = { ...state.lunedeMiel, ...d.lunedeMiel };
       if (d.docsLegaux)  state.docsLegaux = { ...state.docsLegaux, ...d.docsLegaux };
       if (d.kitUrgence)  state.kitUrgence = { ...state.kitUrgence, ...d.kitUrgence };
@@ -2233,6 +2237,7 @@ async function loadAllFromFirebase() {
   // Charger les invités séparément
   await loadGuestsFromFirebase();
   // Re-rendre tout avec les données Firebase
+  await loadAppMembers();
   renderChecklist();
   renderBudget();
   renderVendors();
@@ -2247,6 +2252,8 @@ async function loadAllFromFirebase() {
   renderFairePart();
   renderLuneDeMiel();
   renderDocsLegaux();
+  renderJourJ();
+  renderVenue();
   renderKitUrgence();
   renderAmbiance();
   renderIdees();
@@ -3070,15 +3077,19 @@ function renderMatrix() {
   const sel = document.getElementById('matrix-cat-select');
   if (!sel) return;
 
-  // Peupler le sélecteur
-  if (sel.options.length === 0) {
-    MATRIX_CATEGORIES.forEach(cat => {
-      const o = document.createElement('option');
-      o.value = o.textContent = cat;
-      sel.appendChild(o);
-    });
-  }
+  // Peupler le sélecteur depuis les catégories dynamiques
+  const cats = getMatrixCategories();
+  const currentVal = sel.value;
+  sel.innerHTML = '';
+  cats.forEach(cat => {
+    const o = document.createElement('option');
+    o.value = o.textContent = cat;
+    if (cat === currentVal) o.selected = true;
+    sel.appendChild(o);
+  });
 
+  // Afficher les tags de catégories
+  renderMatrixCategoryTags();
   renderMatrixWeights();
   renderMatrixScore();
 }
@@ -3136,7 +3147,9 @@ function renderMatrixScore() {
         </td>`).join('')}
       <td style="padding:10px;background:${rowBg};border-bottom:1px solid #f0f0f0;text-align:center">
         <div style="font-size:1.4rem;font-weight:800;color:${isBest ? 'var(--green)' : 'var(--dark)'}">${score}</div>
-        ${isBest ? '<div style="font-size:0.7rem;color:var(--green);font-weight:700">✅ Recommandé</div>' : ''}
+        ${isBest ? `<div style="font-size:0.7rem;color:var(--green);font-weight:700">✅ Recommandé</div>
+          <button onclick="pushWinnerToVendors(${JSON.stringify(cat)},${JSON.stringify(c.name)},${JSON.stringify(c.notes||'')})"
+            style="margin-top:4px;font-size:0.7rem;background:var(--green);color:white;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;font-family:inherit">→ Prestataires</button>` : ''}
       </td>
       <td style="padding:8px;background:${rowBg};border-bottom:1px solid #f0f0f0;text-align:center">
         <button onclick="removeMatrixCandidate('${cat}',${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem">🗑️</button>
@@ -3272,26 +3285,33 @@ function renderFilRouge() {
   const tbody = document.getElementById('filrouge-tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
+  memberDatalistHtml(); // refresh datalist
   const rows = state.filrougeRows || FILROUGE_ROWS_DEFAULT.map(r => ({...r}));
   rows.forEach((row, i) => {
     const bg = i % 2 === 0 ? '#fafafa' : 'white';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg};font-weight:700;color:var(--pink);white-space:nowrap">
-        <input value="${row.heure}" onchange="saveFilRouge(${i},'heure',this.value)"
+        <input value="${escHtml(row.heure||'')}" onchange="saveFilRouge(${i},'heure',this.value)"
           style="width:70px;border:1px solid #e0e0e0;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:0.85rem;font-weight:700;color:var(--pink)">
       </td>
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
-        <input value="${row.action}" onchange="saveFilRouge(${i},'action',this.value)"
+        <input value="${escHtml(row.action||'')}" onchange="saveFilRouge(${i},'action',this.value)"
           style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.87rem;font-weight:600">
       </td>
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
-        <input value="${row.resp}" placeholder="À définir…" onchange="saveFilRouge(${i},'resp',this.value)"
+        <input value="${escHtml(row.resp||'')}" placeholder="À définir…"
+          list="members-datalist"
+          onchange="saveFilRouge(${i},'resp',this.value)"
           style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.85rem;color:var(--pink);font-weight:600">
       </td>
       <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;background:${bg}">
-        <input value="${row.notes}" placeholder="Notes…" onchange="saveFilRouge(${i},'notes',this.value)"
+        <input value="${escHtml(row.notes||'')}" placeholder="Notes…" onchange="saveFilRouge(${i},'notes',this.value)"
           style="width:100%;border:1px solid #e0e0e0;border-radius:4px;padding:4px 8px;font-family:inherit;font-size:0.82rem;color:var(--grey)">
+      </td>
+      <td style="padding:4px;border-bottom:1px solid #f0f0f0;background:${bg};text-align:center">
+        <button onclick="deleteFilRouge(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem"
+          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -3314,17 +3334,25 @@ function renderUrgence() {
   const grid = document.getElementById('urgence-grid');
   if (!grid) return;
   grid.innerHTML = '';
+  memberDatalistHtml(); // refresh datalist
   const contacts = state.urgenceContacts || URGENCE_DEFAULT.map(c => ({...c}));
   contacts.forEach((c, i) => {
     const div = document.createElement('div');
-    div.style.cssText = 'background:var(--light-grey);border-radius:8px;padding:14px;border:1px solid #e0e0e0';
+    div.style.cssText = 'background:var(--light-grey);border-radius:8px;padding:14px;border:1px solid #e0e0e0;position:relative';
     div.innerHTML = `
-      <div style="font-weight:700;color:var(--pink);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${c.cat}</div>
-      <input placeholder="👤 Nom / Prénom" value="${c.nom||''}" onchange="saveUrgence(${i},'nom',this.value)"
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <input value="${escHtml(c.cat||'')}" onchange="saveUrgence(${i},'cat',this.value)"
+          style="flex:1;font-weight:700;color:var(--pink);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;border:none;background:transparent;font-family:inherit;padding:0">
+        <button onclick="deleteUrgenceContact(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem"
+          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+      </div>
+      <input placeholder="👤 Nom / Prénom" value="${escHtml(c.nom||'')}"
+        list="members-datalist"
+        onchange="saveUrgence(${i},'nom',this.value)"
         style="width:100%;margin-bottom:6px;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:0.85rem;font-weight:600">
-      <input placeholder="📞 Téléphone" value="${c.tel||''}" onchange="saveUrgence(${i},'tel',this.value)"
+      <input placeholder="📞 Téléphone" value="${escHtml(c.tel||'')}" onchange="saveUrgence(${i},'tel',this.value)"
         style="width:100%;margin-bottom:6px;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:0.85rem">
-      <input placeholder="Rôle / Fonction" value="${c.role||''}" onchange="saveUrgence(${i},'role',this.value)"
+      <input placeholder="Rôle / Fonction" value="${escHtml(c.role||'')}" onchange="saveUrgence(${i},'role',this.value)"
         style="width:100%;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-family:inherit;font-size:0.82rem;color:var(--grey)">`;
     grid.appendChild(div);
   });
@@ -4122,15 +4150,21 @@ function renderEvjf() {
   if (f('evjf-lieu'))    f('evjf-lieu').value    = evjf.lieu    || '';
   if (f('evjf-theme'))   f('evjf-theme').value   = evjf.theme   || '';
   if (f('evjf-cadeaux')) f('evjf-cadeaux').value = evjf.cadeaux || '';
+  memberDatalistHtml();
 
-  // Participantes
+  // Participantes (avec lien profil)
   const pb = f('evjf-participantes-body');
   if (pb) {
     const parts = evjf.participantes || [];
     pb.innerHTML = parts.length === 0
-      ? `<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucune participante — cliquez sur + pour ajouter</td></tr>`
+      ? `<tr><td colspan="6" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucune participante — cliquez sur + pour ajouter</td></tr>`
       : parts.map((p, i) => `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
-          <td style="padding:7px 10px"><input value="${escHtml(p.prenom||'')}" onchange="updateEvjfP(${i},'prenom',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
+          <td style="padding:7px 10px"><input value="${escHtml(p.prenom||'')}" onchange="updateEvjfP(${i},'prenom',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit;font-weight:600"></td>
+          <td style="padding:7px 10px">
+            <select onchange="selectEvjfMember(${i},this.value)" style="width:100%;border:1px solid #eee;border-radius:5px;font-size:0.8rem;font-family:inherit;padding:3px 5px;color:var(--grey)">
+              ${getMemberOptions(p.memberId||'')}
+            </select>
+          </td>
           <td style="padding:7px 10px"><input value="${escHtml(p.role||'')}" onchange="updateEvjfP(${i},'role',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
           <td style="padding:7px 10px"><input value="${escHtml(p.tel||'')}" onchange="updateEvjfP(${i},'tel',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
           <td style="padding:7px 10px"><select onchange="updateEvjfP(${i},'rsvp',this.value)" style="border:none;background:transparent;font-size:0.85rem;font-family:inherit">
@@ -4142,13 +4176,14 @@ function renderEvjf() {
         </tr>`).join('');
   }
 
-  // Programme
+  // Programme (multi-journées)
   const progb = f('evjf-programme-body');
   if (progb) {
     const prog = evjf.programme || [];
     progb.innerHTML = prog.length === 0
-      ? `<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucun moment — cliquez sur + pour ajouter</td></tr>`
+      ? `<tr><td colspan="6" style="text-align:center;color:var(--grey);padding:16px;font-style:italic">Aucun moment — cliquez sur + pour ajouter</td></tr>`
       : prog.map((p, i) => `<tr style="border-bottom:1px solid #f0f0f0;${i%2?'background:#fafafa':''}">
+          <td style="padding:7px 10px"><input value="${escHtml(p.jour||'')}" placeholder="Jour 1" onchange="updateEvjfProg(${i},'jour',this.value)" style="border:none;background:transparent;width:100%;font-size:0.82rem;font-family:inherit;color:var(--pink);font-weight:700"></td>
           <td style="padding:7px 10px"><input value="${escHtml(p.heure||'')}" placeholder="10h00" onchange="updateEvjfProg(${i},'heure',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
           <td style="padding:7px 10px"><input value="${escHtml(p.activite||'')}" onchange="updateEvjfProg(${i},'activite',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
           <td style="padding:7px 10px"><input value="${escHtml(p.lieu||'')}" onchange="updateEvjfProg(${i},'lieu',this.value)" style="border:none;background:transparent;width:100%;font-size:0.88rem;font-family:inherit"></td>
@@ -4176,21 +4211,33 @@ function renderEvjf() {
         </tr>`).join('');
   }
 
-  // Checklist
+  // Checklist (défaut + personnalisée)
   const cl = f('evjf-checklist');
   if (cl) {
     const checks = evjf.checklist || {};
-    cl.innerHTML = EVJF_CHECKLIST_DEFAULT.map((item, i) => {
+    const defaultItems = EVJF_CHECKLIST_DEFAULT.map((item, i) => {
       const k = 'evjf_' + i;
       return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:#fafafa;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--light-pink)'" onmouseout="this.style.background='#fafafa'">
         <input type="checkbox" ${checks[k]?'checked':''} onchange="toggleEvjfCheck('${k}',this.checked)" style="width:16px;height:16px;accent-color:var(--pink)">
-        <span style="${checks[k]?'text-decoration:line-through;color:var(--grey)':''}">${item}</span>
+        <span style="${checks[k]?'text-decoration:line-through;color:var(--grey)':''}">${escHtml(item)}</span>
       </label>`;
     }).join('');
+    const customItems = (evjf.customChecklist || []).map(item => {
+      const k = 'cust_'+item.id;
+      return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--light-pink);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='#f8d7e3'" onmouseout="this.style.background='var(--light-pink)'">
+        <input type="checkbox" ${checks[k]?'checked':''} onchange="toggleEvjfCustomCheck('${item.id}',this.checked)" style="width:16px;height:16px;accent-color:var(--pink)">
+        <span style="flex:1;${checks[k]?'text-decoration:line-through;color:var(--grey)':''}">${escHtml(item.text)}</span>
+        <button onclick="deleteEvjfCustomCheck('${item.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.9rem;padding:0" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button>
+      </label>`;
+    }).join('');
+    cl.innerHTML = defaultItems + customItems;
   }
+
+  // Projets
+  renderEvjfProjets();
 }
 function saveEvjfField(field, val) { if (!state.evjf) state.evjf={}; state.evjf[field]=val; save(); }
-function addEvjfParticipante() { if (!state.evjf.participantes) state.evjf.participantes=[]; state.evjf.participantes.push({prenom:'',role:'Participante',tel:'',rsvp:'⏳ En attente'}); save(); renderEvjf(); }
+function addEvjfParticipante() { if (!state.evjf.participantes) state.evjf.participantes=[]; state.evjf.participantes.push({prenom:'',memberId:'',role:'Participante',tel:'',rsvp:'⏳ En attente'}); save(); renderEvjf(); }
 function updateEvjfP(i,f,v) { state.evjf.participantes[i][f]=v; save(); }
 function deleteEvjfP(i) { state.evjf.participantes.splice(i,1); save(); renderEvjf(); }
 function addEvjfProgramme() { if (!state.evjf.programme) state.evjf.programme=[]; state.evjf.programme.push({heure:'',activite:'',lieu:'',notes:''}); save(); renderEvjf(); }
@@ -4285,13 +4332,22 @@ function renderFairePart() {
   const clEl = document.getElementById('fp-checklist');
   if (clEl) {
     const cl = (state.papeterie||{}).checklist||{};
-    clEl.innerHTML = FP_CHECKLIST_DEFAULT.map((item, i) => {
+    const defaultItems = FP_CHECKLIST_DEFAULT.map((item, i) => {
       const k = 'fp_'+i;
       return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:#fafafa;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--light-pink)'" onmouseout="this.style.background='#fafafa'">
         <input type="checkbox" ${cl[k]?'checked':''} onchange="toggleFpCheck('${k}',this.checked)" style="width:16px;height:16px;accent-color:var(--pink)">
-        <span style="${cl[k]?'text-decoration:line-through;color:var(--grey)':''}">${item}</span>
+        <span style="${cl[k]?'text-decoration:line-through;color:var(--grey)':''}">${escHtml(item)}</span>
       </label>`;
     }).join('');
+    const customItems = ((state.papeterie||{}).customItems||[]).map(item => {
+      const k = 'cust_'+item.id;
+      return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--light-pink);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='#f8d7e3'" onmouseout="this.style.background='var(--light-pink)'">
+        <input type="checkbox" ${cl[k]?'checked':''} onchange="toggleFpCustomItem('${item.id}',this.checked)" style="width:16px;height:16px;accent-color:var(--pink)">
+        <span style="flex:1;${cl[k]?'text-decoration:line-through;color:var(--grey)':''}">${escHtml(item.text)}</span>
+        <button onclick="deleteFpCustomItem('${item.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.9rem;padding:0" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button>
+      </label>`;
+    }).join('');
+    clEl.innerHTML = defaultItems + customItems;
   }
   const notesEl = document.getElementById('fp-notes');
   if (notesEl) notesEl.value = (state.papeterie||{}).notes||'';
@@ -4694,6 +4750,504 @@ renderDocsLegaux();
 renderKitUrgence();
 renderAmbiance();
 renderIdees();
+renderJourJ();
+renderVenue();
+
+// ═══════════════════════════════════════
+// MEMBRES — CACHE ET HELPERS
+// ═══════════════════════════════════════
+window.appMembers = [];
+
+async function loadAppMembers() {
+  if (!window.fbGetDocs || !window.fbCollection || !window.db) return;
+  try {
+    const snap = await window.fbGetDocs(window.fbCollection(window.db,'wedding','keziah-briac','members'));
+    window.appMembers = snap.docs.map(d=>({ uid:d.id, displayName:d.data().displayName||d.data().email||'' }));
+  } catch(e) { console.warn('Erreur chargement membres:', e); }
+}
+
+function memberDatalistHtml() {
+  const members = window.appMembers || [];
+  if (!document.getElementById('members-datalist')) {
+    const dl = document.createElement('datalist');
+    dl.id = 'members-datalist';
+    document.body.appendChild(dl);
+  }
+  const dl = document.getElementById('members-datalist');
+  dl.innerHTML = members.map(m=>`<option value="${escHtml(m.displayName||'')}"></option>`).join('');
+  return 'members-datalist';
+}
+
+function getMemberOptions(currentVal) {
+  const members = window.appMembers || [];
+  return `<option value="">— Aucun profil lié —</option>` +
+    members.map(m => {
+      const name = escHtml(m.displayName || '');
+      const sel = currentVal === name ? 'selected' : '';
+      return `<option value="${name}" ${sel}>${name}</option>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════
+// JOUR J — PROGRAMME DYNAMIQUE
+// ═══════════════════════════════════════
+const JOURJ_DEFAULT = [
+  { id:'jj0',  ordre:10,  heure:'8h00',   titre:'Coiffure & Maquillage',               details:"Keziah, Estelle et l'équipe de la mariée — Espace préparation du château" },
+  { id:'jj1',  ordre:20,  heure:'10h30',  titre:'Habillage & Photos préparatifs',      details:'Keziah + photographe — Chambres du château' },
+  { id:'jj2',  ordre:30,  heure:'11h30',  titre:'⚖️ Cérémonie civile à la mairie',      details:'Mariés + famille proche + témoins — Mairie de Vernon-sur-Brenne' },
+  { id:'jj3',  ordre:40,  heure:'14h30',  titre:'✝️ Cérémonie religieuse',              details:'Tous les invités — Église à Vernon-sur-Brenne' },
+  { id:'jj4',  ordre:50,  heure:'16h00',  titre:"📸 Sortie de l'église & photos",      details:'Lancé de pétales · Photos de couple et de groupe devant l\'église' },
+  { id:'jj5',  ordre:60,  heure:'16h30',  titre:'🏰 Arrivée au Château de Jallanges',  details:'Tous les invités accueillis dans les allées du château' },
+  { id:'jj6',  ordre:70,  heure:'17h00',  titre:'🥂 Cocktail & Photos de couple',      details:'Cocktail dans les jardins du domaine — Photographe & vidéaste' },
+  { id:'jj7',  ordre:80,  heure:'19h30',  titre:'Entrée dans la salle de réception',   details:'Entrée des mariés en musique — Discours des témoins' },
+  { id:'jj8',  ordre:90,  heure:'20h00',  titre:'🍽️ Dîner de gala',                    details:'Tous les invités — Menu gastronomique, ambiance musicale douce' },
+  { id:'jj9',  ordre:100, heure:'22h30',  titre:'💃 Ouverture du bal & Pièce montée',  details:'Keziah & Briac ouvrent le bal — Découpe de la pièce montée' },
+  { id:'jj10', ordre:110, heure:'23h00',  titre:'🎵 Soirée dansante',                  details:"Tous les invités — DJ jusqu'à l'aube !" },
+  { id:'jj11', ordre:120, heure:'2h00+',  titre:'Fin de soirée & Bouquet de la mariée',details:'Les plus courageux… et Estelle !' },
+];
+
+function getJourJItems() {
+  if (!state.jourJItems || state.jourJItems.length === 0)
+    state.jourJItems = JSON.parse(JSON.stringify(JOURJ_DEFAULT));
+  return state.jourJItems;
+}
+
+function renderJourJ() {
+  const el = document.getElementById('jourj-list');
+  if (!el) return;
+  const items = getJourJItems().slice().sort((a,b) => (a.ordre||0)-(b.ordre||0));
+  el.innerHTML = items.map((item, idx) => `
+    <div style="display:grid;grid-template-columns:70px 90px 1fr 36px;gap:6px;align-items:start;padding:10px 12px;background:${idx%2===0?'#fafafa':'white'};border-radius:8px;margin-bottom:6px;border:1px solid #f0f0f0">
+      <div>
+        <div style="font-size:0.72rem;color:var(--grey);margin-bottom:3px">N° ordre</div>
+        <input type="number" value="${item.ordre||0}" min="0" step="10"
+          onchange="saveJourJItem('${item.id}','ordre',parseInt(this.value)||0)"
+          onblur="renderJourJ()"
+          style="width:60px;border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.85rem;text-align:center;color:var(--pink);font-weight:700">
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--grey);margin-bottom:3px">Horaire</div>
+        <input value="${escHtml(item.heure||'')}" placeholder="14h00"
+          onchange="saveJourJItem('${item.id}','heure',this.value)"
+          style="width:82px;border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.88rem;font-weight:700;color:var(--pink)">
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--grey);margin-bottom:3px">Moment / Activité</div>
+        <input value="${escHtml(item.titre||'')}" placeholder="Description du moment…"
+          onchange="saveJourJItem('${item.id}','titre',this.value)"
+          style="width:100%;border:1px solid #ddd;border-radius:5px;padding:5px 8px;font-family:inherit;font-size:0.88rem;font-weight:600">
+        <input value="${escHtml(item.details||'')}" placeholder="Qui, où, détails…"
+          onchange="saveJourJItem('${item.id}','details',this.value)"
+          style="width:100%;border:1px solid #eee;border-radius:5px;padding:3px 8px;font-family:inherit;font-size:0.78rem;color:var(--grey);margin-top:3px">
+      </div>
+      <button onclick="deleteJourJItem('${item.id}')"
+        style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem;padding:4px;margin-top:18px;line-height:1"
+        onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+    </div>
+  `).join('');
+  if (!state.jourJItems || !state.jourJItems.length) { state.jourJItems = JSON.parse(JSON.stringify(JOURJ_DEFAULT)); save(); }
+}
+
+function saveJourJItem(id, field, val) {
+  const item = getJourJItems().find(i => i.id === id);
+  if (item) { item[field] = val; save(); }
+}
+
+function deleteJourJItem(id) {
+  if (!confirm('Supprimer ce moment du programme ?')) return;
+  state.jourJItems = getJourJItems().filter(i => i.id !== id);
+  save(); renderJourJ();
+}
+
+function addJourJItem() {
+  const items = getJourJItems();
+  const maxOrdre = items.reduce((m,i) => Math.max(m, i.ordre||0), 0);
+  items.push({ id:'jj_'+Date.now(), ordre:maxOrdre+10, heure:'', titre:'', details:'' });
+  save(); renderJourJ();
+}
+
+// ═══════════════════════════════════════
+// CHÂTEAU — INFO BOXES MODIFIABLES
+// ═══════════════════════════════════════
+const VENUE_INFOS_DEFAULT = {
+  localisation: "Château de Jallanges\nVernon-sur-Brenne\n37210, Indre-et-Loire\nTouraine — Val de Loire\n\nwww.jallanges.com",
+  acces: "À 20 min de Tours (A10)\nÀ 30 min d'Amboise\nÀ 2h30 de Paris (TGV Tours + voiture)\n\nPrévoir navettes depuis la gare de Tours pour les invités sans voiture.",
+  pointsForts: "🌹 Domaine viticole & château Renaissance\n🛏️ Chambres d'hôtes sur place\n🌳 Jardins à la française\n🍷 Vins du domaine disponibles\n📷 Cadre exceptionnel pour les photos\n🎪 Grande salle de réception\n🌞 Espaces extérieurs pour le cocktail",
+  questions: "• Traiteur libre ou liste imposée ?\n• Nombre de chambres disponibles ?\n• Horaire limite pour la musique ?\n• Parking : combien de places ?\n• Plan B en cas de pluie ?\n• Accès PMR (personnes à mobilité réduite) ?\n• Montant et modalités de l'acompte ?",
+  decoNote: "Le Château de Jallanges est entouré de vignes et de jardins à la française. Un thème floral champêtre et romantique avec des pivoines, roses et hortensias en rose et blanc sera parfaitement en harmonie avec le cadre de la Touraine en juillet.",
+  ceremonieDemarches: "• Contacter le curé / pasteur dès maintenant (12+ mois avant)\n• Choisir l'église : à Vernon-sur-Brenne ou dans la paroisse de Keziah ou Briac\n• Retirer et déposer le dossier de mariage religieux\n• Participer aux sessions de préparation au mariage (obligatoires, 3 à 5 séances)\n• Confirmer la date et l'heure de la messe avec le prêtre",
+  ceremonieMusique: "• Organiste ou chantre à réserver séparément\n• Chants recommandés en juillet (été) : Ave Maria, Magnificat, chants de louange…\n• Chant d'entrée · Psaume · Alleluia · Chant d'offertoire · Notre Père chanté · Chant de sortie\n• Répétition avec le musicien recommandée avant le jour J",
+  ceremonieDeroulement: "🎶 Entrée en musique des mariés\n📖 Liturgie de la Parole (3 lectures + psaume)\n💍 Rite du mariage (consentement, échange des alliances)\n🙏 Liturgie eucharistique (communion)\n🌹 Bénédiction solennelle des époux\n🎵 Sortie en musique",
+  ceremonieLectures: "• 1 Co 13 : «L'amour est patient, l'amour est serviable…»\n• Rt 1,16 : «Où tu iras, j'irai…»\n• Gn 2,18-24 : La création de la femme\n• Jn 2,1-11 : Les noces de Cana\n• Ep 5,2a.25-32 : L'amour mutuel des époux\n• Sg 8,7 : La tempérance, la prudence, la justice",
+};
+
+function getVenueInfo(key) {
+  return (state.venueInfos && state.venueInfos[key] !== undefined) ? state.venueInfos[key] : (VENUE_INFOS_DEFAULT[key] || '');
+}
+
+function saveVenueInfo(key, val) {
+  if (!state.venueInfos) state.venueInfos = {};
+  state.venueInfos[key] = val;
+  save();
+}
+
+function venueInfoBox(icon, title, key, rows) {
+  const val = getVenueInfo(key);
+  return `<div class="info-box">
+    <h4>${icon} ${title}</h4>
+    <textarea rows="${rows||5}" onchange="saveVenueInfo('${key}',this.value)"
+      style="width:100%;border:1px solid #eee;border-radius:7px;padding:8px 10px;font-family:inherit;font-size:0.87rem;line-height:1.6;resize:vertical;color:var(--dark);background:white">${escHtml(val)}</textarea>
+  </div>`;
+}
+
+function renderVenue() {
+  const el = document.getElementById('venue-container');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="venue-info">
+      <div>
+        ${venueInfoBox('📍','Localisation','localisation',5)}
+        <br>
+        ${venueInfoBox('🚗','Accès','acces',4)}
+      </div>
+      <div>
+        ${venueInfoBox('✨','Points forts','pointsForts',7)}
+        <br>
+        ${venueInfoBox('❓','Questions à poser au château','questions',7)}
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:16px">
+      🌹 <strong>Idée déco :</strong><br>
+      <textarea onchange="saveVenueInfo('decoNote',this.value)" rows="3"
+        style="width:100%;border:none;background:transparent;font-family:inherit;font-size:0.9rem;line-height:1.5;resize:vertical;color:var(--dark);margin-top:6px">${escHtml(getVenueInfo('decoNote'))}</textarea>
+    </div>
+    <div style="height:24px"></div>
+    <div class="card-title">✝️ Cérémonie religieuse chrétienne</div>
+    <div class="venue-info">
+      <div>
+        ${venueInfoBox('📋','Démarches à effectuer','ceremonieDemarches',6)}
+        <br>
+        ${venueInfoBox('🎵','Musique liturgique','ceremonieMusique',5)}
+      </div>
+      <div>
+        ${venueInfoBox('📖',"Déroulement type d'une messe de mariage",'ceremonieDeroulement',6)}
+        <br>
+        ${venueInfoBox('📝','Lectures bibliques populaires','ceremonieLectures',6)}
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:16px">
+      ✝️ <strong>Conseil :</strong> Prévoir un <em>livret de messe</em> pour les invités avec les textes des lectures, les paroles des chants et le déroulé de la cérémonie. Cela permet à tous les invités, même non pratiquants, de suivre et de participer. Estelle peut s'en charger avec Keziah !
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+// MATRICE — CATÉGORIES DYNAMIQUES
+// ═══════════════════════════════════════
+function getMatrixCategories() {
+  const m = getMatrixState();
+  return (m.categories && m.categories.length > 0) ? m.categories : [...MATRIX_CATEGORIES];
+}
+
+function addMatrixCategory() {
+  const input = document.getElementById('matrix-new-cat');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  const m = getMatrixState();
+  if (!m.categories) m.categories = [...MATRIX_CATEGORIES];
+  if (m.categories.includes(val)) { alert('Cette catégorie existe déjà.'); return; }
+  m.categories.push(val);
+  input.value = '';
+  saveMatrix(); renderMatrix();
+}
+
+function removeMatrixCategory(cat) {
+  const m = getMatrixState();
+  if (!confirm(`Supprimer la catégorie "${cat}" ? Les candidats de cette catégorie seront perdus.`)) return;
+  if (!m.categories) m.categories = [...MATRIX_CATEGORIES];
+  m.categories = m.categories.filter(c => c !== cat);
+  delete m[cat];
+  saveMatrix(); renderMatrix();
+}
+
+function renderMatrixCategoryTags() {
+  const cont = document.getElementById('matrix-cat-tags');
+  if (!cont) return;
+  const cats = getMatrixCategories();
+  cont.innerHTML = cats.map(cat => `
+    <span style="display:inline-flex;align-items:center;gap:4px;background:var(--light-pink);color:var(--dark-pink);border-radius:20px;padding:4px 12px;font-size:0.82rem;font-weight:600">
+      ${escHtml(cat)}
+      <button onclick="removeMatrixCategory(${JSON.stringify(cat)})"
+        style="background:none;border:none;cursor:pointer;color:var(--dark-pink);font-size:1rem;padding:0;line-height:1;margin-left:2px">×</button>
+    </span>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// MATRICE → PRESTATAIRES
+// ═══════════════════════════════════════
+function pushWinnerToVendors(cat, name, notes) {
+  initVendors();
+  const existing = state.vendors.find(v => v.cat === cat);
+  if (existing) {
+    if (!confirm(`Mettre à jour le prestataire "${cat}" avec "${name}" ?`)) return;
+    existing.name = name;
+    if (notes) existing.notes = (existing.notes ? existing.notes + '\n' : '') + notes;
+  } else {
+    state.vendors.push({ id:'v'+Date.now(), cat, name, contacts:[{nom:'',tel:'',email:'',role:''}], site:'', status:'⏳ À contacter', notes:notes||'' });
+  }
+  save();
+  renderVendors();
+  alert(`✅ "${name}" ajouté dans les Prestataires (catégorie : ${cat})`);
+}
+
+// ═══════════════════════════════════════
+// PRESTATAIRES — REFONTE MULTI-CONTACTS
+// ═══════════════════════════════════════
+function initVendors() {
+  if (state.vendors && state.vendors.length > 0) return;
+  state.vendors = VENDORS_DATA.map((v, i) => {
+    const saved = state['vendor_'+i] || {};
+    return {
+      id: 'v'+i,
+      cat: v.cat,
+      name: saved.name || v.name || '',
+      contacts: [{ nom:'', tel:saved.tel||v.tel||'', email:saved.email||v.email||'', role:'' }],
+      site: saved.site || v.site || '',
+      status: saved.status || v.status || '⏳ À contacter',
+      notes: saved.notes || ''
+    };
+  });
+  save();
+}
+
+function renderVendors() {
+  const grid = document.getElementById('vendors-grid');
+  if (!grid) return;
+  initVendors();
+  grid.innerHTML = '';
+  (state.vendors || []).forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'prest-card';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <input value="${escHtml(v.cat||'')}" placeholder="Catégorie…" onchange="saveVendorField('${v.id}','cat',this.value)"
+          style="flex:1;border:none;background:transparent;font-size:0.75rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;font-family:inherit;padding:0">
+        <button onclick="deleteVendor('${v.id}')" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem"
+          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+      </div>
+      <div class="prest-field"><label>Nom :</label>
+        <input value="${escHtml(v.name||'')}" placeholder="Nom du prestataire"
+          onchange="saveVendorField('${v.id}','name',this.value)" style="font-weight:700"></div>
+      <div id="contacts-${v.id}">${(v.contacts||[]).map((c,ci) => vendorContactHtml(v.id,ci,c)).join('')}</div>
+      <button onclick="addVendorContact('${v.id}')"
+        style="font-size:0.78rem;color:var(--pink);background:none;border:1px dashed var(--pink);border-radius:6px;padding:3px 10px;cursor:pointer;margin:4px 0 8px;font-family:inherit">+ Contact</button>
+      <div class="prest-field"><label>Site web :</label>
+        <input value="${escHtml(v.site||'')}" placeholder="www…" onchange="saveVendorField('${v.id}','site',this.value)"></div>
+      <div class="prest-field"><label>Notes :</label>
+        <input value="${escHtml(v.notes||'')}" placeholder="Notes…" onchange="saveVendorField('${v.id}','notes',this.value)"></div>
+      <div class="prest-status">
+        <select onchange="saveVendorField('${v.id}','status',this.value)"
+          style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-family:inherit;font-size:0.82rem;">
+          <option ${!v.status||v.status==='⏳ À contacter'?'selected':''}>⏳ À contacter</option>
+          <option ${v.status==='🔄 En négociation'?'selected':''}>🔄 En négociation</option>
+          <option ${v.status==='✅ Contrat signé'?'selected':''}>✅ Contrat signé</option>
+          <option ${v.status==='❌ Non retenu'?'selected':''}>❌ Non retenu</option>
+        </select>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function vendorContactHtml(vid, ci, c) {
+  return `<div style="background:#fafafa;border-radius:7px;padding:8px 10px;margin-bottom:6px;border:1px solid #f0f0f0">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span style="font-size:0.72rem;color:var(--grey);font-weight:700;flex:1">👤 Contact ${ci+1}</span>
+      <button onclick="deleteVendorContact('${vid}',${ci})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:0.9rem"
+        onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button>
+    </div>
+    <input value="${escHtml(c.nom||'')}" placeholder="Nom / Prénom"
+      onchange="saveVendorContact('${vid}',${ci},'nom',this.value)"
+      style="width:100%;border:1px solid #eee;border-radius:5px;padding:4px 7px;font-family:inherit;font-size:0.85rem;margin-bottom:3px;font-weight:600">
+    <input value="${escHtml(c.role||'')}" placeholder="Rôle (ex: Directeur artistique)"
+      onchange="saveVendorContact('${vid}',${ci},'role',this.value)"
+      style="width:100%;border:1px solid #eee;border-radius:5px;padding:4px 7px;font-family:inherit;font-size:0.78rem;margin-bottom:3px;color:var(--grey)">
+    <input value="${escHtml(c.tel||'')}" placeholder="📞 Téléphone"
+      onchange="saveVendorContact('${vid}',${ci},'tel',this.value)"
+      style="width:100%;border:1px solid #eee;border-radius:5px;padding:4px 7px;font-family:inherit;font-size:0.84rem;margin-bottom:3px">
+    <input value="${escHtml(c.email||'')}" placeholder="✉️ Email"
+      onchange="saveVendorContact('${vid}',${ci},'email',this.value)"
+      style="width:100%;border:1px solid #eee;border-radius:5px;padding:4px 7px;font-family:inherit;font-size:0.84rem">
+  </div>`;
+}
+
+function saveVendorField(id, field, val) {
+  const v = (state.vendors||[]).find(v=>v.id===id);
+  if (v) { v[field]=val; save(); }
+}
+
+function saveVendorContact(vid, ci, field, val) {
+  const v = (state.vendors||[]).find(v=>v.id===vid);
+  if (v && v.contacts && v.contacts[ci]) { v.contacts[ci][field]=val; save(); }
+}
+
+function addVendorContact(vid) {
+  initVendors();
+  const v = (state.vendors||[]).find(v=>v.id===vid);
+  if (!v) return;
+  if (!v.contacts) v.contacts = [];
+  v.contacts.push({ nom:'', tel:'', email:'', role:'' });
+  save(); renderVendors();
+}
+
+function deleteVendorContact(vid, ci) {
+  const v = (state.vendors||[]).find(v=>v.id===vid);
+  if (!v||!v.contacts) return;
+  if (v.contacts.length===1) { alert('Il faut au moins un contact par prestataire.'); return; }
+  v.contacts.splice(ci,1);
+  save(); renderVendors();
+}
+
+function addVendor() {
+  initVendors();
+  state.vendors.push({ id:'v'+Date.now(), cat:'Nouveau prestataire', name:'', contacts:[{nom:'',tel:'',email:'',role:''}], site:'', status:'⏳ À contacter', notes:'' });
+  save(); renderVendors();
+}
+
+function deleteVendor(id) {
+  if (!confirm('Supprimer ce prestataire ?')) return;
+  state.vendors = (state.vendors||[]).filter(v=>v.id!==id);
+  save(); renderVendors();
+}
+
+// ═══════════════════════════════════════
+// FIL ROUGE — SUPPRESSION
+// ═══════════════════════════════════════
+function deleteFilRouge(i) {
+  if (!state.filrougeRows) state.filrougeRows = FILROUGE_ROWS_DEFAULT.map(r=>({...r}));
+  if (!confirm('Supprimer cette ligne du fil rouge ?')) return;
+  state.filrougeRows.splice(i,1);
+  save(); renderFilRouge();
+}
+
+// ═══════════════════════════════════════
+// URGENCE — SUPPRESSION
+// ═══════════════════════════════════════
+function deleteUrgenceContact(i) {
+  if (!state.urgenceContacts) state.urgenceContacts = URGENCE_DEFAULT.map(c=>({...c}));
+  if (!confirm('Supprimer ce contact d\'urgence ?')) return;
+  state.urgenceContacts.splice(i,1);
+  save(); renderUrgence();
+}
+
+// ═══════════════════════════════════════
+// EVJF — PROJETS
+// ═══════════════════════════════════════
+function renderEvjfProjets() {
+  const el = document.getElementById('evjf-projets-list');
+  if (!el) return;
+  const projets = (state.evjf && state.evjf.projets) || [];
+  if (projets.length === 0) {
+    el.innerHTML = '<p style="color:var(--grey);font-size:0.88rem;font-style:italic;text-align:center;padding:16px">Aucun projet — cliquez sur "+ Nouveau projet" pour commencer</p>';
+    return;
+  }
+  el.innerHTML = projets.map((p, i) => `
+    <div style="background:#fafafa;border:1px solid #eee;border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <input value="${escHtml(p.titre||'')}" placeholder="Nom du projet / idée…"
+          onchange="saveEvjfProjet(${i},'titre',this.value)"
+          style="flex:1;border:none;background:transparent;font-family:inherit;font-size:0.95rem;font-weight:700;color:var(--dark);border-bottom:2px solid #eee;padding-bottom:4px">
+        <button onclick="deleteEvjfProjet(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem"
+          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+      </div>
+      <textarea placeholder="Description, activités prévues, budget estimé, prestataires contactés…" rows="4"
+        onchange="saveEvjfProjet(${i},'desc',this.value)"
+        style="width:100%;border:1px solid #eee;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:0.87rem;resize:vertical">${escHtml(p.desc||'')}</textarea>
+    </div>
+  `).join('');
+}
+
+function addEvjfProjet() {
+  if (!state.evjf) state.evjf = {};
+  if (!state.evjf.projets) state.evjf.projets = [];
+  state.evjf.projets.push({ id:'ep'+Date.now(), titre:'', desc:'' });
+  save(); renderEvjfProjets();
+}
+
+function saveEvjfProjet(i, field, val) {
+  if (!state.evjf||!state.evjf.projets) return;
+  if (state.evjf.projets[i]) { state.evjf.projets[i][field]=val; save(); }
+}
+
+function deleteEvjfProjet(i) {
+  if (!confirm('Supprimer ce projet ?')) return;
+  state.evjf.projets.splice(i,1);
+  save(); renderEvjfProjets();
+}
+
+// EVJF — CHECKLIST PERSONNALISÉE
+function addEvjfCustomCheck() {
+  const input = document.getElementById('evjf-custom-check-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  if (!state.evjf) state.evjf = {};
+  if (!state.evjf.customChecklist) state.evjf.customChecklist = [];
+  state.evjf.customChecklist.push({ id:'ecc'+Date.now(), text });
+  input.value = '';
+  save(); renderEvjf();
+}
+
+function deleteEvjfCustomCheck(id) {
+  if (!state.evjf||!state.evjf.customChecklist) return;
+  state.evjf.customChecklist = state.evjf.customChecklist.filter(i=>i.id!==id);
+  delete (state.evjf.checklist||{})['cust_'+id];
+  save(); renderEvjf();
+}
+
+function toggleEvjfCustomCheck(id, val) {
+  if (!state.evjf) state.evjf = {};
+  if (!state.evjf.checklist) state.evjf.checklist = {};
+  state.evjf.checklist['cust_'+id] = val;
+  save();
+}
+
+// EVJF — LIER PARTICIPANTE À UN PROFIL
+function selectEvjfMember(i, memberName) {
+  if (!state.evjf||!state.evjf.participantes) return;
+  state.evjf.participantes[i].memberId = memberName;
+  if (memberName) state.evjf.participantes[i].prenom = memberName;
+  save(); renderEvjf();
+}
+
+// ═══════════════════════════════════════
+// FAIRE-PART — CHECKLIST PERSONNALISÉE
+// ═══════════════════════════════════════
+function addFpCustomItem() {
+  const input = document.getElementById('fp-custom-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  if (!state.papeterie) state.papeterie = { checklist:{}, notes:'' };
+  if (!state.papeterie.customItems) state.papeterie.customItems = [];
+  state.papeterie.customItems.push({ id:'fp'+Date.now(), text });
+  input.value = '';
+  save(); renderFairePart();
+}
+
+function deleteFpCustomItem(id) {
+  if (!state.papeterie||!state.papeterie.customItems) return;
+  state.papeterie.customItems = state.papeterie.customItems.filter(i=>i.id!==id);
+  delete (state.papeterie.checklist||{})['cust_'+id];
+  save(); renderFairePart();
+}
+
+function toggleFpCustomItem(id, val) {
+  if (!state.papeterie) state.papeterie = { checklist:{}, notes:'' };
+  if (!state.papeterie.checklist) state.papeterie.checklist = {};
+  state.papeterie.checklist['cust_'+id] = val;
+  save();
+}
 
 // ═══════════════════════════════════════
 // PLAYLIST MUSICALE
