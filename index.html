@@ -1243,6 +1243,46 @@
     <button class="btn btn-outline" style="margin-top:14px" onclick="loadMembers()">🔄 Actualiser la liste</button>
   </div>
 
+  <!-- Historique des actions -->
+  <div class="card" id="audit-log-card" style="display:none">
+    <div class="card-title">📋 Historique des actions</div>
+    <p style="font-size:0.88rem;color:var(--grey);margin-bottom:16px">
+      Les 150 dernières actions (ajouts &amp; suppressions) effectuées par les membres de l'équipe.
+    </p>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      <select id="audit-filter-action" onchange="renderAuditLog()"
+        style="padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;background:white">
+        <option value="">Toutes les actions</option>
+        <option value="ajout">➕ Ajouts</option>
+        <option value="suppression">🗑️ Suppressions</option>
+        <option value="modification">✏️ Modifications</option>
+      </select>
+      <select id="audit-filter-section" onchange="renderAuditLog()"
+        style="padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;background:white">
+        <option value="">Toutes les sections</option>
+        <option value="Checklist">Checklist</option>
+        <option value="Budget">Budget</option>
+        <option value="Invités">Invités</option>
+        <option value="Prestataires">Prestataires</option>
+        <option value="Jour J">Jour J</option>
+        <option value="Fil rouge Jour J">Fil rouge Jour J</option>
+        <option value="Plan de table">Plan de table</option>
+        <option value="EVJF">EVJF</option>
+        <option value="Tenues">Tenues</option>
+        <option value="Faire-part">Faire-part</option>
+        <option value="Idées">Idées</option>
+        <option value="Playlist">Playlist</option>
+        <option value="Ambiance">Ambiance</option>
+        <option value="Décisions">Décisions</option>
+      </select>
+      <button class="btn btn-outline" onclick="renderAuditLog()" style="padding:7px 14px">🔄 Actualiser</button>
+      <button class="btn btn-outline" onclick="clearAuditLog()"
+        style="margin-left:auto;padding:7px 14px;color:var(--red);border-color:var(--red)"
+        onmouseover="this.style.background='#FFEBEE'" onmouseout="this.style.background=''">🗑️ Vider l'historique</button>
+    </div>
+    <div id="audit-log-list" style="border:1px solid #f0f0f0;border-radius:10px;overflow:hidden;max-height:500px;overflow-y:auto"></div>
+  </div>
+
 </div>
 
 <div class="footer">💕 Fait avec amour pour Keziah & Briac — Juillet 2027 — Château de Jallanges, Touraine</div>

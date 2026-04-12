@@ -245,6 +245,7 @@ let state = {
   ambiance: { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' },
   idees: { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] },
   playlist: { songs: [], spotifyClientId: '' },
+  auditLog: [],   // [ { id, action, section, description, user, ts } ]
 };
 
 // Sauvegarde locale (fallback) + Firebase
@@ -282,7 +283,18 @@ function load() {
     if (!state.idees.items)      state.idees.items = [];
     if (!state.playlist)         state.playlist = { songs: [], spotifyClientId: '' };
     if (!state.playlist.songs)   state.playlist.songs = [];
+    if (!state.auditLog)         state.auditLog = [];
   } catch(e) {}
+}
+
+// ─── Audit log — enregistrer une action (add/edit/delete) ───────────────
+function logAction(action, section, description) {
+  const user = window.currentUser
+    ? (window.currentUser.displayName || window.currentUser.email?.split('@')[0] || 'Anonyme')
+    : 'Anonyme';
+  if (!state.auditLog) state.auditLog = [];
+  state.auditLog.unshift({ id:'log_'+Date.now(), action, section, description, user, ts: new Date().toISOString() });
+  if (state.auditLog.length > 150) state.auditLog = state.auditLog.slice(0, 150);
 }
 
 // ─── Firebase : sauvegarde de tout l'état (hors invités)
@@ -312,6 +324,7 @@ async function saveToFirebase() {
       ambiance: state.ambiance || {},
       idees: state.idees || { categories:[], items:[] },
       playlist: state.playlist || { songs:[], spotifyClientId:'' },
+      auditLog: (state.auditLog || []).slice(0, 150),
       lastModifiedBy: window.currentUser ? (window.currentUser.displayName || window.currentUser.email) : 'Anonyme',
       lastModifiedAt: window.fbServerTimestamp(),
     };
@@ -355,6 +368,7 @@ async function loadAllFromFirebase() {
       if (d.playlist)    state.playlist = { ...state.playlist, ...d.playlist };
       if (d.lastModifiedBy) state.lastModifiedBy = d.lastModifiedBy;
       if (d.lastModifiedAt) state.lastModifiedAt = d.lastModifiedAt;
+      if (d.auditLog)       state.auditLog = d.auditLog;
       Object.keys(d).filter(k => k.startsWith('vendor_')).forEach(k => { state[k] = d[k]; });
     }
   } catch(e) { console.warn('Firebase load error:', e); }
@@ -389,6 +403,54 @@ async function loadAllFromFirebase() {
 window.loadAllFromFirebase = loadAllFromFirebase;
 
 // ═══════════════════════════════════════
+// HISTORIQUE DES ACTIONS (AUDIT LOG)
+// ═══════════════════════════════════════
+function renderAuditLog() {
+  const card = document.getElementById('audit-log-card');
+  if (!card) return;
+  if (!isAdmin()) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  const el = document.getElementById('audit-log-list');
+  if (!el) return;
+  const logs = state.auditLog || [];
+  const filterAction  = document.getElementById('audit-filter-action')?.value  || '';
+  const filterSection = document.getElementById('audit-filter-section')?.value || '';
+  let filtered = logs;
+  if (filterAction)  filtered = filtered.filter(l => l.action === filterAction);
+  if (filterSection) filtered = filtered.filter(l => l.section === filterSection);
+  if (filtered.length === 0) {
+    el.innerHTML = '<p style="color:var(--grey);font-style:italic;font-size:0.88rem;text-align:center;padding:20px">Aucune action enregistrée pour l\'instant.</p>';
+    return;
+  }
+  const ICONS   = { ajout:'➕', suppression:'🗑️', modification:'✏️' };
+  const COLORS  = { ajout:'var(--green)', suppression:'var(--red)', modification:'var(--orange)' };
+  el.innerHTML = filtered.map(l => {
+    const d = new Date(l.ts);
+    const dateStr = isNaN(d) ? '—' : d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid #f5f5f5;font-size:0.84rem">
+      <span style="font-size:1rem;line-height:1.4;min-width:20px">${ICONS[l.action]||'📝'}</span>
+      <div style="flex:1;min-width:0">
+        <span style="font-weight:700;color:${COLORS[l.action]||'var(--grey)'};text-transform:uppercase;font-size:0.78rem">${escHtml(l.action)}</span>
+        <span style="background:var(--light-pink);color:var(--pink);padding:2px 7px;border-radius:4px;font-size:0.76rem;font-weight:600;margin-left:6px">${escHtml(l.section)}</span>
+        <div style="color:var(--dark);margin-top:4px;word-break:break-word">${escHtml(l.description)}</div>
+      </div>
+      <div style="text-align:right;white-space:nowrap;color:var(--grey);font-size:0.8rem;flex-shrink:0">
+        <div style="font-weight:600;color:var(--dark)">${escHtml(l.user)}</div>
+        <div>${dateStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function clearAuditLog() {
+  if (!isAdmin()) return;
+  if (!confirm('Vider tout l\'historique ? Cette action est irréversible.')) return;
+  logAction('suppression', 'Administration', 'Historique entièrement vidé');
+  state.auditLog = [];
+  save(); renderAuditLog();
+}
+
+// ═══════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════
 function showSection(id, link) {
@@ -396,7 +458,7 @@ function showSection(id, link) {
   document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (link) link.classList.add('active');
-  if (id === 'administration' && isAdmin()) loadMembers();
+  if (id === 'administration' && isAdmin()) { loadMembers(); renderAuditLog(); }
   updateDashboard();
 }
 
@@ -621,6 +683,7 @@ function updateCustomTask(id, field, val) {
 
 function deleteCustomTask(id) {
   if (!confirm('Supprimer cette tâche ?')) return;
+  logAction('suppression', 'Checklist', `Tâche : "${(state.customTasks||[]).find(t=>t.id===id)?.t||'?'}"`);
   state.customTasks = (state.customTasks || []).filter(t => t.id !== id);
   const key = `c-${id}`;
   delete state.checks[key];
@@ -675,7 +738,9 @@ function updateBudgetItem(i, field, val) {
   save(); updateBudget();
 }
 function deleteBudgetRow(i) {
-  if (!confirm('Supprimer "' + (state.budget[i]?.cat || '') + '" du budget ?')) return;
+  const _bcat = state.budget[i]?.cat || '?';
+  if (!confirm(`Supprimer "${_bcat}" du budget ?`)) return;
+  logAction('suppression', 'Budget', `Poste budget : "${_bcat}"`);
   state.budget.splice(i, 1);
   save(); renderBudget();
 }
@@ -881,19 +946,20 @@ async function saveGuestFromModal() {
   if (idx >= 0 && state.guests[idx]) {
     const guest = { ...state.guests[idx], ...updated };
     const id = await saveGuestToFirebase(guest);
-    if (id) state.guests[idx] = { ...guest, id };
+    if (id) { logAction('modification', 'Invités', `Invité modifié : "${updated.prenom} ${updated.nom}"`); state.guests[idx] = { ...guest, id }; }
   } else {
     const id = await saveGuestToFirebase(updated);
-    if (id) state.guests.push({ ...updated, id });
+    if (id) { logAction('ajout', 'Invités', `Invité ajouté : "${updated.prenom} ${updated.nom}"`); state.guests.push({ ...updated, id }); }
   }
   closeGuestModal();
   renderGuests();
 }
 
 async function removeGuest(idx) {
-  if (!confirm('Supprimer cet invité ?')) return;
-  const guest = state.guests[idx];
-  if (guest?.id) await deleteGuestFromFirebase(guest.id);
+  const _guest = state.guests[idx];
+  if (!confirm(`Supprimer ${_guest?.prenom||''} ${_guest?.nom||''} de la liste des invités ?`)) return;
+  logAction('suppression', 'Invités', `Invité supprimé : "${_guest?.prenom||'?'} ${_guest?.nom||''}"`);
+  if (_guest?.id) await deleteGuestFromFirebase(_guest.id);
   state.guests.splice(idx, 1);
   renderGuests();
 }
@@ -1173,8 +1239,11 @@ function addMatrixCandidate() {
 
 function removeMatrixCandidate(cat, i) {
   const m = getMatrixState();
+  const _name = m[cat]?.[i]?.name || '?';
+  if (!confirm(`Supprimer "${_name}" de la catégorie "${cat}" ?`)) return;
+  logAction('suppression', 'Décisions', `Candidat supprimé : "${_name}" (${cat})`);
   m[cat].splice(i, 1);
-  saveMatrix();
+  saveMatrix(); save();
   renderMatrix();
 }
 
@@ -1497,6 +1566,7 @@ function saveUrgence(i, field, val) {
 function addUrgenceContact() {
   if (!state.urgenceContacts) state.urgenceContacts = URGENCE_DEFAULT.map(c => ({...c}));
   state.urgenceContacts.push({ cat: 'Nouveau contact', nom: '', tel: '', role: '' });
+  logAction('ajout', 'Fil rouge Jour J', 'Nouveau contact d\'urgence ajouté');
   save(); renderUrgence();
 }
 
@@ -1806,6 +1876,7 @@ async function deleteTable(id) {
     ? `Supprimer "${t.name}" ? Les ${nb} invité(s) assigné(s) seront replacés dans les non placés.`
     : `Supprimer la table "${t.name}" ?`;
   if (!confirm(msg)) return;
+  logAction('suppression', 'Plan de table', `Table supprimée : "${t.name}"${nb>0?` (${nb} invité(s) déplacé(s))`:''}`) ;
   await Promise.all(state.guests.filter(g => g.table === t.name).map(g => { g.table = ''; return saveGuestToFirebase(g); }));
   state.tables = state.tables.filter(t => t.id !== id);
   save();
@@ -2368,13 +2439,28 @@ function renderEvjf() {
 function saveEvjfField(field, val) { if (!state.evjf) state.evjf={}; state.evjf[field]=val; save(); }
 function addEvjfParticipante() { if (!state.evjf.participantes) state.evjf.participantes=[]; state.evjf.participantes.push({prenom:'',memberId:'',role:'Participante',tel:'',rsvp:'⏳ En attente'}); save(); renderEvjf(); }
 function updateEvjfP(i,f,v) { state.evjf.participantes[i][f]=v; save(); }
-function deleteEvjfP(i) { state.evjf.participantes.splice(i,1); save(); renderEvjf(); }
-function addEvjfProgramme() { if (!state.evjf.programme) state.evjf.programme=[]; state.evjf.programme.push({heure:'',activite:'',lieu:'',notes:''}); save(); renderEvjf(); }
+function deleteEvjfP(i) {
+  const _n = state.evjf?.participantes?.[i]?.prenom || '?';
+  if (!confirm(`Supprimer "${_n}" des participantes EVJF ?`)) return;
+  logAction('suppression', 'EVJF', `Participante supprimée : "${_n}"`);
+  state.evjf.participantes.splice(i,1); save(); renderEvjf();
+}
+function addEvjfProgramme() { if (!state.evjf.programme) state.evjf.programme=[]; state.evjf.programme.push({heure:'',activite:'',lieu:'',notes:''}); logAction('ajout','EVJF','Ajout d\'une activité au programme EVJF'); save(); renderEvjf(); }
 function updateEvjfProg(i,f,v) { state.evjf.programme[i][f]=v; save(); }
-function deleteEvjfProg(i) { state.evjf.programme.splice(i,1); save(); renderEvjf(); }
-function addEvjfBudget() { if (!state.evjf.budget) state.evjf.budget=[]; state.evjf.budget.push({poste:'',montant:0,statut:'⏳ À payer'}); save(); renderEvjf(); }
+function deleteEvjfProg(i) {
+  const _a = state.evjf?.programme?.[i]?.activite || '?';
+  if (!confirm(`Supprimer "${_a}" du programme EVJF ?`)) return;
+  logAction('suppression', 'EVJF', `Activité EVJF supprimée : "${_a}"`);
+  state.evjf.programme.splice(i,1); save(); renderEvjf();
+}
+function addEvjfBudget() { if (!state.evjf.budget) state.evjf.budget=[]; state.evjf.budget.push({poste:'',montant:0,statut:'⏳ À payer'}); logAction('ajout','EVJF','Ajout d\'un poste budget EVJF'); save(); renderEvjf(); }
 function updateEvjfBudget(i,f,v) { state.evjf.budget[i][f]= f==='montant'?(parseFloat(v)||0):v; save(); renderEvjf(); }
-function deleteEvjfBudget(i) { state.evjf.budget.splice(i,1); save(); renderEvjf(); }
+function deleteEvjfBudget(i) {
+  const _p = state.evjf?.budget?.[i]?.poste || '?';
+  if (!confirm(`Supprimer le poste "${_p}" du budget EVJF ?`)) return;
+  logAction('suppression', 'EVJF', `Poste budget EVJF supprimé : "${_p}"`);
+  state.evjf.budget.splice(i,1); save(); renderEvjf();
+}
 function toggleEvjfCheck(k,v) { if (!state.evjf.checklist) state.evjf.checklist={}; state.evjf.checklist[k]=v; save(); renderEvjf(); }
 
 // ═══════════════════════════════════════
@@ -2406,8 +2492,20 @@ function renderTenues() {
   </tr>`).join('');
 }
 function updateTenue(i,f,v) { if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT)); state.tenues[i][f]=v; save(); }
-function deleteTenue(i) { if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT)); state.tenues.splice(i,1); save(); renderTenues(); }
-function addTenue() { if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT)); state.tenues.push({id:'tenue_'+Date.now(),personne:'',type:'',couleur:'',prestataire:'',statut:'🔍 À choisir',notes:''}); save(); renderTenues(); }
+function deleteTenue(i) {
+  if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT));
+  const _t = state.tenues[i];
+  const _label = [_t?.personne, _t?.type].filter(Boolean).join(' — ') || '?';
+  if (!confirm(`Supprimer la tenue "${_label}" ?`)) return;
+  logAction('suppression', 'Tenues', `Tenue supprimée : "${_label}"`);
+  state.tenues.splice(i,1); save(); renderTenues();
+}
+function addTenue() {
+  if(!state.tenues||!state.tenues.length) state.tenues=JSON.parse(JSON.stringify(TENUES_DEFAULT));
+  state.tenues.push({id:'tenue_'+Date.now(),personne:'',type:'',couleur:'',prestataire:'',statut:'🔍 À choisir',notes:''});
+  logAction('ajout', 'Tenues', 'Nouvelle tenue ajoutée');
+  save(); renderTenues();
+}
 
 // ═══════════════════════════════════════
 // FAIRE-PART & PAPETERIE
@@ -2616,7 +2714,13 @@ function editAmbianceColor(i) {
   if (v&&v.trim()) { updateAmbianceColor(i, v.trim()); }
 }
 function updateAmbianceColor(i,v) { if(!state.ambiance) state.ambiance={}; if(!state.ambiance.colors) state.ambiance.colors=[]; state.ambiance.colors[i]=v; save(); renderAmbiance(); }
-function deleteAmbianceColor(i) { if(!state.ambiance||!state.ambiance.colors) return; state.ambiance.colors.splice(i,1); save(); renderAmbiance(); }
+function deleteAmbianceColor(i) {
+  if(!state.ambiance||!state.ambiance.colors) return;
+  const _c = state.ambiance.colors[i] || '?';
+  if (!confirm(`Supprimer la couleur ${_c} de la palette ?`)) return;
+  logAction('suppression', 'Ambiance', `Couleur supprimée : ${_c}`);
+  state.ambiance.colors.splice(i,1); save(); renderAmbiance();
+}
 function addAmbianceColor() {
   if(!state.ambiance) state.ambiance={};
   if(!state.ambiance.colors) state.ambiance.colors=[];
@@ -2745,9 +2849,11 @@ function saveIdeeFromModal() {
       idee.title    = titre;
       idee.category = document.getElementById('idee-categorie').value;
       idee.notes    = document.getElementById('idee-notes').value.trim();
+      logAction('modification', 'Idées', `Idée modifiée : "${titre}"`);
     }
   } else {
     if (!state.idees.items) state.idees.items = [];
+    logAction('ajout', 'Idées', `Nouvelle idée : "${titre}"`);
     state.idees.items.push({
       id: 'idee_' + Date.now(),
       title: titre,
@@ -2764,7 +2870,9 @@ function saveIdeeFromModal() {
 }
 
 function deleteIdee(id) {
-  if (!confirm('Supprimer cette idée et toutes ses options ?')) return;
+  const _title = (state.idees.items||[]).find(i=>i.id===id)?.title || '?';
+  if (!confirm(`Supprimer l'idée "${_title}" et toutes ses options ?`)) return;
+  logAction('suppression', 'Idées', `Idée supprimée : "${_title}"`);
   state.idees.items = (state.idees.items||[]).filter(i => i.id !== id);
   save();
   renderIdees();
@@ -2817,10 +2925,12 @@ function saveOptionFromModal() {
 }
 
 function deleteOption(ideaId, optId) {
-  if (!confirm('Supprimer cette option ?')) return;
-  const idee = (state.idees.items||[]).find(i => i.id === ideaId);
-  if (!idee) return;
-  idee.options = (idee.options||[]).filter(o => o.id !== optId);
+  const _idee = (state.idees.items||[]).find(i => i.id === ideaId);
+  const _opt = (_idee?.options||[]).find(o => o.id === optId);
+  if (!confirm(`Supprimer l'option "${_opt?.nom||'?'}" ?`)) return;
+  logAction('suppression', 'Idées', `Option supprimée : "${_opt?.nom||'?'}" (idée : "${_idee?.title||'?'}")`);
+  if (!_idee) return;
+  _idee.options = (_idee.options||[]).filter(o => o.id !== optId);
   save();
   renderIdees();
 }
@@ -3020,7 +3130,9 @@ function saveJourJItem(id, field, val) {
 }
 
 function deleteJourJItem(id) {
-  if (!confirm('Supprimer ce moment du programme ?')) return;
+  const _titre = getJourJItems().find(i=>i.id===id)?.titre || '?';
+  if (!confirm(`Supprimer le moment "${_titre}" du programme Jour J ?`)) return;
+  logAction('suppression', 'Jour J', `Moment supprimé : "${_titre}"`);
   state.jourJItems = getJourJItems().filter(i => i.id !== id);
   save(); renderJourJ(); renderFilRouge();
 }
@@ -3029,6 +3141,7 @@ function addJourJItem() {
   const items = getJourJItems();
   const maxOrdre = items.reduce((m,i) => Math.max(m, i.ordre||0), 0);
   items.push({ id:'jj_'+Date.now(), ordre:maxOrdre+10, heure:'', titre:'', details:'', resp:'', vigilance:'' });
+  logAction('ajout', 'Jour J', 'Nouveau moment ajouté au programme Jour J');
   save(); renderJourJ();
 }
 
@@ -3260,6 +3373,9 @@ function deleteVendorContact(vid, ci) {
   const v = (state.vendors||[]).find(v=>v.id===vid);
   if (!v||!v.contacts) return;
   if (v.contacts.length===1) { alert('Il faut au moins un contact par prestataire.'); return; }
+  const _nom = v.contacts[ci]?.nom || '?';
+  if (!confirm(`Supprimer le contact "${_nom}" du prestataire "${v.cat||'?'}" ?`)) return;
+  logAction('suppression', 'Prestataires', `Contact supprimé : "${_nom}" (${v.cat||'?'})`);
   v.contacts.splice(ci,1);
   save(); renderVendors();
 }
@@ -3267,11 +3383,14 @@ function deleteVendorContact(vid, ci) {
 function addVendor() {
   initVendors();
   state.vendors.push({ id:'v'+Date.now(), cat:'Nouveau prestataire', name:'', contacts:[{nom:'',tel:'',email:'',role:''}], site:'', status:'⏳ À contacter', notes:'' });
+  logAction('ajout', 'Prestataires', 'Nouveau prestataire ajouté');
   save(); renderVendors();
 }
 
 function deleteVendor(id) {
-  if (!confirm('Supprimer ce prestataire ?')) return;
+  const _cat = (state.vendors||[]).find(v=>v.id===id)?.cat || '?';
+  if (!confirm(`Supprimer le prestataire "${_cat}" ?`)) return;
+  logAction('suppression', 'Prestataires', `Prestataire supprimé : "${_cat}"`);
   state.vendors = (state.vendors||[]).filter(v=>v.id!==id);
   save(); renderVendors();
 }
@@ -3291,7 +3410,9 @@ function deleteFilRouge(i) {
 // ═══════════════════════════════════════
 function deleteUrgenceContact(i) {
   if (!state.urgenceContacts) state.urgenceContacts = URGENCE_DEFAULT.map(c=>({...c}));
-  if (!confirm('Supprimer ce contact d\'urgence ?')) return;
+  const _nom = (state.urgenceContacts||[])[i]?.nom || '?';
+  if (!confirm(`Supprimer le contact d'urgence "${_nom}" ?`)) return;
+  logAction('suppression', 'Fil rouge Jour J', `Contact d'urgence supprimé : "${_nom}"`);
   state.urgenceContacts.splice(i,1);
   save(); renderUrgence();
 }
@@ -3447,6 +3568,7 @@ function addEvjfProjet() {
   const newId = 'ep' + Date.now();
   state.evjf.projets.push({ id:newId, titre:'', destination:'', theme:'', dateDebut:'', dateFin:'', notes:'', programme:[], budget:[], idees:[] });
   _evjfOpenProjet = newId;
+  logAction('ajout', 'EVJF', 'Nouveau projet EVJF créé');
   save(); renderEvjfProjets();
 }
 
@@ -3457,7 +3579,9 @@ function saveEvjfProjetField(i, field, val) {
 }
 
 function deleteEvjfProjet(i) {
-  if (!confirm('Supprimer ce projet EVJF et tout son contenu ?')) return;
+  const _titre = state.evjf?.projets?.[i]?.titre || 'Nouveau projet';
+  if (!confirm(`Supprimer le projet EVJF "${_titre}" et tout son contenu ?`)) return;
+  logAction('suppression', 'EVJF', `Projet EVJF supprimé : "${_titre}"`);
   const id = state.evjf.projets[i]?.id;
   if (_evjfOpenProjet === id) _evjfOpenProjet = null;
   state.evjf.projets.splice(i, 1);
@@ -3476,6 +3600,9 @@ function saveEvjfProgItem(pi, ii, field, val) {
 }
 function deleteEvjfProgItem(pi, ii) {
   const p = state.evjf?.projets?.[pi]; if (!p?.programme) return;
+  const _a = p.programme[ii]?.activite || '?';
+  if (!confirm(`Supprimer "${_a}" du programme ?`)) return;
+  logAction('suppression', 'EVJF', `Activité projet supprimée : "${_a}" (${p.titre||'?'})`);
   p.programme.splice(ii,1); save(); renderEvjfProjets();
 }
 
@@ -3491,6 +3618,9 @@ function saveEvjfBudgetItem(pi, ii, field, val) {
 }
 function deleteEvjfBudgetItem(pi, ii) {
   const p = state.evjf?.projets?.[pi]; if (!p?.budget) return;
+  const _poste = p.budget[ii]?.poste || '?';
+  if (!confirm(`Supprimer le poste "${_poste}" du budget ?`)) return;
+  logAction('suppression', 'EVJF', `Poste budget projet supprimé : "${_poste}" (${p.titre||'?'})`);
   p.budget.splice(ii,1); save(); renderEvjfProjets();
 }
 
@@ -3506,6 +3636,9 @@ function saveEvjfIdeeItem(pi, ii, field, val) {
 }
 function deleteEvjfIdeeItem(pi, ii) {
   const p = state.evjf?.projets?.[pi]; if (!p?.idees) return;
+  const _texte = p.idees[ii]?.texte || '?';
+  if (!confirm(`Supprimer l'idée "${_texte}" ?`)) return;
+  logAction('suppression', 'EVJF', `Idée projet supprimée : "${_texte}" (${p.titre||'?'})`);
   p.idees.splice(ii,1); save(); renderEvjfProjets();
 }
 
@@ -3524,6 +3657,9 @@ function addEvjfCustomCheck() {
 
 function deleteEvjfCustomCheck(id) {
   if (!state.evjf||!state.evjf.customChecklist) return;
+  const _text = state.evjf.customChecklist.find(i=>i.id===id)?.text || '?';
+  if (!confirm(`Supprimer "${_text}" de la checklist EVJF ?`)) return;
+  logAction('suppression', 'EVJF', `Item checklist EVJF supprimé : "${_text}"`);
   state.evjf.customChecklist = state.evjf.customChecklist.filter(i=>i.id!==id);
   delete (state.evjf.checklist||{})['cust_'+id];
   save(); renderEvjf();
@@ -3561,6 +3697,9 @@ function addFpCustomItem() {
 
 function deleteFpCustomItem(id) {
   if (!state.papeterie||!state.papeterie.customItems) return;
+  const _text = state.papeterie.customItems.find(i=>i.id===id)?.text || '?';
+  if (!confirm(`Supprimer "${_text}" de la checklist faire-part ?`)) return;
+  logAction('suppression', 'Faire-part', `Item checklist supprimé : "${_text}"`);
   state.papeterie.customItems = state.papeterie.customItems.filter(i=>i.id!==id);
   delete (state.papeterie.checklist||{})['cust_'+id];
   save(); renderFairePart();
@@ -3704,13 +3843,17 @@ function saveSong() {
   if (editingSongId) {
     const song = state.playlist.songs.find(s => s.id===editingSongId);
     if (song) { song.titre=titre; song.artiste=artiste; song.moment=moment; song.coupDeCoeur=coupDeCoeur; }
+    logAction('modification', 'Playlist', `Chanson modifiée : "${titre}"${artiste?' — '+artiste:''}`);
   } else {
     state.playlist.songs.push({ id:'song_'+Date.now(), titre, artiste, moment, coupDeCoeur, addedBy:name, addedAt:new Date().toISOString() });
+    logAction('ajout', 'Playlist', `Chanson ajoutée : "${titre}"${artiste?' — '+artiste:''}`);
   }
   save(); closeSongModal(); renderPlaylist();
 }
 function deleteSong(id) {
-  if (!confirm('Supprimer cette chanson ?')) return;
+  const _song = (state.playlist?.songs||[]).find(s=>s.id===id);
+  if (!confirm(`Supprimer "${_song?.titre||'?'}"${_song?.artiste?' — '+_song.artiste:''} de la playlist ?`)) return;
+  logAction('suppression', 'Playlist', `Chanson supprimée : "${_song?.titre||'?'}"${_song?.artiste?' — '+_song.artiste:''}`);
   if (!state.playlist) return;
   state.playlist.songs = (state.playlist.songs||[]).filter(s => s.id!==id);
   save(); renderPlaylist();
