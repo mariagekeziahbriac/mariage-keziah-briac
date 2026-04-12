@@ -470,6 +470,132 @@
   .auth-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(194,24,91,0.4); }
   .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   #nav-user { display: flex; align-items: center; gap: 8px; margin-left: auto; padding: 2px 0; }
+
+  /* ── ACCOUNT DROPDOWN (desktop) ── */
+  .account-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--dark-pink), var(--pink));
+    color: white; font-weight: 800; font-size: 0.88rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; box-shadow: 0 2px 8px rgba(194,24,91,0.3);
+    cursor: pointer; border: none;
+  }
+  .account-avatar.is-admin { background: linear-gradient(135deg, #E65100, #FF9800); box-shadow: 0 2px 8px rgba(230,81,0,0.3); }
+  #acct-wrap { position: relative; flex-shrink: 0; }
+  .account-dropdown {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    background: white; border-radius: 14px; min-width: 240px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18); z-index: 500;
+    overflow: hidden; display: none;
+    animation: fadeDown 0.15s ease;
+  }
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .account-dropdown.open { display: block; }
+  .acct-head { padding: 14px 16px 12px; background: var(--light-pink); border-bottom: 1px solid #f0f0f0; }
+  .acct-name { font-weight: 700; font-size: 0.95rem; color: var(--dark); }
+  .acct-email { font-size: 0.76rem; color: var(--grey); margin-top: 2px; }
+  .acct-item {
+    display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+    cursor: pointer; font-size: 0.875rem; color: var(--dark);
+    transition: background 0.15s; border: none; background: none;
+    width: 100%; text-align: left; font-family: inherit;
+  }
+  .acct-item:hover { background: #f5f5f5; }
+  .acct-item.danger { color: var(--red); }
+  .acct-item.danger:hover { background: #fff5f5; }
+  .acct-sep { height: 1px; background: #f0f0f0; }
+
+  /* ── MOBILE BOTTOM BAR ── */
+  .mob-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid #eee;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 200;
+    height: 60px; align-items: center; justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mbb {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    background: none; border: none; cursor: pointer; padding: 0 18px;
+    font-size: 0.58rem; color: var(--grey); font-family: inherit; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .mbb .mico { font-size: 1.3rem; line-height: 1; }
+  .mob-fab {
+    width: 50px; height: 50px; border-radius: 50%; margin-top: -16px;
+    background: linear-gradient(135deg, var(--dark-pink), var(--pink));
+    border: 3px solid white; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem; color: white; line-height: 1;
+    box-shadow: 0 4px 16px rgba(194,24,91,0.45);
+    transition: transform 0.15s;
+  }
+  .mob-fab:active { transform: scale(0.9); }
+
+  /* ── MOBILE MENU DRAWER ── */
+  .mob-overlay {
+    display: none; position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.45);
+  }
+  .mob-overlay.open { display: block; }
+  .mob-drawer {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 285px;
+    background: white; overflow-y: auto;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+    transform: translateX(-100%); transition: transform 0.25s ease;
+  }
+  .mob-overlay.open .mob-drawer { transform: translateX(0); }
+  .mob-drhead {
+    background: linear-gradient(135deg, var(--dark-pink), var(--pink));
+    color: white; padding: 22px 18px 16px; position: relative;
+  }
+  .mob-drhead h3 { font-size: 1.05rem; font-weight: 800; }
+  .mob-drhead p { font-size: 0.76rem; opacity: 0.85; margin-top: 3px; }
+  .mob-close {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.95rem;
+  }
+  .mob-link {
+    display: block; width: 100%; padding: 12px 20px;
+    border: none; border-bottom: 1px solid #f8f8f8;
+    background: none; text-align: left; font-family: inherit;
+    font-size: 0.88rem; color: var(--dark); cursor: pointer;
+    transition: background 0.12s;
+  }
+  .mob-link:hover { background: var(--light-pink); color: var(--pink); }
+
+  /* ── QUICK ADD MODAL ── */
+  .qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .qa-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 18px 10px; border-radius: 12px; border: 2px solid #f0f0f0;
+    cursor: pointer; background: white; font-family: inherit; transition: all 0.18s;
+  }
+  .qa-btn:hover { border-color: var(--pink); background: var(--light-pink); }
+  .qa-ico { font-size: 1.7rem; }
+  .qa-lbl { font-size: 0.85rem; font-weight: 700; color: var(--dark); }
+  .qa-sub { font-size: 0.7rem; color: var(--grey); }
+
+  /* ── ACCOUNT SETTINGS MODAL ── */
+  .stab { padding: 7px 14px; border: none; background: none; cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 600; color: var(--grey); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .stab.active { color: var(--pink); border-color: var(--pink); }
+  .spanel { display: none; }
+  .spanel.active { display: block; }
+  .s-field { margin-bottom: 14px; }
+  .s-field label { display: block; font-size: 0.74rem; font-weight: 700; color: var(--grey); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+  .s-field input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 9px 12px; font-family: inherit; font-size: 0.9rem; }
+  .s-field input:disabled { background: #fafafa; color: var(--grey); border-color: #eee; }
+  .s-msg { display: none; border-radius: 8px; padding: 9px 14px; font-size: 0.84rem; margin-bottom: 12px; }
+  .member-row { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: #fafafa; border-radius: 10px; border: 1px solid #f0f0f0; margin-bottom: 8px; flex-wrap: wrap; }
+  .mbr-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.82rem; flex-shrink: 0; background: var(--light-pink); color: var(--pink); }
+  .mbr-avatar.is-admin { background: #FFF3E0; color: #E65100; }
+
+  @media (max-width: 768px) {
+    .mob-bar { display: flex; }
+    .container { padding-bottom: 80px; }
+    #nav-user { display: none !important; }
+    #nav-admin-link { display: none !important; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -536,6 +662,49 @@
   <a href="#" id="nav-admin-link" style="display:none;color:#E65100 !important" onclick="showSection('administration',this)">⚙️ Administration</a>
   <div id="nav-user"></div>
 </nav>
+
+<!-- ══ MOBILE BOTTOM BAR ══ -->
+<div class="mob-bar" id="mob-bar">
+  <button class="mbb" onclick="openMobMenu()">
+    <span class="mico">☰</span>Menu
+  </button>
+  <button class="mob-fab" onclick="openQuickAdd()">+</button>
+  <button class="mbb" onclick="openAccountSettings()">
+    <span class="mico" id="mob-acct-ico">👤</span>Compte
+  </button>
+</div>
+
+<!-- ══ MOBILE MENU DRAWER ══ -->
+<div class="mob-overlay" id="mob-overlay" onclick="closeMobMenu()">
+  <div class="mob-drawer" onclick="event.stopPropagation()">
+    <div class="mob-drhead">
+      <h3>💍 Keziah &amp; Briac</h3>
+      <p>10 juillet 2027 · Château de Jallanges</p>
+      <button class="mob-close" onclick="closeMobMenu()">✕</button>
+    </div>
+    <button class="mob-link" onclick="mobileGo('dashboard')">🏠 Tableau de bord</button>
+    <button class="mob-link" onclick="mobileGo('planning')">📅 Rétroplanning</button>
+    <button class="mob-link" onclick="mobileGo('checklist')">✅ Checklist</button>
+    <button class="mob-link" onclick="mobileGo('budget')">💰 Budget</button>
+    <button class="mob-link" onclick="mobileGo('guests')">👥 Invités</button>
+    <button class="mob-link" onclick="mobileGo('vendors')">📋 Prestataires</button>
+    <button class="mob-link" onclick="mobileGo('daytimeline')">🎉 Jour J</button>
+    <button class="mob-link" onclick="mobileGo('venue')">🏰 Château</button>
+    <button class="mob-link" onclick="mobileGo('gantt')">📊 Gantt</button>
+    <button class="mob-link" onclick="mobileGo('matrix')">⚖️ Décisions</button>
+    <button class="mob-link" onclick="mobileGo('filrouge')">📋 Fil rouge Jour J</button>
+    <button class="mob-link" onclick="mobileGo('plantable')">🪑 Plan de table</button>
+    <button class="mob-link" onclick="mobileGo('evjf')">🎉 EVJF</button>
+    <button class="mob-link" onclick="mobileGo('tenues')">👗 Tenues</button>
+    <button class="mob-link" onclick="mobileGo('fairepart')">💌 Faire-part</button>
+    <button class="mob-link" onclick="mobileGo('lunedeMiel')">✈️ Lune de miel</button>
+    <button class="mob-link" onclick="mobileGo('docsLegaux')">📄 Documents</button>
+    <button class="mob-link" onclick="mobileGo('kitUrgence')">🧰 Kit urgence</button>
+    <button class="mob-link" onclick="mobileGo('ambiance')">🎨 Ambiance</button>
+    <button class="mob-link" onclick="mobileGo('idees')">💡 Idées</button>
+    <button class="mob-link" id="mob-admin-link" style="display:none;color:#E65100" onclick="mobileGo('administration')">⚙️ Administration</button>
+  </div>
+</div>
 
 <div class="container">
 
@@ -1835,7 +2004,12 @@ const VENDORS_DATA = [
 // ═══════════════════════════════════════
 // ── Administrateurs (emails autorisés) ──
 const ADMIN_EMAILS = ['mariage.keziah.briac@gmail.com'];
-function isAdmin() { return window.currentUser && ADMIN_EMAILS.includes(window.currentUser.email); }
+window.currentUserIsAdmin = false;
+function isAdmin() {
+  if (!window.currentUser) return false;
+  if (ADMIN_EMAILS.includes(window.currentUser.email)) return true;
+  return !!window.currentUserIsAdmin;
+}
 
 // Palette de couleurs pour les tables
 const TABLE_COLORS = [
@@ -3554,43 +3728,264 @@ async function doSignOut() {
 
 function updateNavUser(user) {
   const el = document.getElementById('nav-user');
-  const adminLink = document.getElementById('nav-admin-link');
+  const adminLink   = document.getElementById('nav-admin-link');
+  const mobAdminLink= document.getElementById('mob-admin-link');
+  const stabMembres = document.getElementById('stab-membres');
+  const mobIco      = document.getElementById('mob-acct-ico');
   if (!el) return;
   if (user) {
-    const name = user.displayName || user.email.split('@')[0];
-    const admin = ADMIN_EMAILS.includes(user.email);
+    const name    = user.displayName || user.email.split('@')[0];
+    const admin   = isAdmin();
+    const initials= name.split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
     el.innerHTML = `
-      ${admin ? '<span style="background:#FFF3E0;color:#E65100;border-radius:20px;padding:4px 10px;font-size:0.75rem;font-weight:700;white-space:nowrap">⚙️ Admin</span>' : ''}
-      <span style="background:var(--light-pink);color:var(--pink);border-radius:20px;padding:5px 14px;font-size:0.82rem;font-weight:700;white-space:nowrap">
-        👤 ${escHtml(name)}
-      </span>
-      <button onclick="doSignOut()" title="Se déconnecter"
-        style="background:none;border:1px solid #ddd;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:0.78rem;color:var(--grey);transition:all 0.2s;white-space:nowrap;font-family:inherit"
-        onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'"
-        onmouseout="this.style.borderColor='#ddd';this.style.color='var(--grey)'">Déconnexion</button>`;
-    // Afficher ou masquer le lien Admin dans le nav
-    if (adminLink) adminLink.style.display = admin ? '' : 'none';
-    // Enregistrer le membre dans Firestore
+      <div id="acct-wrap">
+        <button class="account-avatar${admin?' is-admin':''}" onclick="toggleAcctDropdown()" title="${escHtml(name)}" id="acct-btn">${initials}</button>
+        <div class="account-dropdown" id="acct-dropdown">
+          <div class="acct-head">
+            <div class="acct-name">${escHtml(name)}${admin?'&ensp;<span style="background:#FFF3E0;color:#E65100;border-radius:8px;padding:1px 7px;font-size:0.7rem;font-weight:700">Admin</span>':''}</div>
+            <div class="acct-email">${escHtml(user.email)}</div>
+          </div>
+          <button class="acct-item" onclick="openAccountSettings('profil')">👤&nbsp; Mon profil</button>
+          <button class="acct-item" onclick="openAccountSettings('securite')">🔑&nbsp; Changer le mot de passe</button>
+          ${admin?'<div class="acct-sep"></div><button class="acct-item" onclick="openAccountSettings(\'membres\');loadSettingsMembers()">👥&nbsp; Gérer les membres</button>':''}
+          <div class="acct-sep"></div>
+          <button class="acct-item danger" onclick="doSignOut()">🚪&nbsp; Se déconnecter</button>
+        </div>
+      </div>`;
+    if (adminLink)    adminLink.style.display    = admin ? '' : 'none';
+    if (mobAdminLink) mobAdminLink.style.display = admin ? '' : 'none';
+    if (stabMembres)  stabMembres.style.display  = admin ? '' : 'none';
+    if (mobIco)       mobIco.textContent          = admin ? '⚙️' : '👤';
     registerMemberInFirestore(user);
   } else {
     el.innerHTML = '';
-    if (adminLink) adminLink.style.display = 'none';
+    if (adminLink)    adminLink.style.display    = 'none';
+    if (mobAdminLink) mobAdminLink.style.display = 'none';
+    if (stabMembres)  stabMembres.style.display  = 'none';
   }
 }
 
+function toggleAcctDropdown() {
+  const dd = document.getElementById('acct-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('acct-wrap');
+  const dd   = document.getElementById('acct-dropdown');
+  if (dd && dd.classList.contains('open') && wrap && !wrap.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
 async function registerMemberInFirestore(user) {
-  if (!window.fbSetDoc || !window.fbDoc || !window.db) return;
+  if (!window.fbSetDoc || !window.fbDoc || !window.fbGetDoc || !window.db) return;
+  try {
+    const ref = window.fbDoc(window.db, 'wedding', 'keziah-briac', 'members', user.uid);
+    await window.fbSetDoc(ref, {
+      displayName: user.displayName || user.email.split('@')[0],
+      email: user.email,
+      lastSeen: window.fbServerTimestamp(),
+    }, { merge: true });
+    // Vérifier le statut admin stocké dans Firestore
+    const snap = await window.fbGetDoc(ref);
+    if (snap.exists()) {
+      window.currentUserIsAdmin = snap.data().isAdmin === true;
+    }
+    // Re-render nav avec les bons droits
+    updateNavUser(user);
+  } catch(e) { console.warn('Erreur enregistrement membre:', e); }
+}
+
+// ── MOBILE MENU ────────────────────────────────────────
+function openMobMenu()  { document.getElementById('mob-overlay').classList.add('open'); }
+function closeMobMenu() { document.getElementById('mob-overlay').classList.remove('open'); }
+function mobileGo(section) {
+  closeMobMenu();
+  const link = document.querySelector(`.nav a[onclick*="'${section}'"]`);
+  if (link) link.click();
+}
+
+// ── QUICK ADD ──────────────────────────────────────────
+function openQuickAdd()  { document.getElementById('quick-add-overlay').classList.remove('hidden'); }
+function closeQuickAdd() { document.getElementById('quick-add-overlay').classList.add('hidden'); }
+function quickAddGo(type) {
+  closeQuickAdd();
+  if (type === 'guest') {
+    mobileGo('guests');
+    setTimeout(() => openGuestModal(-1), 250);
+  } else if (type === 'budget') {
+    mobileGo('budget');
+    setTimeout(() => { addBudgetRow(); document.querySelector('#budget')?.scrollIntoView({behavior:'smooth'}); }, 250);
+  } else if (type === 'task') {
+    mobileGo('checklist');
+    setTimeout(() => { const btn = document.querySelector('.btn-add-task'); if (btn) btn.click(); }, 250);
+  } else if (type === 'idea') {
+    mobileGo('idees');
+    setTimeout(() => openIdeeModal(), 250);
+  }
+}
+
+// ── ACCOUNT SETTINGS MODAL ────────────────────────────
+function openAccountSettings(tab) {
+  const dd = document.getElementById('acct-dropdown');
+  if (dd) dd.classList.remove('open');
+  const user = window.currentUser;
+  if (user) {
+    const n = document.getElementById('s-displayname'); if (n) n.value = user.displayName || '';
+    const e = document.getElementById('s-email');       if (e) e.value = user.email || '';
+  }
+  ['s-profil-msg','s-pwd-msg','sm-create-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display='none'; el.textContent=''; }
+  });
+  const p1=document.getElementById('s-pwd1'); if(p1) p1.value='';
+  const p2=document.getElementById('s-pwd2'); if(p2) p2.value='';
+  document.getElementById('acct-overlay').classList.remove('hidden');
+  switchStab(tab || 'profil');
+}
+function closeAccountSettings() { document.getElementById('acct-overlay').classList.add('hidden'); }
+function switchStab(tab) {
+  ['profil','securite','membres'].forEach(t => {
+    const b = document.getElementById('stab-'+t);
+    const p = document.getElementById('spanel-'+t);
+    if (b) b.classList.toggle('active', t===tab);
+    if (p) p.classList.toggle('active', t===tab);
+  });
+}
+
+async function saveDisplayName() {
+  const input = document.getElementById('s-displayname');
+  const msg   = document.getElementById('s-profil-msg');
+  const name  = input.value.trim();
+  if (!name) { showSMsg(msg,'Veuillez entrer un prénom et nom.','error'); return; }
+  if (!window.currentUser) return;
+  try {
+    await window.fbUpdateProfile(window.currentUser, { displayName: name });
+    if (window.fbSetDoc && window.fbDoc && window.db) {
+      await window.fbSetDoc(
+        window.fbDoc(window.db,'wedding','keziah-briac','members',window.currentUser.uid),
+        { displayName: name }, { merge: true }
+      );
+    }
+    showSMsg(msg,'✅ Nom mis à jour !','ok');
+    updateNavUser(window.currentUser);
+  } catch(e) { showSMsg(msg,'❌ Erreur : '+e.message,'error'); }
+}
+
+async function saveNewPassword() {
+  const p1  = document.getElementById('s-pwd1').value;
+  const p2  = document.getElementById('s-pwd2').value;
+  const msg = document.getElementById('s-pwd-msg');
+  if (!p1)         { showSMsg(msg,'Entrez un nouveau mot de passe.','error'); return; }
+  if (p1.length<6) { showSMsg(msg,'Le mot de passe doit faire au moins 6 caractères.','error'); return; }
+  if (p1!==p2)     { showSMsg(msg,'Les mots de passe ne correspondent pas.','error'); return; }
+  if (!window.currentUser) return;
+  try {
+    const token = await window.currentUser.getIdToken();
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=${FIREBASE_API_KEY}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ idToken: token, password: p1, returnSecureToken: false })
+    });
+    const d = await res.json();
+    if (d.error) throw new Error(d.error.message);
+    showSMsg(msg,'✅ Mot de passe changé avec succès !','ok');
+    document.getElementById('s-pwd1').value='';
+    document.getElementById('s-pwd2').value='';
+  } catch(e) { showSMsg(msg,'❌ Erreur : '+e.message,'error'); }
+}
+
+function showSMsg(el, text, type) {
+  if (!el) return;
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.background = type==='ok' ? 'var(--light-green)' : 'var(--light-red)';
+  el.style.color      = type==='ok' ? 'var(--green)'       : 'var(--red)';
+}
+
+async function loadSettingsMembers() {
+  if (!isAdmin()) return;
+  const el = document.getElementById('sm-members-list');
+  if (!el) return;
+  el.innerHTML = '<p style="color:var(--grey);font-size:0.85rem;font-style:italic">Chargement…</p>';
+  try {
+    const snap = await window.fbGetDocs(window.fbCollection(window.db,'wedding','keziah-briac','members'));
+    const members = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if (!members.length) { el.innerHTML='<p style="color:var(--grey);font-size:0.85rem;font-style:italic">Aucun membre.</p>'; return; }
+    el.innerHTML = members.map(m => {
+      const isMAdmin = ADMIN_EMAILS.includes(m.email) || m.isAdmin===true;
+      const isMe     = window.currentUser && m.email===window.currentUser.email;
+      const initials = (m.displayName||m.email||'?').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const lastSeen = m.lastSeen?.toDate ? m.lastSeen.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+      const isSuperAdmin = ADMIN_EMAILS.includes(m.email);
+      return `<div class="member-row">
+        <div class="mbr-avatar${isMAdmin?' is-admin':''}">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.88rem;line-height:1.3">${escHtml(m.displayName||'—')}
+            ${isMAdmin?'<span style="background:#FFF3E0;color:#E65100;border-radius:8px;padding:1px 6px;font-size:0.68rem;font-weight:700;margin-left:4px">Admin</span>':''}
+            ${isMe?'<span style="background:var(--light-blue);color:var(--blue);border-radius:8px;padding:1px 6px;font-size:0.68rem;margin-left:4px">Moi</span>':''}
+          </div>
+          <div style="font-size:0.75rem;color:var(--grey)">${escHtml(m.email||'—')} · Vu ${lastSeen}</div>
+        </div>
+        ${(!isMe && !isSuperAdmin) ? `
+          <button onclick="toggleMemberAdmin('${m.id}','${escHtml(m.email)}',${!isMAdmin})"
+            style="background:none;border:1px solid ${isMAdmin?'#E65100':'#ddd'};border-radius:8px;padding:4px 10px;cursor:pointer;font-size:0.74rem;color:${isMAdmin?'#E65100':'var(--grey)'};font-family:inherit;white-space:nowrap">
+            ${isMAdmin?'⊖ Admin':'⊕ Admin'}
+          </button>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML=`<p style="color:var(--red);font-size:0.85rem">Erreur : ${e.message}</p>`; }
+}
+
+async function toggleMemberAdmin(docId, email, makeAdmin) {
+  if (!isAdmin()) return;
+  const action = makeAdmin ? `Rendre ${email} administrateur(rice) ?` : `Retirer les droits admin de ${email} ?`;
+  if (!confirm(action)) return;
   try {
     await window.fbSetDoc(
-      window.fbDoc(window.db, 'wedding', 'keziah-briac', 'members', user.uid),
-      {
-        displayName: user.displayName || user.email.split('@')[0],
-        email: user.email,
-        lastSeen: window.fbServerTimestamp(),
-      },
-      { merge: true }
+      window.fbDoc(window.db,'wedding','keziah-briac','members',docId),
+      { isAdmin: makeAdmin }, { merge: true }
     );
-  } catch(e) { console.warn('Erreur enregistrement membre:', e); }
+    loadSettingsMembers();
+  } catch(e) { alert('Erreur : '+e.message); }
+}
+
+async function settingsCreateUser() {
+  if (!isAdmin()) return;
+  const name  = document.getElementById('sm-name').value.trim();
+  const email = document.getElementById('sm-email').value.trim();
+  const pwd   = document.getElementById('sm-pwd').value.trim();
+  const msg   = document.getElementById('sm-create-msg');
+  const btn   = document.getElementById('sm-create-btn');
+  if (!name||!email||!pwd) { showSMsg(msg,'Remplissez tous les champs.','error'); return; }
+  if (pwd.length<6)        { showSMsg(msg,'Mot de passe trop court (6 car. min.).','error'); return; }
+  btn.disabled=true; btn.textContent='Création…'; msg.style.display='none';
+  try {
+    const r1 = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email,password:pwd,returnSecureToken:true})
+    });
+    const d1 = await r1.json();
+    if (d1.error) throw new Error(d1.error.message);
+    await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=${FIREBASE_API_KEY}`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({idToken:d1.idToken,displayName:name,returnSecureToken:false})
+    });
+    if (window.fbSetDoc && window.fbDoc && window.db) {
+      await window.fbSetDoc(
+        window.fbDoc(window.db,'wedding','keziah-briac','members',d1.localId),
+        { displayName:name, email, isAdmin:false, createdAt:window.fbServerTimestamp(), createdBy:window.currentUser?.displayName||'Admin', lastSeen:null }
+      );
+    }
+    showSMsg(msg,`✅ Compte créé pour ${escHtml(name)}. Mot de passe temporaire : ${escHtml(pwd)}`,'ok');
+    document.getElementById('sm-name').value='';
+    document.getElementById('sm-email').value='';
+    document.getElementById('sm-pwd').value='';
+    loadSettingsMembers();
+  } catch(e) {
+    const msgs={'EMAIL_EXISTS':'E-mail déjà utilisé.','INVALID_EMAIL':'E-mail invalide.','WEAK_PASSWORD':'Mot de passe trop faible.'};
+    showSMsg(msg,'❌ '+(msgs[e.message]||e.message),'error');
+  }
+  btn.disabled=false; btn.textContent='Créer le compte';
 }
 
 // ═══════════════════════════════════════
@@ -4261,5 +4656,100 @@ updateDashboard();
 
   console.log("Firebase + Auth connectés 🚀");
 </script>
+
+<!-- ══ QUICK ADD MODAL ══ -->
+<div class="modal-overlay hidden" id="quick-add-overlay" onclick="closeQuickAdd()">
+  <div class="modal-box" style="max-width:400px" onclick="event.stopPropagation()">
+    <div class="modal-title">Ajouter rapidement…</div>
+    <div class="qa-grid">
+      <button class="qa-btn" onclick="quickAddGo('guest')">
+        <span class="qa-ico">👥</span>
+        <span class="qa-lbl">Invité</span>
+        <span class="qa-sub">Ajouter à la liste</span>
+      </button>
+      <button class="qa-btn" onclick="quickAddGo('budget')">
+        <span class="qa-ico">💰</span>
+        <span class="qa-lbl">Dépense</span>
+        <span class="qa-sub">Ligne de budget</span>
+      </button>
+      <button class="qa-btn" onclick="quickAddGo('task')">
+        <span class="qa-ico">✅</span>
+        <span class="qa-lbl">Tâche</span>
+        <span class="qa-sub">Checklist</span>
+      </button>
+      <button class="qa-btn" onclick="quickAddGo('idea')">
+        <span class="qa-ico">💡</span>
+        <span class="qa-lbl">Idée</span>
+        <span class="qa-sub">Nouvelle idée</span>
+      </button>
+    </div>
+    <div style="margin-top:16px;text-align:right">
+      <button class="btn btn-outline" onclick="closeQuickAdd()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ACCOUNT SETTINGS MODAL ══ -->
+<div class="modal-overlay hidden" id="acct-overlay" onclick="closeAccountSettings()">
+  <div class="modal-box" style="max-width:500px" onclick="event.stopPropagation()">
+    <div class="modal-title">Mon compte</div>
+    <div style="display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:20px">
+      <button class="stab active" id="stab-profil" onclick="switchStab('profil')">Profil</button>
+      <button class="stab" id="stab-securite" onclick="switchStab('securite')">Mot de passe</button>
+      <button class="stab" id="stab-membres" onclick="switchStab('membres');loadSettingsMembers()" style="display:none">Membres</button>
+    </div>
+
+    <!-- Panel profil -->
+    <div class="spanel active" id="spanel-profil">
+      <div class="s-field">
+        <label>Prénom et nom</label>
+        <input type="text" id="s-displayname" placeholder="Marie Dupont">
+      </div>
+      <div class="s-field">
+        <label>Adresse e-mail</label>
+        <input type="text" id="s-email" disabled>
+      </div>
+      <div class="s-msg" id="s-profil-msg"></div>
+      <button class="btn btn-pink" onclick="saveDisplayName()">Enregistrer le nom</button>
+    </div>
+
+    <!-- Panel mot de passe -->
+    <div class="spanel" id="spanel-securite">
+      <p style="font-size:0.84rem;color:var(--grey);margin-bottom:16px">Choisissez un nouveau mot de passe (minimum 6 caractères).</p>
+      <div class="s-field">
+        <label>Nouveau mot de passe</label>
+        <input type="password" id="s-pwd1" placeholder="••••••••">
+      </div>
+      <div class="s-field">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="s-pwd2" placeholder="••••••••">
+      </div>
+      <div class="s-msg" id="s-pwd-msg"></div>
+      <button class="btn btn-pink" onclick="saveNewPassword()">Changer le mot de passe</button>
+    </div>
+
+    <!-- Panel membres (admin seulement) -->
+    <div class="spanel" id="spanel-membres">
+      <div style="background:var(--light-pink);border-radius:10px;padding:14px;margin-bottom:16px">
+        <div style="font-weight:700;font-size:0.88rem;color:var(--pink);margin-bottom:10px">➕ Créer un nouveau compte</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <input type="text" id="sm-name" placeholder="Prénom et nom" class="auth-input" style="margin:0">
+          <input type="email" id="sm-email" placeholder="email@exemple.com" class="auth-input" style="margin:0">
+          <input type="text" id="sm-pwd" placeholder="Mot de passe temporaire (6 car. min.)" class="auth-input" style="margin:0">
+        </div>
+        <div class="s-msg" id="sm-create-msg" style="margin-top:10px"></div>
+        <button class="btn btn-pink" id="sm-create-btn" onclick="settingsCreateUser()" style="width:100%;margin-top:10px">Créer le compte</button>
+      </div>
+      <div style="font-weight:700;font-size:0.88rem;color:var(--dark);margin-bottom:10px">👥 Membres</div>
+      <div id="sm-members-list"><p style="color:var(--grey);font-size:0.85rem;font-style:italic">Chargement…</p></div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;padding-top:14px;border-top:1px solid #f0f0f0">
+      <button class="btn danger" style="background:none;border:1px solid var(--red);color:var(--red);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.84rem" onclick="closeAccountSettings();doSignOut()">🚪 Se déconnecter</button>
+      <button class="btn btn-outline" onclick="closeAccountSettings()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
