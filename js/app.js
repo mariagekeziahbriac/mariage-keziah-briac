@@ -241,7 +241,7 @@ let state = {
   vendors: [],
   lunedeMiel: { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} },
   docsLegaux: { checklist:{} },
-  kitUrgence: { checklist:{} },
+  kitUrgence: { checklist:{}, customItems:[] },
   ambiance: { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' },
   idees: { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] },
   playlist: { songs: [], spotifyClientId: '' },
@@ -283,7 +283,8 @@ function load() {
     if (!state.vendors)     state.vendors = [];
     if (!state.lunedeMiel)  state.lunedeMiel = { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} };
     if (!state.docsLegaux)  state.docsLegaux = { checklist:{} };
-    if (!state.kitUrgence)  state.kitUrgence = { checklist:{} };
+    if (!state.kitUrgence)  state.kitUrgence = { checklist:{}, customItems:[] };
+    if (!state.kitUrgence.customItems) state.kitUrgence.customItems = [];
     if (!state.ambiance)    state.ambiance = { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' };
     if (!state.idees)       state.idees = { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] };
     if (!state.idees.categories) state.idees.categories = ['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'];
@@ -2690,6 +2691,9 @@ const KIT_URGENCE_DEFAULT = [
   { cat:'🍬 Divers',   items:[{k:'k20',l:'Chewing-gum / bonbons à la menthe'},{k:'k21',l:'Snacks (biscuits, fruits secs — pour le matin)'},{k:'k22',l:'Bouteille d\'eau'},{k:'k23',l:'Mouchoirs en papier'},{k:'k24',l:'Stylo (pour signer les registres !)'},{k:'k25',l:'Petite monnaie / argent liquide'},{k:'k26',l:'Programme du jour J imprimé'},{k:'k27',l:'Parapluie de secours (mini)'},{k:'k28',l:'Mini coussin gonflable (pour les pieds !)'}] },
 ];
 
+let _kitAddMode = false;
+let _kitEditId  = null;
+
 function renderKitUrgence() {
   const el = document.getElementById('kit-checklist');
   if (!el) return;
@@ -2702,8 +2706,111 @@ function renderKitUrgence() {
         <span style="font-size:0.88rem;${cl[item.k]?'text-decoration:line-through;color:#bbb':''}">${item.l}</span>
       </label>`).join('')}
     </div>`).join('');
+
+  const customEl = document.getElementById('kit-custom-section');
+  if (!customEl) return;
+  const customItems = (state.kitUrgence||{}).customItems||[];
+  let html = '';
+
+  if (customItems.length > 0) {
+    html += `<div style="font-weight:700;font-size:0.9rem;margin-bottom:10px;color:var(--dark)">📌 Articles personnalisés</div>`;
+    customItems.forEach(item => {
+      const checked = cl['cust_'+item.id] || false;
+      if (_kitEditId === item.id) {
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;flex-wrap:wrap">
+          <input type="text" id="kit-edit-input-${item.id}" value="${item.label.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" style="flex:1;min-width:140px;padding:5px 10px;border:1.5px solid var(--pink);border-radius:8px;font-size:0.88rem">
+          <select id="kit-edit-cat-${item.id}" style="padding:5px 8px;border:1.5px solid #ddd;border-radius:8px;font-size:0.85rem">
+            ${['💊 Santé','🧵 Couture','💄 Beauté','📱 Tech','🍬 Divers','📋 Autre'].map(c=>`<option value="${c}"${item.cat===c?' selected':''}>${c}</option>`).join('')}
+          </select>
+          <button onclick="saveEditKitItem('${item.id}')" style="background:var(--pink);color:white;border:none;border-radius:8px;padding:5px 14px;cursor:pointer;font-size:0.85rem">✓</button>
+          <button onclick="_kitEditId=null;renderKitUrgence()" style="background:#eee;color:#555;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.85rem">✕</button>
+        </div>`;
+      } else {
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleKitCustomCheck('${item.id}',this.checked)" style="width:15px;height:15px;accent-color:var(--pink);flex-shrink:0">
+          <span style="flex:1;font-size:0.88rem;${checked?'text-decoration:line-through;color:#bbb':''}">
+            ${item.cat?`<small style="color:var(--grey);margin-right:5px">${item.cat}</small>`:''}${item.label}
+          </span>
+          <button onclick="editKitItem('${item.id}')" title="Modifier" style="background:none;border:1px solid #ddd;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.8rem;color:var(--grey)">✏️</button>
+          <button onclick="deleteKitItem('${item.id}')" title="Supprimer" style="background:none;border:1px solid #ffd0d0;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.8rem;color:#e57373">🗑️</button>
+        </div>`;
+      }
+    });
+  }
+
+  if (_kitAddMode) {
+    html += `<div style="display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap">
+      <input type="text" id="kit-add-label" placeholder="Nom de l'article..." style="flex:1;min-width:150px;padding:7px 12px;border:1.5px solid var(--pink);border-radius:8px;font-size:0.88rem">
+      <select id="kit-add-cat" style="padding:7px 8px;border:1.5px solid #ddd;border-radius:8px;font-size:0.85rem">
+        <option value="">-- Catégorie --</option>
+        ${['💊 Santé','🧵 Couture','💄 Beauté','📱 Tech','🍬 Divers','📋 Autre'].map(c=>`<option value="${c}">${c}</option>`).join('')}
+      </select>
+      <button onclick="addKitItem()" style="background:var(--pink);color:white;border:none;border-radius:8px;padding:7px 16px;cursor:pointer;font-size:0.88rem;white-space:nowrap">➕ Ajouter</button>
+      <button onclick="_kitAddMode=false;renderKitUrgence()" style="background:#eee;color:#555;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:0.88rem">Annuler</button>
+    </div>`;
+  } else {
+    html += `<div style="margin-top:${customItems.length>0?'14px':'4px'}">
+      <button onclick="_kitAddMode=true;_kitEditId=null;renderKitUrgence()" style="background:none;border:2px dashed var(--pink);color:var(--pink);border-radius:10px;padding:8px 18px;cursor:pointer;font-size:0.88rem;font-weight:600">➕ Ajouter un article personnalisé</button>
+    </div>`;
+  }
+
+  customEl.innerHTML = html;
 }
-function toggleKitCheck(k,v) { if(!state.kitUrgence) state.kitUrgence={checklist:{}}; if(!state.kitUrgence.checklist) state.kitUrgence.checklist={}; state.kitUrgence.checklist[k]=v; save(); renderKitUrgence(); }
+
+function toggleKitCheck(k,v) {
+  if (!state.kitUrgence) state.kitUrgence = { checklist:{}, customItems:[] };
+  if (!state.kitUrgence.checklist) state.kitUrgence.checklist = {};
+  state.kitUrgence.checklist[k] = v;
+  save(); renderKitUrgence();
+}
+
+function toggleKitCustomCheck(id, val) {
+  if (!state.kitUrgence) state.kitUrgence = { checklist:{}, customItems:[] };
+  if (!state.kitUrgence.checklist) state.kitUrgence.checklist = {};
+  state.kitUrgence.checklist['cust_'+id] = val;
+  save();
+}
+
+function addKitItem() {
+  const label = (document.getElementById('kit-add-label')?.value||'').trim();
+  const cat   = document.getElementById('kit-add-cat')?.value || '';
+  if (!label) { alert('Veuillez saisir un nom d\'article.'); return; }
+  if (!state.kitUrgence) state.kitUrgence = { checklist:{}, customItems:[] };
+  if (!state.kitUrgence.customItems) state.kitUrgence.customItems = [];
+  state.kitUrgence.customItems.push({ id:'kit_'+Date.now(), label, cat });
+  logAction('ajout', 'Kit d\'urgence', `Article ajouté : "${label}"`);
+  _kitAddMode = false;
+  save(); renderKitUrgence();
+}
+
+function editKitItem(id) {
+  _kitAddMode = false;
+  _kitEditId  = id;
+  renderKitUrgence();
+}
+
+function saveEditKitItem(id) {
+  const label = (document.getElementById('kit-edit-input-'+id)?.value||'').trim();
+  const cat   = document.getElementById('kit-edit-cat-'+id)?.value || '';
+  if (!label) { alert('Le nom ne peut pas être vide.'); return; }
+  const item = ((state.kitUrgence||{}).customItems||[]).find(i => i.id === id);
+  if (!item) return;
+  const oldLabel = item.label;
+  item.label = label;
+  item.cat   = cat;
+  logAction('modification', 'Kit d\'urgence', `Article modifié : "${oldLabel}" → "${label}"`);
+  _kitEditId = null;
+  save(); renderKitUrgence();
+}
+
+function deleteKitItem(id) {
+  const _label = ((state.kitUrgence||{}).customItems||[]).find(i=>i.id===id)?.label || '?';
+  if (!confirm(`Supprimer l'article "${_label}" du kit d'urgence ?`)) return;
+  logAction('suppression', 'Kit d\'urgence', `Article supprimé : "${_label}"`);
+  state.kitUrgence.customItems = state.kitUrgence.customItems.filter(i => i.id !== id);
+  delete (state.kitUrgence.checklist||{})['cust_'+id];
+  save(); renderKitUrgence();
+}
 
 // ═══════════════════════════════════════
 // TABLEAU D'AMBIANCE
