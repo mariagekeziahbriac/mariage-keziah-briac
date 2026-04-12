@@ -3272,6 +3272,8 @@ function deleteUrgenceContact(i) {
 // ═══════════════════════════════════════
 // EVJF — PROJETS
 // ═══════════════════════════════════════
+let _evjfOpenProjet = null;
+
 function renderEvjfProjets() {
   const el = document.getElementById('evjf-projets-list');
   if (!el) return;
@@ -3280,38 +3282,204 @@ function renderEvjfProjets() {
     el.innerHTML = '<p style="color:var(--grey);font-size:0.88rem;font-style:italic;text-align:center;padding:16px">Aucun projet — cliquez sur "+ Nouveau projet" pour commencer</p>';
     return;
   }
-  el.innerHTML = projets.map((p, i) => `
-    <div style="background:#fafafa;border:1px solid #eee;border-radius:12px;padding:16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <input value="${escHtml(p.titre||'')}" placeholder="Nom du projet / idée…"
-          onchange="saveEvjfProjet(${i},'titre',this.value)"
-          style="flex:1;border:none;background:transparent;font-family:inherit;font-size:0.95rem;font-weight:700;color:var(--dark);border-bottom:2px solid #eee;padding-bottom:4px">
-        <button onclick="deleteEvjfProjet(${i})" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem"
-          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+  el.innerHTML = projets.map((p, i) => {
+    if (!p.programme) p.programme = [];
+    if (!p.budget)    p.budget = [];
+    if (!p.idees)     p.idees = [];
+    const isOpen = _evjfOpenProjet === p.id;
+    const totalBudget = p.budget.reduce((s, b) => s + (parseFloat(b.montant) || 0), 0);
+    return `
+    <div style="border:1px solid #e0d4f7;border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+      <div style="background:linear-gradient(135deg,#f3e8ff,#fce4ec);padding:16px 18px;cursor:pointer"
+        onclick="toggleEvjfProjet('${p.id}')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.3rem">💜</span>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:1rem;color:var(--dark)">${escHtml(p.titre||'Nouveau projet')}</div>
+            <div style="font-size:0.8rem;color:var(--grey);margin-top:2px">
+              ${p.destination?'📍 '+escHtml(p.destination):''}
+              ${p.dateDebut?' · 📅 '+escHtml(p.dateDebut)+(p.dateFin&&p.dateFin!==p.dateDebut?' → '+escHtml(p.dateFin):''):''}
+              ${p.theme?' · 🎨 '+escHtml(p.theme):''}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:0.78rem;color:var(--grey);background:white;padding:3px 8px;border-radius:10px;border:1px solid #eee">
+              ${p.programme.length} étape${p.programme.length!==1?'s':''} · ${totalBudget.toFixed(0)} €
+            </span>
+            <span style="color:var(--grey)">${isOpen?'▲':'▼'}</span>
+          </div>
+          <button onclick="event.stopPropagation();deleteEvjfProjet(${i})"
+            style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem;padding:4px"
+            onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+        </div>
       </div>
-      <textarea placeholder="Description, activités prévues, budget estimé, prestataires contactés…" rows="4"
-        onchange="saveEvjfProjet(${i},'desc',this.value)"
-        style="width:100%;border:1px solid #eee;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:0.87rem;resize:vertical">${escHtml(p.desc||'')}</textarea>
-    </div>
-  `).join('');
+      ${isOpen ? `
+      <div style="padding:18px;background:white">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px">
+          <div><label style="font-size:0.75rem;color:var(--grey);display:block;margin-bottom:3px">Nom du projet</label>
+            <input value="${escHtml(p.titre||'')}" placeholder="Ex: Weekend Spa Paris"
+              onchange="saveEvjfProjetField(${i},'titre',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:0.88rem;font-weight:700"></div>
+          <div><label style="font-size:0.75rem;color:var(--grey);display:block;margin-bottom:3px">Destination / Lieu</label>
+            <input value="${escHtml(p.destination||'')}" placeholder="Ex: Paris, Bordeaux…"
+              onchange="saveEvjfProjetField(${i},'destination',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:0.88rem"></div>
+          <div><label style="font-size:0.75rem;color:var(--grey);display:block;margin-bottom:3px">Thème / Style</label>
+            <input value="${escHtml(p.theme||'')}" placeholder="Ex: Luxe & Détente"
+              onchange="saveEvjfProjetField(${i},'theme',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:0.88rem"></div>
+          <div><label style="font-size:0.75rem;color:var(--grey);display:block;margin-bottom:3px">Date début</label>
+            <input type="date" value="${escHtml(p.dateDebut||'')}"
+              onchange="saveEvjfProjetField(${i},'dateDebut',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:0.88rem"></div>
+          <div><label style="font-size:0.75rem;color:var(--grey);display:block;margin-bottom:3px">Date fin</label>
+            <input type="date" value="${escHtml(p.dateFin||'')}"
+              onchange="saveEvjfProjetField(${i},'dateFin',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:0.88rem"></div>
+          <div><label style="font-size:0.75rem;color:var(--grey);display:block;margin-bottom:3px">Notes</label>
+            <textarea rows="2" placeholder="Infos, contraintes…" onchange="saveEvjfProjetField(${i},'notes',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:0.88rem;resize:vertical">${escHtml(p.notes||'')}</textarea></div>
+        </div>
+
+        <div style="font-weight:700;color:var(--pink);font-size:0.9rem;margin-bottom:10px">📅 Programme</div>
+        ${p.programme.length===0?'<p style="color:var(--grey);font-size:0.85rem;font-style:italic;margin-bottom:8px">Aucune étape pour l\'instant</p>':''}
+        ${p.programme.map((pr,ii)=>`
+          <div style="display:grid;grid-template-columns:70px 70px 1fr auto;gap:8px;align-items:center;padding:8px;background:#fafafa;border-radius:8px;margin-bottom:6px;border:1px solid #f0f0f0">
+            <input value="${escHtml(pr.jour||'')}" placeholder="Jour 1"
+              onchange="saveEvjfProgItem(${i},${ii},'jour',this.value)"
+              style="border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.82rem;text-align:center">
+            <input value="${escHtml(pr.heure||'')}" placeholder="10h00"
+              onchange="saveEvjfProgItem(${i},${ii},'heure',this.value)"
+              style="border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.82rem;text-align:center;color:var(--pink);font-weight:600">
+            <input value="${escHtml(pr.activite||'')}" placeholder="Activité, lieu…"
+              onchange="saveEvjfProgItem(${i},${ii},'activite',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:5px;padding:5px 8px;font-family:inherit;font-size:0.85rem">
+            <button onclick="deleteEvjfProgItem(${i},${ii})" style="background:none;border:none;cursor:pointer;color:#ccc"
+              onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+          </div>`).join('')}
+        <button onclick="addEvjfProgItem(${i})"
+          style="margin-bottom:20px;background:none;border:1px dashed var(--pink);color:var(--pink);border-radius:7px;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:0.83rem">
+          + Ajouter une étape</button>
+
+        <div style="font-weight:700;color:var(--pink);font-size:0.9rem;margin-bottom:10px">💰 Budget estimé</div>
+        ${p.budget.length===0?'<p style="color:var(--grey);font-size:0.85rem;font-style:italic;margin-bottom:8px">Aucun poste pour l\'instant</p>':''}
+        ${p.budget.map((b,ii)=>`
+          <div style="display:grid;grid-template-columns:1fr 100px 110px auto;gap:8px;align-items:center;padding:8px;background:#fafafa;border-radius:8px;margin-bottom:6px;border:1px solid #f0f0f0">
+            <input value="${escHtml(b.poste||'')}" placeholder="Restaurant, hébergement…"
+              onchange="saveEvjfBudgetItem(${i},${ii},'poste',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:5px;padding:5px 8px;font-family:inherit;font-size:0.85rem">
+            <input type="number" value="${b.montant||''}" placeholder="€"
+              onchange="saveEvjfBudgetItem(${i},${ii},'montant',parseFloat(this.value)||0)"
+              style="border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.85rem;text-align:right;color:var(--green);font-weight:600">
+            <select onchange="saveEvjfBudgetItem(${i},${ii},'statut',this.value)"
+              style="border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.8rem;background:white">
+              <option value="estimé" ${b.statut==='estimé'?'selected':''}>Estimé</option>
+              <option value="confirmé" ${b.statut==='confirmé'?'selected':''}>Confirmé</option>
+              <option value="payé" ${b.statut==='payé'?'selected':''}>Payé</option>
+            </select>
+            <button onclick="deleteEvjfBudgetItem(${i},${ii})" style="background:none;border:none;cursor:pointer;color:#ccc"
+              onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+          </div>`).join('')}
+        ${p.budget.length>0?`<div style="text-align:right;font-size:0.88rem;color:var(--grey);margin-top:2px;margin-bottom:8px">Total : <strong style="color:var(--green)">${totalBudget.toFixed(2)} €</strong></div>`:''}
+        <button onclick="addEvjfBudgetItem(${i})"
+          style="margin-bottom:20px;background:none;border:1px dashed var(--green);color:var(--green);border-radius:7px;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:0.83rem">
+          + Ajouter un poste</button>
+
+        <div style="font-weight:700;color:var(--pink);font-size:0.9rem;margin-bottom:10px">💡 Idées & activités</div>
+        ${p.idees.length===0?'<p style="color:var(--grey);font-size:0.85rem;font-style:italic;margin-bottom:8px">Aucune idée pour l\'instant</p>':''}
+        ${p.idees.map((id,ii)=>`
+          <div style="display:grid;grid-template-columns:1fr 110px auto;gap:8px;align-items:center;padding:8px;background:#fafafa;border-radius:8px;margin-bottom:6px;border:1px solid #f0f0f0">
+            <input value="${escHtml(id.texte||'')}" placeholder="Spa, dégustation, visite…"
+              onchange="saveEvjfIdeeItem(${i},${ii},'texte',this.value)"
+              style="width:100%;border:1px solid #ddd;border-radius:5px;padding:5px 8px;font-family:inherit;font-size:0.85rem">
+            <select onchange="saveEvjfIdeeItem(${i},${ii},'statut',this.value)"
+              style="border:1px solid #ddd;border-radius:5px;padding:5px 6px;font-family:inherit;font-size:0.8rem;background:white">
+              <option value="à explorer" ${id.statut==='à explorer'?'selected':''}>À explorer</option>
+              <option value="retenu" ${id.statut==='retenu'?'selected':''}>✅ Retenu</option>
+              <option value="écarté" ${id.statut==='écarté'?'selected':''}>❌ Écarté</option>
+            </select>
+            <button onclick="deleteEvjfIdeeItem(${i},${ii})" style="background:none;border:none;cursor:pointer;color:#ccc"
+              onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">🗑️</button>
+          </div>`).join('')}
+        <button onclick="addEvjfIdeeItem(${i})"
+          style="background:none;border:1px dashed var(--orange);color:var(--orange);border-radius:7px;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:0.83rem">
+          + Ajouter une idée</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleEvjfProjet(id) {
+  _evjfOpenProjet = (_evjfOpenProjet === id) ? null : id;
+  renderEvjfProjets();
 }
 
 function addEvjfProjet() {
   if (!state.evjf) state.evjf = {};
   if (!state.evjf.projets) state.evjf.projets = [];
-  state.evjf.projets.push({ id:'ep'+Date.now(), titre:'', desc:'' });
+  const newId = 'ep' + Date.now();
+  state.evjf.projets.push({ id:newId, titre:'', destination:'', theme:'', dateDebut:'', dateFin:'', notes:'', programme:[], budget:[], idees:[] });
+  _evjfOpenProjet = newId;
   save(); renderEvjfProjets();
 }
 
-function saveEvjfProjet(i, field, val) {
-  if (!state.evjf||!state.evjf.projets) return;
-  if (state.evjf.projets[i]) { state.evjf.projets[i][field]=val; save(); }
+function saveEvjfProjetField(i, field, val) {
+  if (!state.evjf?.projets?.[i]) return;
+  state.evjf.projets[i][field] = val;
+  save(); renderEvjfProjets();
 }
 
 function deleteEvjfProjet(i) {
-  if (!confirm('Supprimer ce projet ?')) return;
-  state.evjf.projets.splice(i,1);
+  if (!confirm('Supprimer ce projet EVJF et tout son contenu ?')) return;
+  const id = state.evjf.projets[i]?.id;
+  if (_evjfOpenProjet === id) _evjfOpenProjet = null;
+  state.evjf.projets.splice(i, 1);
   save(); renderEvjfProjets();
+}
+
+function addEvjfProgItem(pi) {
+  const p = state.evjf?.projets?.[pi]; if (!p) return;
+  if (!p.programme) p.programme = [];
+  p.programme.push({ id:'prog'+Date.now(), jour:'Jour 1', heure:'', activite:'' });
+  save(); renderEvjfProjets();
+}
+function saveEvjfProgItem(pi, ii, field, val) {
+  const p = state.evjf?.projets?.[pi];
+  if (p?.programme?.[ii]) { p.programme[ii][field]=val; save(); }
+}
+function deleteEvjfProgItem(pi, ii) {
+  const p = state.evjf?.projets?.[pi]; if (!p?.programme) return;
+  p.programme.splice(ii,1); save(); renderEvjfProjets();
+}
+
+function addEvjfBudgetItem(pi) {
+  const p = state.evjf?.projets?.[pi]; if (!p) return;
+  if (!p.budget) p.budget = [];
+  p.budget.push({ id:'bud'+Date.now(), poste:'', montant:0, statut:'estimé' });
+  save(); renderEvjfProjets();
+}
+function saveEvjfBudgetItem(pi, ii, field, val) {
+  const p = state.evjf?.projets?.[pi];
+  if (p?.budget?.[ii]) { p.budget[ii][field]=val; save(); renderEvjfProjets(); }
+}
+function deleteEvjfBudgetItem(pi, ii) {
+  const p = state.evjf?.projets?.[pi]; if (!p?.budget) return;
+  p.budget.splice(ii,1); save(); renderEvjfProjets();
+}
+
+function addEvjfIdeeItem(pi) {
+  const p = state.evjf?.projets?.[pi]; if (!p) return;
+  if (!p.idees) p.idees = [];
+  p.idees.push({ id:'ide'+Date.now(), texte:'', statut:'à explorer' });
+  save(); renderEvjfProjets();
+}
+function saveEvjfIdeeItem(pi, ii, field, val) {
+  const p = state.evjf?.projets?.[pi];
+  if (p?.idees?.[ii]) { p.idees[ii][field]=val; save(); renderEvjfProjets(); }
+}
+function deleteEvjfIdeeItem(pi, ii) {
+  const p = state.evjf?.projets?.[pi]; if (!p?.idees) return;
+  p.idees.splice(ii,1); save(); renderEvjfProjets();
 }
 
 // EVJF — CHECKLIST PERSONNALISÉE
