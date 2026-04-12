@@ -344,6 +344,34 @@
     padding: 8px 12px; font-size: 0.88rem; cursor: pointer; transition: all 0.15s;
   }
   .guest-chip-unassigned:hover { background: var(--light-pink); border-color: var(--pink); color: var(--pink); }
+  /* ── DESKTOP : hero compact + compte fixe top-right ── */
+  @media (min-width: 769px) {
+    .hero {
+      padding: 10px 20px 8px;
+      display: flex; flex-direction: row; align-items: center;
+      justify-content: center; gap: 10px; text-align: center; flex-wrap: wrap;
+    }
+    .hero .emoji { font-size: 1.2rem; margin-bottom: 0; }
+    .hero h1 { font-size: 1.4rem; }
+    .hero h2 { font-size: 0.85rem; margin-top: 0; font-weight: 300; }
+    .hero .sub { display: none; }
+    .hero .venue { font-size: 0.78rem; padding: 4px 12px; margin-top: 0; }
+    /* Compte en position fixe haut-droite */
+    #nav-user {
+      position: fixed; top: 10px; right: 16px;
+      z-index: 600; margin-left: 0; padding: 0;
+    }
+    /* Nav sur une seule ligne scrollable, avec espace à droite pour le compte */
+    .nav {
+      flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
+      scrollbar-width: none; padding-right: 64px;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a { white-space: nowrap; flex-shrink: 0; }
+    /* Masquer l'admin link dans la nav (il est dans le dropdown) */
+    #nav-admin-link { display: none !important; }
+  }
+
   @media (max-width: 768px) {
     /* ── Hero compact sur mobile ── */
     .hero { padding: 16px 16px 14px; }
@@ -355,21 +383,12 @@
 
     /* ── Nav en scroll horizontal (une seule ligne) ── */
     .nav {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      justify-content: flex-start;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding: 6px 8px;
-      gap: 4px;
+      flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      padding: 6px 8px; gap: 4px;
     }
     .nav::-webkit-scrollbar { display: none; }
-    .nav a {
-      white-space: nowrap;
-      flex-shrink: 0;
-      padding: 6px 12px;
-      font-size: 0.78rem;
-    }
+    .nav a { white-space: nowrap; flex-shrink: 0; padding: 6px 12px; font-size: 0.78rem; }
     #nav-user { flex-shrink: 0; }
 
     /* ── Budget ── */
