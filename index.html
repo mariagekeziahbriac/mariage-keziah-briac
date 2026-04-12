@@ -308,6 +308,30 @@
 
   @media print { .nav { display: none; } .section { display: block !important; } }
 
+  /* ── PLAYLIST ── */
+  .pl-tabs { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .pl-tab { padding:7px 14px; border-radius:20px; border:2px solid #eee; background:white; cursor:pointer; font-family:inherit; font-size:0.82rem; font-weight:600; color:var(--grey); transition:all 0.2s; display:flex; align-items:center; gap:5px; }
+  .pl-tab.active { background:var(--pink); color:white; border-color:var(--pink); }
+  .pl-tab:hover:not(.active) { border-color:var(--pink); color:var(--pink); }
+  .pl-count { background:rgba(255,255,255,0.3); border-radius:10px; padding:0 6px; font-size:0.7rem; min-width:16px; text-align:center; }
+  .pl-tab:not(.active) .pl-count { background:var(--light-pink); color:var(--pink); }
+  .pl-tab:not(.active) .pl-count:empty { display:none; }
+  .song-card { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid #f0f0f0; border-radius:10px; margin-bottom:6px; background:white; transition:background 0.15s; flex-wrap:wrap; }
+  .song-card:hover { background:#fafafa; }
+  .song-heart { background:none; border:none; cursor:pointer; font-size:1.15rem; flex-shrink:0; transition:transform 0.15s; padding:0; line-height:1; }
+  .song-heart:hover { transform:scale(1.3); }
+  .song-info { flex:1; min-width:100px; }
+  .song-titre { font-weight:700; font-size:0.9rem; color:var(--dark); }
+  .song-artiste { font-size:0.78rem; color:var(--grey); margin-top:1px; }
+  .song-meta { display:flex; align-items:center; gap:6px; flex-shrink:0; flex-wrap:wrap; margin-left:auto; }
+  .song-badge { padding:2px 9px; border-radius:10px; font-size:0.7rem; font-weight:700; white-space:nowrap; }
+  .song-by { font-size:0.7rem; color:var(--grey); font-style:italic; white-space:nowrap; }
+  .song-act { background:none; border:none; cursor:pointer; font-size:0.9rem; padding:2px 4px; color:var(--grey); opacity:0.6; transition:opacity 0.2s; }
+  .song-act:hover { opacity:1; }
+  .sp-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border:2px solid #f0f0f0; border-radius:10px; cursor:pointer; transition:all 0.15s; }
+  .sp-item:hover { border-color:#1DB954; background:#f0fff4; }
+  .sp-item.selected { border-color:#1DB954; background:#f0fff4; }
+
   /* ── PLAN DE TABLE ── */
   .table-visual-card {
     background: white; border-radius: 16px;
@@ -680,6 +704,7 @@
   <a href="#" onclick="showSection('kitUrgence',this)">🧰 Kit urgence</a>
   <a href="#" onclick="showSection('ambiance',this)">🎨 Ambiance</a>
   <a href="#" onclick="showSection('idees',this)">💡 Idées</a>
+  <a href="#" onclick="showSection('playlist',this)">🎵 Playlist</a>
   <a href="#" id="nav-admin-link" style="display:none;color:#E65100 !important" onclick="showSection('administration',this)">⚙️ Administration</a>
   <div id="nav-user"></div>
 </nav>
@@ -723,6 +748,7 @@
     <button class="mob-link" onclick="mobileGo('kitUrgence')">🧰 Kit urgence</button>
     <button class="mob-link" onclick="mobileGo('ambiance')">🎨 Ambiance</button>
     <button class="mob-link" onclick="mobileGo('idees')">💡 Idées</button>
+    <button class="mob-link" onclick="mobileGo('playlist')">🎵 Playlist</button>
     <button class="mob-link" id="mob-admin-link" style="display:none;color:#E65100" onclick="mobileGo('administration')">⚙️ Administration</button>
   </div>
 </div>
@@ -1771,6 +1797,45 @@
   </div>
 </div>
 
+<!-- ══ PLAYLIST ══ -->
+<div id="playlist" class="section">
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <span>🎵 Playlist du mariage</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn" onclick="startSpotifyImport()"
+          style="background:#1DB954;color:white;border:none;display:flex;align-items:center;gap:6px;font-size:0.84rem;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          Importer depuis Spotify
+        </button>
+        <button class="btn btn-pink" onclick="openSongModal()">+ Ajouter une chanson</button>
+      </div>
+    </div>
+
+    <!-- Tabs par moment -->
+    <div class="pl-tabs">
+      <button class="pl-tab active" id="pl-tab-all" onclick="setPlaylistMoment('all',this)">🎵 Toutes <span class="pl-count" id="pl-count-all"></span></button>
+      <button class="pl-tab" id="pl-tab-ceremonie" onclick="setPlaylistMoment('ceremonie',this)">💒 Cérémonie <span class="pl-count" id="pl-count-ceremonie"></span></button>
+      <button class="pl-tab" id="pl-tab-cocktail" onclick="setPlaylistMoment('cocktail',this)">🥂 Cocktail <span class="pl-count" id="pl-count-cocktail"></span></button>
+      <button class="pl-tab" id="pl-tab-diner" onclick="setPlaylistMoment('diner',this)">🍽️ Dîner <span class="pl-count" id="pl-count-diner"></span></button>
+      <button class="pl-tab" id="pl-tab-soiree" onclick="setPlaylistMoment('soiree',this)">🎉 Soirée <span class="pl-count" id="pl-count-soiree"></span></button>
+    </div>
+
+    <!-- Filtres -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+      <select id="pl-filter-person" onchange="renderPlaylist()" style="padding:7px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;background:white">
+        <option value="">Toutes les personnes</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--grey)">
+        <input type="checkbox" id="pl-filter-coeur" onchange="renderPlaylist()" style="accent-color:var(--pink)">
+        ❤️ Coups de cœur uniquement
+      </label>
+    </div>
+
+    <div id="pl-songs"></div>
+  </div>
+</div>
+
 <!-- ══ ADMINISTRATION ══ -->
 <div id="administration" class="section">
 
@@ -2063,6 +2128,7 @@ let state = {
   kitUrgence: { checklist:{} },
   ambiance: { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' },
   idees: { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] },
+  playlist: { songs: [], spotifyClientId: '' },
 };
 
 // Sauvegarde locale (fallback) + Firebase
@@ -2092,6 +2158,8 @@ function load() {
     if (!state.idees)       state.idees = { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] };
     if (!state.idees.categories) state.idees.categories = ['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'];
     if (!state.idees.items)      state.idees.items = [];
+    if (!state.playlist)         state.playlist = { songs: [], spotifyClientId: '' };
+    if (!state.playlist.songs)   state.playlist.songs = [];
   } catch(e) {}
 }
 
@@ -2118,6 +2186,7 @@ async function saveToFirebase() {
       kitUrgence: state.kitUrgence || {},
       ambiance: state.ambiance || {},
       idees: state.idees || { categories:[], items:[] },
+      playlist: state.playlist || { songs:[], spotifyClientId:'' },
       lastModifiedBy: window.currentUser ? (window.currentUser.displayName || window.currentUser.email) : 'Anonyme',
       lastModifiedAt: window.fbServerTimestamp(),
     };
@@ -2154,7 +2223,8 @@ async function loadAllFromFirebase() {
       if (d.docsLegaux)  state.docsLegaux = { ...state.docsLegaux, ...d.docsLegaux };
       if (d.kitUrgence)  state.kitUrgence = { ...state.kitUrgence, ...d.kitUrgence };
       if (d.ambiance)    state.ambiance = { ...state.ambiance, ...d.ambiance };
-      if (d.idees)       state.idees = { ...state.idees, ...d.idees };
+      if (d.idees)       state.idees    = { ...state.idees, ...d.idees };
+      if (d.playlist)    state.playlist = { ...state.playlist, ...d.playlist };
       if (d.lastModifiedBy) state.lastModifiedBy = d.lastModifiedBy;
       if (d.lastModifiedAt) state.lastModifiedAt = d.lastModifiedAt;
       Object.keys(d).filter(k => k.startsWith('vendor_')).forEach(k => { state[k] = d[k]; });
@@ -2180,6 +2250,9 @@ async function loadAllFromFirebase() {
   renderKitUrgence();
   renderAmbiance();
   renderIdees();
+  renderPlaylist();
+  // Spotify callback après chargement des données
+  if (window._spotifyCode) setTimeout(handleSpotifyCallback, 200);
   updateDashboard();
 }
 window.loadAllFromFirebase = loadAllFromFirebase;
@@ -3843,6 +3916,9 @@ function quickAddGo(type) {
   } else if (type === 'idea') {
     mobileGo('idees');
     setTimeout(() => openIdeeModal(), 250);
+  } else if (type === 'song') {
+    mobileGo('playlist');
+    setTimeout(() => openSongModal(), 250);
   }
 }
 
@@ -4609,7 +4685,300 @@ renderDocsLegaux();
 renderKitUrgence();
 renderAmbiance();
 renderIdees();
+
+// ═══════════════════════════════════════
+// PLAYLIST MUSICALE
+// ═══════════════════════════════════════
+const PLAYLIST_MOMENTS = {
+  ceremonie: { label:'💒 Cérémonie', color:'#C2185B', light:'#FCE4EC' },
+  cocktail:  { label:'🥂 Cocktail',  color:'#F57C00', light:'#FFF3E0' },
+  diner:     { label:'🍽️ Dîner',     color:'#1565C0', light:'#E3F2FD' },
+  soiree:    { label:'🎉 Soirée',    color:'#388E3C', light:'#E8F5E9' },
+};
+let currentPlaylistMoment = 'all';
+let editingSongId = null;
+
+function setPlaylistMoment(moment, btn) {
+  currentPlaylistMoment = moment;
+  document.querySelectorAll('.pl-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderPlaylist();
+}
+
+function renderPlaylist() {
+  const songs = (state.playlist?.songs || []).slice();
+  // Comptes par onglet
+  ['ceremonie','cocktail','diner','soiree'].forEach(m => {
+    const el = document.getElementById('pl-count-'+m);
+    const n = songs.filter(s => s.moment===m).length;
+    if (el) el.textContent = n || '';
+  });
+  const elAll = document.getElementById('pl-count-all');
+  if (elAll) elAll.textContent = songs.length || '';
+
+  // Mise à jour du select personne
+  const personSel = document.getElementById('pl-filter-person');
+  const curPerson = personSel?.value || '';
+  const persons = [...new Set(songs.map(s => s.addedBy).filter(Boolean))].sort();
+  if (personSel) {
+    personSel.innerHTML = '<option value="">Toutes les personnes</option>' +
+      persons.map(p => `<option value="${escHtml(p)}"${curPerson===p?' selected':''}>${escHtml(p)}</option>`).join('');
+  }
+
+  // Filtres
+  const filterCoeur  = document.getElementById('pl-filter-coeur')?.checked;
+  const filterPerson = personSel?.value || '';
+  let filtered = songs;
+  if (currentPlaylistMoment !== 'all') filtered = filtered.filter(s => s.moment === currentPlaylistMoment);
+  if (filterCoeur)   filtered = filtered.filter(s => s.coupDeCoeur);
+  if (filterPerson)  filtered = filtered.filter(s => s.addedBy === filterPerson);
+  // Coups de cœur en premier
+  filtered.sort((a, b) => (b.coupDeCoeur ? 1 : 0) - (a.coupDeCoeur ? 1 : 0));
+
+  const el = document.getElementById('pl-songs');
+  if (!el) return;
+
+  if (!filtered.length) {
+    el.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--grey)">
+      <div style="font-size:2.8rem;margin-bottom:10px">🎵</div>
+      <p>Aucune chanson — ajoutez-en une !</p></div>`;
+    return;
+  }
+
+  if (currentPlaylistMoment === 'all') {
+    el.innerHTML = Object.entries(PLAYLIST_MOMENTS).map(([m, info]) => {
+      const group = filtered.filter(s => s.moment === m);
+      if (!group.length) return '';
+      return `<div style="margin-bottom:24px">
+        <div style="font-weight:700;font-size:1rem;color:${info.color};margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${info.light};display:flex;align-items:center;gap:8px">
+          ${info.label} <span style="font-size:0.75rem;font-weight:400;color:var(--grey)">${group.length} chanson${group.length>1?'s':''}</span>
+        </div>
+        ${group.map(s => renderSongCard(s)).join('')}
+      </div>`;
+    }).join('');
+  } else {
+    el.innerHTML = filtered.map(s => renderSongCard(s)).join('');
+  }
+}
+
+function renderSongCard(song) {
+  const info = PLAYLIST_MOMENTS[song.moment] || { label:song.moment, color:'var(--grey)', light:'#f0f0f0' };
+  const showBadge = currentPlaylistMoment === 'all';
+  return `<div class="song-card">
+    <button class="song-heart" onclick="toggleSongCoeur('${song.id}')" title="${song.coupDeCoeur?'Retirer coup de cœur':'Marquer coup de cœur'}">${song.coupDeCoeur?'❤️':'🤍'}</button>
+    <div class="song-info">
+      <div class="song-titre">${escHtml(song.titre)}</div>
+      <div class="song-artiste">${escHtml(song.artiste||'—')}</div>
+    </div>
+    <div class="song-meta">
+      ${showBadge ? `<span class="song-badge" style="background:${info.light};color:${info.color}">${info.label}</span>` : ''}
+      <span class="song-by">par ${escHtml(song.addedBy||'?')}</span>
+      <button class="song-act" onclick="openSongModal('${song.id}')" title="Modifier">✏️</button>
+      <button class="song-act" onclick="deleteSong('${song.id}')" title="Supprimer"
+        onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--grey)'">×</button>
+    </div>
+  </div>`;
+}
+
+function openSongModal(id = null) {
+  editingSongId = id;
+  const song = id ? (state.playlist?.songs||[]).find(s => s.id===id) : null;
+  const t = document.getElementById('song-titre');
+  const a = document.getElementById('song-artiste');
+  const m = document.getElementById('song-moment');
+  const c = document.getElementById('song-coeur');
+  const title = document.getElementById('song-modal-title');
+  if (title) title.textContent = id ? 'Modifier la chanson' : '🎵 Ajouter une chanson';
+  if (t) t.value = song?.titre || '';
+  if (a) a.value = song?.artiste || '';
+  if (m) m.value = song?.moment || (currentPlaylistMoment!=='all' ? currentPlaylistMoment : 'soiree');
+  if (c) c.checked = song?.coupDeCoeur || false;
+  document.getElementById('song-modal-overlay').classList.remove('hidden');
+  setTimeout(() => t?.focus(), 80);
+}
+function closeSongModal() {
+  document.getElementById('song-modal-overlay').classList.add('hidden');
+  editingSongId = null;
+}
+function saveSong() {
+  const titre    = document.getElementById('song-titre')?.value.trim();
+  const artiste  = document.getElementById('song-artiste')?.value.trim() || '';
+  const moment   = document.getElementById('song-moment')?.value;
+  const coupDeCoeur = document.getElementById('song-coeur')?.checked || false;
+  if (!titre) {
+    const el = document.getElementById('song-titre');
+    if (el) { el.style.borderColor='var(--red)'; setTimeout(()=>el.style.borderColor='',1500); }
+    return;
+  }
+  if (!state.playlist)        state.playlist = { songs:[], spotifyClientId:'' };
+  if (!state.playlist.songs)  state.playlist.songs = [];
+  const user = window.currentUser;
+  const name = user?.displayName || user?.email?.split('@')[0] || 'Inconnu';
+  if (editingSongId) {
+    const song = state.playlist.songs.find(s => s.id===editingSongId);
+    if (song) { song.titre=titre; song.artiste=artiste; song.moment=moment; song.coupDeCoeur=coupDeCoeur; }
+  } else {
+    state.playlist.songs.push({ id:'song_'+Date.now(), titre, artiste, moment, coupDeCoeur, addedBy:name, addedAt:new Date().toISOString() });
+  }
+  save(); closeSongModal(); renderPlaylist();
+}
+function deleteSong(id) {
+  if (!confirm('Supprimer cette chanson ?')) return;
+  if (!state.playlist) return;
+  state.playlist.songs = (state.playlist.songs||[]).filter(s => s.id!==id);
+  save(); renderPlaylist();
+}
+function toggleSongCoeur(id) {
+  const song = (state.playlist?.songs||[]).find(s => s.id===id);
+  if (!song) return;
+  song.coupDeCoeur = !song.coupDeCoeur;
+  save(); renderPlaylist();
+}
+
+// ── Spotify ──────────────────────────────────────────
+function startSpotifyImport() {
+  if (state.playlist?.spotifyClientId) { startSpotifyAuth(); }
+  else { openSpotifySetup(); }
+}
+function openSpotifySetup() {
+  const overlay = document.getElementById('spotify-setup-overlay');
+  if (!overlay) return;
+  const rid = document.getElementById('spotify-redirect-uri');
+  if (rid) rid.textContent = window.location.origin + window.location.pathname.replace(/\/$/,'') + '/';
+  const cid = document.getElementById('spotify-client-id-input');
+  if (cid) cid.value = state.playlist?.spotifyClientId || '';
+  overlay.classList.remove('hidden');
+}
+function closeSpotifySetup() { document.getElementById('spotify-setup-overlay').classList.add('hidden'); }
+function saveSpotifyClientId() {
+  const cid = document.getElementById('spotify-client-id-input')?.value.trim();
+  if (!cid) { alert('Veuillez coller votre Client ID Spotify.'); return; }
+  if (!state.playlist) state.playlist = { songs:[], spotifyClientId:'' };
+  state.playlist.spotifyClientId = cid;
+  save(); closeSpotifySetup(); startSpotifyAuth();
+}
+
+function _genVerifier() {
+  const arr = new Uint8Array(64);
+  window.crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_').slice(0,128);
+}
+async function _genChallenge(v) {
+  const data = new TextEncoder().encode(v);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+}
+async function startSpotifyAuth() {
+  const clientId = state.playlist?.spotifyClientId;
+  if (!clientId) return;
+  const verifier = _genVerifier();
+  const challenge = await _genChallenge(verifier);
+  localStorage.setItem('spotify_verifier', verifier);
+  localStorage.setItem('spotify_moment', currentPlaylistMoment);
+  const redirectUri = window.location.origin + window.location.pathname.replace(/\/$/,'') + '/';
+  const params = new URLSearchParams({
+    client_id: clientId, response_type:'code',
+    redirect_uri: redirectUri,
+    scope:'playlist-read-private playlist-read-collaborative',
+    code_challenge_method:'S256', code_challenge: challenge,
+  });
+  window.location.href = 'https://accounts.spotify.com/authorize?' + params;
+}
+async function handleSpotifyCallback() {
+  const code = window._spotifyCode;
+  if (!code) return;
+  window._spotifyCode = null;
+  const verifier  = localStorage.getItem('spotify_verifier');
+  const savedMoment = localStorage.getItem('spotify_moment') || 'soiree';
+  localStorage.removeItem('spotify_verifier');
+  localStorage.removeItem('spotify_moment');
+  const clientId = state.playlist?.spotifyClientId;
+  if (!clientId || !verifier) { alert('Erreur : Client ID ou verifier manquant.'); return; }
+  const loading = document.getElementById('spotify-loading');
+  if (loading) loading.style.display = 'flex';
+  try {
+    const redirectUri = window.location.origin + window.location.pathname.replace(/\/$/,'') + '/';
+    const tokenRes = await fetch('https://accounts.spotify.com/api/token', {
+      method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: new URLSearchParams({ grant_type:'authorization_code', code, redirect_uri:redirectUri, client_id:clientId, code_verifier:verifier }),
+    });
+    const tokenData = await tokenRes.json();
+    if (tokenData.error) throw new Error(tokenData.error_description || tokenData.error);
+    const plRes = await fetch('https://api.spotify.com/v1/me/playlists?limit=50', {
+      headers: { 'Authorization': 'Bearer ' + tokenData.access_token }
+    });
+    const plData = await plRes.json();
+    if (loading) loading.style.display = 'none';
+    showSpotifyPicker(plData.items || [], tokenData.access_token, savedMoment);
+  } catch(e) {
+    if (loading) loading.style.display = 'none';
+    alert('Erreur Spotify : ' + e.message);
+  }
+}
+function showSpotifyPicker(playlists, token, defaultMoment) {
+  const overlay = document.getElementById('spotify-picker-overlay');
+  if (!overlay) return;
+  const list = document.getElementById('spotify-pl-list');
+  if (list) {
+    list.innerHTML = playlists.length ? playlists.map(pl => `
+      <div class="sp-item" data-id="${pl.id}" data-token="${token}" onclick="selectSpotifyPl(this)">
+        ${pl.images?.[0] ? `<img src="${pl.images[0].url}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0">` : '<div style="width:44px;height:44px;border-radius:6px;background:#eee;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem">🎵</div>'}
+        <div><div style="font-weight:700;font-size:0.9rem">${escHtml(pl.name)}</div><div style="font-size:0.75rem;color:var(--grey)">${pl.tracks?.total||0} titres</div></div>
+      </div>`).join('') : '<p style="color:var(--grey);font-size:0.85rem;font-style:italic">Aucune playlist trouvée.</p>';
+  }
+  const ms = document.getElementById('spotify-moment-sel');
+  if (ms && defaultMoment !== 'all') ms.value = defaultMoment;
+  overlay.classList.remove('hidden');
+  // Switch to playlist tab
+  showSection('playlist', document.querySelector('.nav a[onclick*="playlist"]'));
+}
+function selectSpotifyPl(el) {
+  document.querySelectorAll('.sp-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+}
+async function importSpotifyPlaylist() {
+  const selected = document.querySelector('.sp-item.selected');
+  if (!selected) { alert('Sélectionnez une playlist.'); return; }
+  const plId = selected.dataset.id;
+  const token = selected.dataset.token;
+  const moment = document.getElementById('spotify-moment-sel')?.value || 'soiree';
+  const btn = document.getElementById('spotify-import-btn');
+  if (btn) { btn.disabled=true; btn.textContent='Import en cours…'; }
+  try {
+    const res = await fetch(`https://api.spotify.com/v1/playlists/${plId}/tracks?limit=100&fields=items(track(name,artists))`, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (!state.playlist) state.playlist = { songs:[], spotifyClientId:'' };
+    if (!state.playlist.songs) state.playlist.songs = [];
+    const user = window.currentUser;
+    const addedBy = (user?.displayName || user?.email?.split('@')[0] || 'Spotify') + ' (Spotify)';
+    const newSongs = (data.items||[]).filter(i => i.track?.name).map(i => ({
+      id: 'song_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      titre: i.track.name,
+      artiste: (i.track.artists||[]).map(a=>a.name).join(', '),
+      moment, coupDeCoeur: false, addedBy, addedAt: new Date().toISOString(),
+    }));
+    state.playlist.songs.push(...newSongs);
+    save();
+    document.getElementById('spotify-picker-overlay').classList.add('hidden');
+    renderPlaylist();
+    alert(`✅ ${newSongs.length} chanson${newSongs.length>1?'s':''} importée${newSongs.length>1?'s':''} !`);
+  } catch(e) { alert('Erreur : ' + e.message); }
+  if (btn) { btn.disabled=false; btn.textContent='Importer'; }
+}
+
+renderPlaylist();
 updateDashboard();
+
+// Détection du callback Spotify (avant Firebase auth)
+(function() {
+  const _p = new URLSearchParams(window.location.search);
+  if (_p.has('code') && localStorage.getItem('spotify_verifier')) {
+    window._spotifyCode = _p.get('code');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -4678,6 +5047,108 @@ updateDashboard();
   console.log("Firebase + Auth connectés 🚀");
 </script>
 
+<!-- ══ SONG MODAL ══ -->
+<div class="modal-overlay hidden" id="song-modal-overlay" onclick="closeSongModal()">
+  <div class="modal-box" style="max-width:420px" onclick="event.stopPropagation()">
+    <div class="modal-title" id="song-modal-title">🎵 Ajouter une chanson</div>
+    <div class="modal-field">
+      <label>Titre *</label>
+      <input type="text" id="song-titre" placeholder="Perfect" onkeydown="if(event.key==='Enter')saveSong()"
+        style="border:1px solid #ddd;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:0.9rem;width:100%">
+    </div>
+    <div class="modal-field" style="margin-top:12px">
+      <label>Artiste</label>
+      <input type="text" id="song-artiste" placeholder="Ed Sheeran" onkeydown="if(event.key==='Enter')saveSong()"
+        style="border:1px solid #ddd;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:0.9rem;width:100%">
+    </div>
+    <div class="modal-field" style="margin-top:12px">
+      <label>Moment</label>
+      <select id="song-moment" style="border:1px solid #ddd;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:0.9rem;width:100%;background:white">
+        <option value="ceremonie">💒 Cérémonie</option>
+        <option value="cocktail">🥂 Cocktail</option>
+        <option value="diner">🍽️ Dîner</option>
+        <option value="soiree">🎉 Soirée</option>
+      </select>
+    </div>
+    <div style="margin-top:14px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.92rem">
+        <input type="checkbox" id="song-coeur" style="width:18px;height:18px;accent-color:var(--pink)">
+        ❤️ Coup de cœur
+      </label>
+    </div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-outline" onclick="closeSongModal()">Annuler</button>
+      <button class="btn btn-pink" onclick="saveSong()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SPOTIFY SETUP MODAL ══ -->
+<div class="modal-overlay hidden" id="spotify-setup-overlay" onclick="closeSpotifySetup()">
+  <div class="modal-box" style="max-width:520px" onclick="event.stopPropagation()">
+    <div class="modal-title" style="color:#1DB954">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#1DB954" style="flex-shrink:0;margin-right:6px"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+      Connecter Spotify (gratuit)
+    </div>
+    <p style="font-size:0.87rem;color:var(--dark);line-height:1.65;margin-bottom:16px">
+      Il suffit de créer une application développeur gratuite sur Spotify — cela prend 5 minutes et ne coûte rien.
+    </p>
+    <div style="background:#f8f8f8;border-radius:10px;padding:16px;margin-bottom:18px">
+      <div style="font-weight:700;font-size:0.88rem;margin-bottom:10px;color:var(--dark)">📋 Étapes (une seule fois) :</div>
+      <ol style="font-size:0.83rem;line-height:2.1;padding-left:18px;color:var(--dark);margin:0">
+        <li>Aller sur <strong>developer.spotify.com/dashboard</strong></li>
+        <li>Se connecter avec votre compte Spotify → <em>Create app</em></li>
+        <li>Nom de l'app : <em>Mariage K&B</em> (n'importe quoi)</li>
+        <li>Redirect URI : <code id="spotify-redirect-uri" style="background:#eee;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.78rem;word-break:break-all"></code></li>
+        <li>Cocher <strong>Web API</strong> → Save</li>
+        <li>Copier le <strong>Client ID</strong> affiché et le coller ci-dessous</li>
+      </ol>
+    </div>
+    <div class="modal-field">
+      <label>Client ID Spotify</label>
+      <input type="text" id="spotify-client-id-input" placeholder="1a2b3c4d5e6f..." autocomplete="off"
+        style="border:1px solid #ddd;border-radius:8px;padding:9px 12px;font-family:monospace;font-size:0.88rem;width:100%;letter-spacing:0.5px">
+    </div>
+    <div class="modal-actions" style="margin-top:18px">
+      <button class="btn btn-outline" onclick="closeSpotifySetup()">Annuler</button>
+      <button class="btn" style="background:#1DB954;color:white;border:none;font-family:inherit;font-weight:600;padding:9px 20px;border-radius:8px;cursor:pointer" onclick="saveSpotifyClientId()">
+        Connecter et importer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SPOTIFY PLAYLIST PICKER ══ -->
+<div class="modal-overlay hidden" id="spotify-picker-overlay" onclick="document.getElementById('spotify-picker-overlay').classList.add('hidden')">
+  <div class="modal-box" style="max-width:460px" onclick="event.stopPropagation()">
+    <div class="modal-title" style="color:#1DB954">Choisir une playlist Spotify</div>
+    <div class="modal-field" style="margin-bottom:14px">
+      <label>Importer dans le moment</label>
+      <select id="spotify-moment-sel" style="border:1px solid #ddd;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:0.9rem;width:100%;background:white">
+        <option value="ceremonie">💒 Cérémonie</option>
+        <option value="cocktail">🥂 Cocktail</option>
+        <option value="diner">🍽️ Dîner</option>
+        <option value="soiree" selected>🎉 Soirée</option>
+      </select>
+    </div>
+    <div style="font-size:0.78rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">Vos playlists</div>
+    <div id="spotify-pl-list" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+    <div class="modal-actions" style="margin-top:18px">
+      <button class="btn btn-outline" onclick="document.getElementById('spotify-picker-overlay').classList.add('hidden')">Annuler</button>
+      <button class="btn" id="spotify-import-btn" onclick="importSpotifyPlaylist()" style="background:#1DB954;color:white;border:none;font-family:inherit;font-weight:600;padding:9px 20px;border-radius:8px;cursor:pointer">Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Spotify loading overlay -->
+<div id="spotify-loading" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;padding:32px 40px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
+    <div style="font-size:2.5rem;margin-bottom:10px">🎵</div>
+    <p style="font-weight:700;font-size:1rem;color:var(--dark)">Connexion à Spotify…</p>
+    <p style="font-size:0.82rem;color:var(--grey);margin-top:4px">Récupération de vos playlists</p>
+  </div>
+</div>
+
 <!-- ══ QUICK ADD MODAL ══ -->
 <div class="modal-overlay hidden" id="quick-add-overlay" onclick="closeQuickAdd()">
   <div class="modal-box" style="max-width:400px" onclick="event.stopPropagation()">
@@ -4702,6 +5173,11 @@ updateDashboard();
         <span class="qa-ico">💡</span>
         <span class="qa-lbl">Idée</span>
         <span class="qa-sub">Nouvelle idée</span>
+      </button>
+      <button class="qa-btn" onclick="quickAddGo('song')">
+        <span class="qa-ico">🎵</span>
+        <span class="qa-lbl">Chanson</span>
+        <span class="qa-sub">Playlist musicale</span>
       </button>
     </div>
     <div style="margin-top:16px;text-align:right">
