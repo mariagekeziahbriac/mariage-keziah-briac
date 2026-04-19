@@ -478,6 +478,7 @@ function showSection(id, link) {
   if (link) link.classList.add('active');
   if (id === 'administration' && isAdmin()) { loadMembers(); renderAuditLog(); }
   if (id === 'dashboard') renderInfosClés();
+  if (id === 'budget') renderBudget();
   updateDashboard();
 }
 
@@ -751,44 +752,76 @@ function updateCheckProgress() {
 function renderBudget() {
   const container = document.getElementById('budget-rows');
   container.innerHTML = '';
-  // Initialiser l'input depuis l'état (sauf si l'utilisateur est en train de taper)
+  const admin = isAdmin();
+
+  // Input budget total : éditable admin seulement
   const inp = document.getElementById('budget-input');
   if (inp && document.activeElement !== inp) inp.value = state.budgetTotal || 30000;
+  if (inp) {
+    inp.readOnly   = !admin;
+    inp.style.cursor = admin ? 'text' : 'default';
+    inp.title      = admin ? 'Cliquez pour modifier le budget total' : 'Seul l\'administrateur peut modifier le budget';
+  }
+
+  // Bouton "+ Ajouter une ligne" : admin seulement
+  const addBtn = document.getElementById('budget-add-btn');
+  if (addBtn) addBtn.style.display = admin ? '' : 'none';
+
   state.budget.forEach((item, i) => {
+    const statusBadge = item.status === '✅ Signé'
+      ? `<span style="color:#388E3C;font-size:0.8rem;font-weight:600">✅ Signé</span>`
+      : item.status === '🔄 En négo.'
+        ? `<span style="color:#E65100;font-size:0.8rem;font-weight:600">🔄 En négo.</span>`
+        : `<span style="color:#888;font-size:0.8rem">⏳ À contacter</span>`;
     const row = document.createElement('div');
     row.className = 'budget-row';
-    row.innerHTML = `
-      <div style="font-weight:600">${item.cat}</div>
-      <div style="text-align:right;color:#888">${fmtEur(item.est)}</div>
-      <div><input type="number" value="${item.prev}" placeholder="0" min="0" onchange="updateBudgetItem(${i},'prev',this.value)" style="text-align:right;font-weight:600;color:#1565C0;width:100%;border:none;background:transparent;font-family:inherit;font-size:0.88rem;padding:10px 8px;"></div>
-      <div><input type="number" value="${item.acomp}" placeholder="0" min="0" onchange="updateBudgetItem(${i},'acomp',this.value)" style="text-align:right;color:#388E3C;width:100%;border:none;background:transparent;font-family:inherit;font-size:0.88rem;padding:10px 8px;"></div>
-      <div><select onchange="updateBudgetItem(${i},'status',this.value)" style="font-size:0.8rem;border:none;background:transparent;font-family:inherit;cursor:pointer;">
-        <option ${!item.status||item.status==='⏳ À contacter'?'selected':''}>⏳ À contacter</option>
-        <option ${item.status==='🔄 En négo.'?'selected':''}>🔄 En négo.</option>
-        <option ${item.status==='✅ Signé'?'selected':''}>✅ Signé</option>
-      </select></div>
-      <div style="text-align:center"><button onclick="deleteBudgetRow(${i})" title="Supprimer" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem;line-height:1;padding:4px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></div>`;
+    if (admin) {
+      row.innerHTML = `
+        <div style="font-weight:600">${escHtml(item.cat)}</div>
+        <div style="text-align:right;color:#888">${fmtEur(item.est)}</div>
+        <div><input type="number" value="${item.prev}" placeholder="0" min="0" onchange="updateBudgetItem(${i},'prev',this.value)" style="text-align:right;font-weight:600;color:#1565C0;width:100%;border:none;background:transparent;font-family:inherit;font-size:0.88rem;padding:10px 8px;"></div>
+        <div><input type="number" value="${item.acomp}" placeholder="0" min="0" onchange="updateBudgetItem(${i},'acomp',this.value)" style="text-align:right;color:#388E3C;width:100%;border:none;background:transparent;font-family:inherit;font-size:0.88rem;padding:10px 8px;"></div>
+        <div><select onchange="updateBudgetItem(${i},'status',this.value)" style="font-size:0.8rem;border:none;background:transparent;font-family:inherit;cursor:pointer;">
+          <option ${!item.status||item.status==='⏳ À contacter'?'selected':''}>⏳ À contacter</option>
+          <option ${item.status==='🔄 En négo.'?'selected':''}>🔄 En négo.</option>
+          <option ${item.status==='✅ Signé'?'selected':''}>✅ Signé</option>
+        </select></div>
+        <div style="text-align:center"><button onclick="deleteBudgetRow(${i})" title="Supprimer" style="background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem;line-height:1;padding:4px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#ccc'">×</button></div>`;
+    } else {
+      row.innerHTML = `
+        <div style="font-weight:600">${escHtml(item.cat)}</div>
+        <div style="text-align:right;color:#888">${fmtEur(item.est)}</div>
+        <div style="text-align:right;font-weight:600;color:#1565C0;padding:10px 8px">${fmtEur(item.prev)}</div>
+        <div style="text-align:right;color:#388E3C;padding:10px 8px">${fmtEur(item.acomp)}</div>
+        <div>${statusBadge}</div>
+        <div></div>`;
+    }
     container.appendChild(row);
   });
   updateBudget();
 }
 
 function updateBudgetItem(i, field, val) {
+  if (!isAdmin()) return;
   state.budget[i][field] = field === 'status' ? val : (parseFloat(val) || 0);
+  logAction('modification', 'Budget', `Poste "${state.budget[i]?.cat}" : ${field} = ${val}`);
   save(); updateBudget();
 }
 function deleteBudgetRow(i) {
+  if (!isAdmin()) return;
   const _bcat = state.budget[i]?.cat || '?';
   if (!confirm(`Supprimer "${_bcat}" du budget ?`)) return;
-  logAction('suppression', 'Budget', `Poste budget : "${_bcat}"`);
+  logAction('suppression', 'Budget', `Poste budget supprimé : "${_bcat}"`);
   state.budget.splice(i, 1);
   save(); renderBudget();
 }
 function addBudgetRow() {
+  if (!isAdmin()) return;
   const cat = prompt('Nom du poste budgétaire :');
   if (!cat || !cat.trim()) return;
   const est = parseFloat(prompt('Montant estimé (€) :', '0') || '0') || 0;
   state.budget.push({ cat: cat.trim(), est, prev: 0, acomp: 0 });
+  logAction('ajout', 'Budget', `Nouveau poste : "${cat.trim()}" — ${fmtEur(est)}`);
   save(); renderBudget();
 }
 
@@ -813,9 +846,12 @@ function updateBudget() {
 }
 
 function saveBudgetTotal() {
+  if (!isAdmin()) return;
   const inp = document.getElementById('budget-input');
   if (!inp) return;
+  const prev = state.budgetTotal || 30000;
   state.budgetTotal = parseFloat(inp.value) || 30000;
+  if (state.budgetTotal !== prev) logAction('modification', 'Budget', `Budget total modifié : ${fmtEur(prev)} → ${fmtEur(state.budgetTotal)}`);
   save();
   updateBudget();
 }
