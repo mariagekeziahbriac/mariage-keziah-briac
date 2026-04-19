@@ -541,8 +541,12 @@ function renderChecklist() {
     // En-tête
     let html = `
       <div class="check-header" onclick="toggleSection(this)">
-        <span>${section.cat}</span>
-        <span class="badge">${done}/${total} — ${pct}%</span>
+        <span style="flex:1">${section.cat}</span>
+        <div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()">
+          <span class="badge">${done}/${total} — ${pct}%</span>
+          <button onclick="checkAllPhase(${si})" title="Tout cocher cette phase" style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.5);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:0.75rem;color:white;white-space:nowrap">☑ tout</button>
+          <button onclick="uncheckAllPhase(${si})" title="Tout décocher cette phase" style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.5);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:0.75rem;color:white;white-space:nowrap">☐</button>
+        </div>
       </div>
       <div class="check-body">
         <div class="progress-bar-wrap" style="margin:4px 8px;"><div class="progress-bar" style="width:${pct}%"></div></div>`;
@@ -713,6 +717,20 @@ function toggleSection(header) {
   const body = header.nextElementSibling;
   body.style.display = body.style.display === 'none' ? 'block' : 'none';
 }
+function checkAllPhase(si) {
+  const section = CHECKLIST_DATA[si];
+  if (!section) return;
+  section.tasks.forEach((_, ti) => { state.checks[`${si}-${ti}`] = true; });
+  (state.customTasks||[]).filter(ct => ct.phase === section.cat).forEach(ct => { state.checks[`c-${ct.id}`] = true; });
+  save(); renderChecklist(); renderGantt(); updateDashboard();
+}
+function uncheckAllPhase(si) {
+  const section = CHECKLIST_DATA[si];
+  if (!section) return;
+  section.tasks.forEach((_, ti) => { delete state.checks[`${si}-${ti}`]; });
+  (state.customTasks||[]).filter(ct => ct.phase === section.cat).forEach(ct => { delete state.checks[`c-${ct.id}`]; });
+  save(); renderChecklist(); renderGantt(); updateDashboard();
+}
 
 function updateCheckProgress() {
   // Total = tâches par défaut + tâches custom
@@ -733,6 +751,9 @@ function updateCheckProgress() {
 function renderBudget() {
   const container = document.getElementById('budget-rows');
   container.innerHTML = '';
+  // Initialiser l'input depuis l'état (sauf si l'utilisateur est en train de taper)
+  const inp = document.getElementById('budget-input');
+  if (inp && document.activeElement !== inp) inp.value = state.budgetTotal || 30000;
   state.budget.forEach((item, i) => {
     const row = document.createElement('div');
     row.className = 'budget-row';
@@ -772,25 +793,31 @@ function addBudgetRow() {
 }
 
 function updateBudget() {
-  const totalPrev = state.budgetTotal;
+  const totalPrev = state.budgetTotal || 30000;
   const totalEst = state.budget.reduce((a,b) => a+b.est, 0);
   const totalPrev2 = state.budget.reduce((a,b) => a+b.prev, 0);
   const totalAcomp = state.budget.reduce((a,b) => a+b.acomp, 0);
   const libre = totalPrev - totalPrev2;
   const pct = totalPrev > 0 ? Math.round(totalPrev2/totalPrev*100) : 0;
 
-  document.getElementById('b-total').textContent = fmtEur(totalPrev);
-  document.getElementById('b-paid').textContent = fmtEur(totalPrev2);
-  document.getElementById('b-left').textContent = fmtEur(libre);
-  document.getElementById('b-pct').textContent = pct + '%';
-  document.getElementById('bt-est').textContent = fmtEur(totalEst);
-  document.getElementById('bt-prev').textContent = fmtEur(totalPrev2);
-  document.getElementById('bt-acomp').textContent = fmtEur(totalAcomp);
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('b-total',   fmtEur(totalPrev));
+  set('b-paid',    fmtEur(totalPrev2));
+  set('b-left',    fmtEur(libre));
+  set('b-pct',     pct + '%');
+  set('bt-est',    fmtEur(totalEst));
+  set('bt-prev',   fmtEur(totalPrev2));
+  set('bt-acomp',  fmtEur(totalAcomp));
+  set('stat-budget-used',  fmtEur(totalPrev2));
+  set('stat-budget-total', fmtEur(totalPrev));
+}
 
+function saveBudgetTotal() {
   const inp = document.getElementById('budget-input');
-  if (inp) { state.budgetTotal = parseFloat(inp.value) || 30000; save(); }
-
-  document.getElementById('stat-budget-used').textContent = fmtEur(totalPrev2);
+  if (!inp) return;
+  state.budgetTotal = parseFloat(inp.value) || 30000;
+  save();
+  updateBudget();
 }
 
 function fmtEur(n) {
@@ -848,6 +875,8 @@ async function deleteGuestFromFirebase(id) {
   } catch (e) { console.error("Erreur suppression invité :", e); }
 }
 
+let _guestSelected = new Set(); // IDs Firebase des invités sélectionnés
+
 // ── Helpers ──
 function escHtml(s) {
   return (s == null ? '' : String(s))
@@ -882,8 +911,12 @@ function renderGuests() {
     const lBadge = (g.liste || 'A') === 'A'
       ? '<span class="badge-liste-a">A</span>'
       : '<span class="badge-liste-b">B</span>';
+    const selKey = g.id || ('idx_'+idx);
+    const isSel  = _guestSelected.has(selKey);
     const tr = document.createElement('tr');
+    if (isSel) tr.style.background = 'var(--light-pink)';
     tr.innerHTML = `
+      <td style="text-align:center"><input type="checkbox" ${isSel?'checked':''} onchange="toggleGuestSelect('${selKey}')" style="width:14px;height:14px;accent-color:var(--pink);cursor:pointer"></td>
       <td>${n}</td>
       <td style="font-weight:600;white-space:nowrap">${escHtml(guestFullName(g))}</td>
       <td style="font-size:0.8rem">${escHtml(g.categorie||'')}</td>
@@ -902,6 +935,7 @@ function renderGuests() {
     tbody.appendChild(tr);
   });
   updateGuestStats();
+  updateGuestBulkBar();
 }
 
 function filterGuests() { renderGuests(); }
@@ -980,6 +1014,85 @@ async function removeGuest(idx) {
   logAction('suppression', 'Invités', `Invité supprimé : "${_guest?.prenom||'?'} ${_guest?.nom||''}"`);
   if (_guest?.id) await deleteGuestFromFirebase(_guest.id);
   state.guests.splice(idx, 1);
+  renderGuests();
+}
+
+// ── Bulk invités ──────────────────────────────────────
+function toggleGuestSelect(selKey) {
+  if (_guestSelected.has(selKey)) _guestSelected.delete(selKey);
+  else _guestSelected.add(selKey);
+  updateGuestBulkBar();
+  renderGuests();
+}
+function selectAllGuestsVisible() {
+  const q   = (document.getElementById('guest-search')?.value || '').toLowerCase();
+  const fL  = document.getElementById('f-liste')?.value || '';
+  const fR  = document.getElementById('f-rsvp')?.value || '';
+  const fC  = document.getElementById('f-cat')?.value || '';
+  state.guests.forEach((g, idx) => {
+    if (fL && (g.liste || 'A') !== fL) return;
+    if (fR && (g.rsvp || '⏳ En attente') !== fR) return;
+    if (fC && (g.categorie || '') !== fC) return;
+    const name = guestFullName(g).toLowerCase();
+    if (q && !name.includes(q) && !(g.email||'').toLowerCase().includes(q)) return;
+    _guestSelected.add(g.id || ('idx_'+idx));
+  });
+  renderGuests();
+}
+function clearGuestSelection() {
+  _guestSelected.clear();
+  renderGuests();
+}
+function updateGuestBulkBar() {
+  const bar = document.getElementById('guest-bulk-bar');
+  if (!bar) return;
+  if (_guestSelected.size === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const countEl = document.getElementById('guest-bulk-count');
+  if (countEl) countEl.textContent = `${_guestSelected.size} invité(s) sélectionné(s)`;
+}
+function _resolveSelectedGuests() {
+  return state.guests.map((g, idx) => ({ g, idx, key: g.id || ('idx_'+idx) }))
+    .filter(({ key }) => _guestSelected.has(key));
+}
+function bulkUpdateGuestRsvp() {
+  const rsvp = document.getElementById('bulk-guest-rsvp')?.value;
+  if (!rsvp || !_guestSelected.size) return;
+  if (!confirm(`Mettre "${rsvp}" pour ${_guestSelected.size} invité(s) ?`)) return;
+  _resolveSelectedGuests().forEach(({ g }) => { g.rsvp = rsvp; });
+  logAction('modification', 'Invités', `RSVP "${rsvp}" appliqué à ${_guestSelected.size} invité(s)`);
+  _guestSelected.clear();
+  save(); renderGuests();
+}
+function bulkUpdateGuestCat() {
+  const cat = document.getElementById('bulk-guest-cat')?.value;
+  if (!cat || !_guestSelected.size) return;
+  if (!confirm(`Mettre la catégorie "${cat}" pour ${_guestSelected.size} invité(s) ?`)) return;
+  _resolveSelectedGuests().forEach(({ g }) => { g.categorie = cat; });
+  logAction('modification', 'Invités', `Catégorie "${cat}" appliquée à ${_guestSelected.size} invité(s)`);
+  _guestSelected.clear();
+  save(); renderGuests();
+}
+function bulkUpdateGuestTable() {
+  const table = document.getElementById('bulk-guest-table')?.value?.trim();
+  if (!table || !_guestSelected.size) return;
+  if (!confirm(`Attribuer la table "${table}" à ${_guestSelected.size} invité(s) ?`)) return;
+  _resolveSelectedGuests().forEach(({ g }) => { g.table = table; });
+  logAction('modification', 'Invités', `Table "${table}" attribuée à ${_guestSelected.size} invité(s)`);
+  _guestSelected.clear();
+  save(); renderGuests();
+}
+async function bulkDeleteGuests() {
+  if (!_guestSelected.size) return;
+  if (!confirm(`Supprimer définitivement ${_guestSelected.size} invité(s) sélectionné(s) ?`)) return;
+  const toDelete = _resolveSelectedGuests();
+  for (const { g } of toDelete) {
+    if (g.id) await deleteGuestFromFirebase(g.id);
+  }
+  const keys = new Set(toDelete.map(({ key }) => key));
+  state.guests = state.guests.filter((g, idx) => !keys.has(g.id || ('idx_'+idx)));
+  logAction('suppression', 'Invités', `${toDelete.length} invité(s) supprimé(s) en masse`);
+  _guestSelected.clear();
   renderGuests();
 }
 
@@ -1092,6 +1205,8 @@ function updateDashboard() {
   if (lmEl && state.lastModifiedBy) {
     lmEl.textContent = '✏️ Dernière modification par ' + state.lastModifiedBy;
   }
+  // Synchroniser les stats budget sur le dashboard
+  updateBudget();
 }
 
 // ═══════════════════════════════════════
@@ -2525,6 +2640,15 @@ function addTenue() {
   logAction('ajout', 'Tenues', 'Nouvelle tenue ajoutée');
   save(); renderTenues();
 }
+function bulkTenueStatut() {
+  const statut = document.getElementById('bulk-tenue-statut')?.value;
+  if (!statut) { alert('Choisissez un statut à appliquer.'); return; }
+  if (!state.tenues || !state.tenues.length) return;
+  if (!confirm(`Passer toutes les tenues (${state.tenues.length}) en "${statut}" ?`)) return;
+  state.tenues.forEach(t => { t.statut = statut; });
+  logAction('modification', 'Tenues', `Toutes les tenues passées en "${statut}"`);
+  save(); renderTenues();
+}
 
 // ═══════════════════════════════════════
 // FAIRE-PART & PAPETERIE
@@ -2600,6 +2724,18 @@ function renderFairePart() {
 }
 function toggleFpCheck(k,v) { if(!state.papeterie) state.papeterie={checklist:{},notes:''}; if(!state.papeterie.checklist) state.papeterie.checklist={}; state.papeterie.checklist[k]=v; save(); renderFairePart(); }
 function savePaperieNotes(v) { if(!state.papeterie) state.papeterie={checklist:{},notes:''}; state.papeterie.notes=v; save(); }
+function checkAllFp() {
+  if (!state.papeterie) state.papeterie = { checklist:{}, notes:'', customItems:[] };
+  if (!state.papeterie.checklist) state.papeterie.checklist = {};
+  FP_CHECKLIST_DEFAULT.forEach((_, i) => { state.papeterie.checklist['fp_'+i] = true; });
+  (state.papeterie.customItems||[]).forEach(it => { state.papeterie.checklist['cust_'+it.id] = true; });
+  save(); renderFairePart();
+}
+function uncheckAllFp() {
+  if (!state.papeterie) state.papeterie = { checklist:{}, notes:'', customItems:[] };
+  state.papeterie.checklist = {};
+  save(); renderFairePart();
+}
 
 // ═══════════════════════════════════════
 // LUNE DE MIEL
@@ -2642,6 +2778,17 @@ function renderLuneDeMiel() {
 }
 function saveLuneDeMielField(f,v) { if(!state.lunedeMiel) state.lunedeMiel={}; state.lunedeMiel[f]=v; save(); }
 function toggleLdmCheck(k,v) { if(!state.lunedeMiel) state.lunedeMiel={}; if(!state.lunedeMiel.checklist) state.lunedeMiel.checklist={}; state.lunedeMiel.checklist[k]=v; save(); renderLuneDeMiel(); }
+function checkAllLdm() {
+  if (!state.lunedeMiel) state.lunedeMiel = {};
+  if (!state.lunedeMiel.checklist) state.lunedeMiel.checklist = {};
+  LDM_CHECKLIST_DEFAULT.forEach((_, i) => { state.lunedeMiel.checklist['ldm_'+i] = true; });
+  save(); renderLuneDeMiel();
+}
+function uncheckAllLdm() {
+  if (!state.lunedeMiel) state.lunedeMiel = {};
+  state.lunedeMiel.checklist = {};
+  save(); renderLuneDeMiel();
+}
 
 // ═══════════════════════════════════════
 // DOCUMENTS LÉGAUX
@@ -2679,6 +2826,17 @@ function renderDocsLegaux() {
     </label>`).join('');
 }
 function toggleDocCheck(k,v) { if(!state.docsLegaux) state.docsLegaux={checklist:{}}; if(!state.docsLegaux.checklist) state.docsLegaux.checklist={}; state.docsLegaux.checklist[k]=v; save(); renderDocsLegaux(); }
+function checkAllDocs() {
+  if (!state.docsLegaux) state.docsLegaux = { checklist:{} };
+  if (!state.docsLegaux.checklist) state.docsLegaux.checklist = {};
+  DOCS_LEGAUX_DEFAULT.forEach(item => { state.docsLegaux.checklist[item.key] = true; });
+  save(); renderDocsLegaux();
+}
+function uncheckAllDocs() {
+  if (!state.docsLegaux) state.docsLegaux = { checklist:{} };
+  state.docsLegaux.checklist = {};
+  save(); renderDocsLegaux();
+}
 
 // ═══════════════════════════════════════
 // KIT D'URGENCE
@@ -2698,9 +2856,15 @@ function renderKitUrgence() {
   const el = document.getElementById('kit-checklist');
   if (!el) return;
   const cl = (state.kitUrgence||{}).checklist||{};
-  el.innerHTML = KIT_URGENCE_DEFAULT.map(cat => `
+  el.innerHTML = KIT_URGENCE_DEFAULT.map((cat, catIdx) => `
     <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
-      <div style="font-weight:700;font-size:0.9rem;margin-bottom:10px;color:var(--dark)">${cat.cat}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-weight:700;font-size:0.9rem;color:var(--dark)">${cat.cat}</div>
+        <div style="display:flex;gap:4px">
+          <button onclick="checkKitCategory(${catIdx})" title="Tout cocher" style="background:none;border:1px solid #ddd;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:0.75rem;color:var(--grey)">☑ tout</button>
+          <button onclick="uncheckKitCategory(${catIdx})" title="Tout décocher" style="background:none;border:1px solid #ddd;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:0.75rem;color:var(--grey)">☐</button>
+        </div>
+      </div>
       ${cat.items.map(item => `<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer">
         <input type="checkbox" ${cl[item.k]?'checked':''} onchange="toggleKitCheck('${item.k}',this.checked)" style="width:15px;height:15px;accent-color:var(--pink);flex-shrink:0">
         <span style="font-size:0.88rem;${cl[item.k]?'text-decoration:line-through;color:#bbb':''}">${item.l}</span>
@@ -2809,6 +2973,17 @@ function deleteKitItem(id) {
   logAction('suppression', 'Kit d\'urgence', `Article supprimé : "${_label}"`);
   state.kitUrgence.customItems = state.kitUrgence.customItems.filter(i => i.id !== id);
   delete (state.kitUrgence.checklist||{})['cust_'+id];
+  save(); renderKitUrgence();
+}
+function checkKitCategory(catIdx) {
+  if (!state.kitUrgence) state.kitUrgence = { checklist:{}, customItems:[] };
+  if (!state.kitUrgence.checklist) state.kitUrgence.checklist = {};
+  KIT_URGENCE_DEFAULT[catIdx].items.forEach(item => { state.kitUrgence.checklist[item.k] = true; });
+  save(); renderKitUrgence();
+}
+function uncheckKitCategory(catIdx) {
+  if (!state.kitUrgence || !state.kitUrgence.checklist) return;
+  KIT_URGENCE_DEFAULT[catIdx].items.forEach(item => { delete state.kitUrgence.checklist[item.k]; });
   save(); renderKitUrgence();
 }
 
@@ -3001,6 +3176,21 @@ function deleteIdee(id) {
   state.idees.items = (state.idees.items||[]).filter(i => i.id !== id);
   save();
   renderIdees();
+}
+function deleteAllAbandonedIdees() {
+  const all = state.idees.items || [];
+  const toDelete = all.filter(idee =>
+    (idee.options||[]).length > 0 && (idee.options||[]).every(o => o.statut === 'abandonnee')
+  );
+  if (toDelete.length === 0) {
+    alert('Aucune idée avec toutes les options Abandonnées à supprimer.');
+    return;
+  }
+  if (!confirm(`Supprimer ${toDelete.length} idée(s) dont toutes les options sont Abandonnées ?`)) return;
+  const ids = new Set(toDelete.map(i => i.id));
+  state.idees.items = all.filter(i => !ids.has(i.id));
+  logAction('suppression', 'Idées', `${toDelete.length} idée(s) abandonnée(s) supprimée(s)`);
+  save(); renderIdees();
 }
 
 function openOptionModal(ideaId, optId=null) {
@@ -3953,6 +4143,7 @@ const PLAYLIST_MOMENTS = {
 };
 let currentPlaylistMoment = 'all';
 let editingSongId = null;
+let _playlistSelected = new Set();
 
 function setPlaylistMoment(moment, btn) {
   currentPlaylistMoment = moment;
@@ -4015,12 +4206,15 @@ function renderPlaylist() {
   } else {
     el.innerHTML = filtered.map(s => renderSongCard(s)).join('');
   }
+  updatePlaylistBulkBar();
 }
 
 function renderSongCard(song) {
   const info = PLAYLIST_MOMENTS[song.moment] || { label:song.moment, color:'var(--grey)', light:'#f0f0f0' };
   const showBadge = currentPlaylistMoment === 'all';
-  return `<div class="song-card">
+  const sel = _playlistSelected.has(song.id);
+  return `<div class="song-card" style="${sel?'outline:2px solid var(--pink);background:var(--light-pink);':''}">
+    <input type="checkbox" ${sel?'checked':''} onchange="toggleSongSelect('${song.id}')" style="width:15px;height:15px;accent-color:var(--pink);flex-shrink:0;cursor:pointer" title="Sélectionner">
     <button class="song-heart" onclick="toggleSongCoeur('${song.id}')" title="${song.coupDeCoeur?'Retirer coup de cœur':'Marquer coup de cœur'}">${song.coupDeCoeur?'❤️':'🤍'}</button>
     <div class="song-info">
       <div class="song-titre">${escHtml(song.titre)}</div>
@@ -4092,6 +4286,66 @@ function toggleSongCoeur(id) {
   const song = (state.playlist?.songs||[]).find(s => s.id===id);
   if (!song) return;
   song.coupDeCoeur = !song.coupDeCoeur;
+  save(); renderPlaylist();
+}
+
+// ── Bulk playlist ──────────────────────────────────────
+function toggleSongSelect(id) {
+  if (_playlistSelected.has(id)) _playlistSelected.delete(id);
+  else _playlistSelected.add(id);
+  updatePlaylistBulkBar();
+  // Mettre à jour juste la card concernée sans re-render tout
+  const songs = state.playlist?.songs || [];
+  const song = songs.find(s => s.id === id);
+  const el = document.getElementById('pl-songs');
+  if (el && song) {
+    // Trouver et remplacer la card (plus rapide qu'un full re-render)
+    el.querySelectorAll('.song-card').forEach(card => {
+      const cb = card.querySelector('input[type="checkbox"]');
+      if (cb && cb.getAttribute('onchange') && cb.getAttribute('onchange').includes(`'${id}'`)) {
+        card.outerHTML = renderSongCard(song);
+      }
+    });
+  }
+}
+function selectAllPlaylistVisible() {
+  const songs = state.playlist?.songs || [];
+  let visible = songs;
+  if (currentPlaylistMoment !== 'all') visible = visible.filter(s => s.moment === currentPlaylistMoment);
+  const filterCoeur  = document.getElementById('pl-filter-coeur')?.checked;
+  const filterPerson = document.getElementById('pl-filter-person')?.value || '';
+  if (filterCoeur)  visible = visible.filter(s => s.coupDeCoeur);
+  if (filterPerson) visible = visible.filter(s => s.addedBy === filterPerson);
+  visible.forEach(s => _playlistSelected.add(s.id));
+  renderPlaylist();
+}
+function clearPlaylistSelection() {
+  _playlistSelected.clear();
+  renderPlaylist();
+}
+function updatePlaylistBulkBar() {
+  const bar = document.getElementById('pl-bulk-bar');
+  if (!bar) return;
+  if (_playlistSelected.size === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const countEl = document.getElementById('pl-bulk-count');
+  if (countEl) countEl.textContent = `${_playlistSelected.size} chanson(s) sélectionnée(s)`;
+}
+function bulkDeleteSongs() {
+  if (_playlistSelected.size === 0) return;
+  if (!confirm(`Supprimer ${_playlistSelected.size} chanson(s) sélectionnée(s) ?`)) return;
+  logAction('suppression', 'Playlist', `${_playlistSelected.size} chanson(s) supprimée(s) en masse`);
+  state.playlist.songs = (state.playlist.songs||[]).filter(s => !_playlistSelected.has(s.id));
+  _playlistSelected.clear();
+  save(); renderPlaylist();
+}
+function bulkMoveSongs(moment) {
+  if (_playlistSelected.size === 0) return;
+  const info = PLAYLIST_MOMENTS[moment];
+  if (!confirm(`Déplacer ${_playlistSelected.size} chanson(s) vers "${info?.label||moment}" ?`)) return;
+  (state.playlist.songs||[]).forEach(s => { if (_playlistSelected.has(s.id)) s.moment = moment; });
+  logAction('modification', 'Playlist', `${_playlistSelected.size} chanson(s) déplacée(s) vers "${info?.label||moment}"`);
+  _playlistSelected.clear();
   save(); renderPlaylist();
 }
 

@@ -152,9 +152,13 @@
       <div class="val" style="color:var(--orange)" id="stat-tasks-left">0</div>
       <div class="lbl">Tâches restantes</div>
     </div>
-    <div class="stat-card" style="border-top-color:var(--green)">
+    <div class="stat-card" onclick="showSection('budget',document.querySelector('.nav a[onclick*=budget]'))" style="border-top-color:var(--green);cursor:pointer" title="Aller au budget">
       <div class="val" style="color:var(--green)" id="stat-budget-used">0 €</div>
       <div class="lbl">Budget engagé</div>
+    </div>
+    <div class="stat-card" onclick="showSection('budget',document.querySelector('.nav a[onclick*=budget]'))" style="border-top-color:#E65100;cursor:pointer" title="Aller au budget">
+      <div class="val" style="color:#E65100" id="stat-budget-total">0 €</div>
+      <div class="lbl">Budget total prévu</div>
     </div>
     <div class="stat-card" style="border-top-color:var(--blue)">
       <div class="val" style="color:var(--blue)" id="stat-guests">0</div>
@@ -300,7 +304,7 @@
     <div class="budget-summary">
       <div class="budget-box budget-total">
         <div class="val" id="b-total">30 000 €</div>
-        <div class="lbl">Budget prévu<br><input id="budget-input" type="number" value="30000" style="border:none;background:transparent;color:var(--pink);font-weight:800;font-size:1rem;text-align:center;width:120px;" oninput="updateBudget()"> €</div>
+        <div class="lbl">Budget prévu<br><input id="budget-input" type="number" value="30000" style="border:none;background:transparent;color:var(--pink);font-weight:800;font-size:1rem;text-align:center;width:120px;" oninput="saveBudgetTotal()"> €</div>
       </div>
       <div class="budget-box budget-paye">
         <div class="val" id="b-paid">0 €</div>
@@ -394,12 +398,37 @@
         📤 Import Excel
         <input type="file" id="import-file" accept=".xlsx" onchange="importGuestsExcel(this)" style="display:none">
       </label>
+      <button class="btn btn-outline" onclick="selectAllGuestsVisible()" style="font-size:0.82rem;padding:5px 12px">☑ Tout sélectionner</button>
+      <button class="btn btn-outline" onclick="clearGuestSelection()" style="font-size:0.82rem;padding:5px 12px">☐ Désélectionner</button>
+    </div>
+
+    <!-- Barre bulk invités (masquée par défaut) -->
+    <div id="guest-bulk-bar" style="display:none;gap:10px;flex-wrap:wrap;align-items:center;background:var(--light-pink);border-radius:10px;padding:10px 14px;margin-bottom:12px">
+      <span id="guest-bulk-count" style="font-weight:700;font-size:0.88rem;color:var(--dark-pink)">0 invité(s)</span>
+      <select id="bulk-guest-rsvp" style="padding:5px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.85rem;font-family:inherit;background:white">
+        <option value="">— RSVP —</option>
+        <option value="✅ Confirmé">✅ Confirmé</option>
+        <option value="⏳ En attente">⏳ En attente</option>
+        <option value="❌ Décliné">❌ Décliné</option>
+      </select>
+      <button onclick="bulkUpdateGuestRsvp()" class="btn btn-outline" style="font-size:0.82rem;padding:5px 12px">Appliquer RSVP</button>
+      <select id="bulk-guest-cat" style="padding:5px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.85rem;font-family:inherit;background:white">
+        <option value="">— Catégorie —</option>
+        <option>Famille mariée</option><option>Famille marié</option>
+        <option>Amis communs</option><option>Amis mariée</option><option>Amis marié</option>
+        <option>Collègues</option><option>Autres</option>
+      </select>
+      <button onclick="bulkUpdateGuestCat()" class="btn btn-outline" style="font-size:0.82rem;padding:5px 12px">Appliquer catégorie</button>
+      <input id="bulk-guest-table" type="text" placeholder="Nom de table…" style="padding:5px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.85rem;font-family:inherit;width:130px">
+      <button onclick="bulkUpdateGuestTable()" class="btn btn-outline" style="font-size:0.82rem;padding:5px 12px">Attribuer table</button>
+      <button onclick="bulkDeleteGuests()" style="background:#FFEBEE;color:var(--red);border:1px solid #FFCDD2;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem;margin-left:auto;font-family:inherit">🗑️ Supprimer la sélection</button>
     </div>
 
     <!-- Tableau -->
     <div style="overflow-x:auto;">
       <table class="guest-table" id="guest-table">
         <thead><tr>
+          <th style="width:32px"></th>
           <th>N°</th>
           <th>Prénom Nom</th>
           <th>Catégorie</th>
@@ -936,6 +965,18 @@
   <div class="card">
     <div class="card-title">👗 Tenues du mariage</div>
     <p style="font-size:0.85rem;color:var(--grey);margin-bottom:16px">Suivez l'état de toutes les tenues : mariés, cortège, famille.</p>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;background:var(--light-pink);border-radius:10px;padding:10px 14px">
+      <span style="font-size:0.82rem;font-weight:600;color:var(--dark-pink)">Changer statut en masse :</span>
+      <select id="bulk-tenue-statut" style="padding:5px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.85rem;font-family:inherit;background:white">
+        <option value="">— Choisir un statut —</option>
+        <option>🔍 À choisir</option>
+        <option>📦 Commandé</option>
+        <option>🧵 En essayage</option>
+        <option>✅ Prêt</option>
+        <option>🔄 À louer</option>
+      </select>
+      <button class="btn btn-pink" onclick="bulkTenueStatut()" style="font-size:0.82rem;padding:5px 14px">Appliquer à toutes</button>
+    </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
         <thead><tr style="background:var(--pink);color:white">
@@ -968,6 +1009,10 @@
   </div>
   <div class="card">
     <div class="card-title">✅ Checklist Papeterie</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn btn-outline" onclick="checkAllFp()" style="font-size:0.82rem;padding:5px 14px">☑ Tout cocher</button>
+      <button class="btn btn-outline" onclick="uncheckAllFp()" style="font-size:0.82rem;padding:5px 14px">☐ Tout décocher</button>
+    </div>
     <div id="fp-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
     <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
       <input id="fp-custom-input" type="text" placeholder="Ajouter un élément personnalisé…"
@@ -999,6 +1044,10 @@
   </div>
   <div class="card">
     <div class="card-title">✅ Checklist lune de miel</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn btn-outline" onclick="checkAllLdm()" style="font-size:0.82rem;padding:5px 14px">☑ Tout cocher</button>
+      <button class="btn btn-outline" onclick="uncheckAllLdm()" style="font-size:0.82rem;padding:5px 14px">☐ Tout décocher</button>
+    </div>
     <div id="ldm-checklist" style="display:flex;flex-direction:column;gap:7px"></div>
   </div>
   <div class="card">
@@ -1012,6 +1061,10 @@
   <div class="card">
     <div class="card-title">📄 Documents légaux & démarches administratives</div>
     <div class="tip-box" style="margin-bottom:18px">⚖️ Ces démarches sont obligatoires pour la validité du mariage civil en France. Les délais varient selon les mairies — renseignez-vous auprès de la mairie de Vernon-sur-Brenne.</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn btn-outline" onclick="checkAllDocs()" style="font-size:0.82rem;padding:5px 14px">☑ Tout cocher</button>
+      <button class="btn btn-outline" onclick="uncheckAllDocs()" style="font-size:0.82rem;padding:5px 14px">☐ Tout décocher</button>
+    </div>
     <div id="docs-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 </div>
@@ -1067,6 +1120,7 @@
       </select>
       <button class="btn btn-pink" onclick="openIdeeModal()">+ Nouvelle idée</button>
       <button class="btn btn-outline" onclick="gererCategories()">⚙️ Catégories</button>
+      <button class="btn btn-outline" onclick="deleteAllAbandonedIdees()" style="color:#e57373;border-color:#e57373;font-size:0.82rem" title="Supprimer toutes les idées dont chaque option est Abandonnée">🗑️ Supprimer les abandonnées</button>
     </div>
     <div id="idees-list"></div>
   </div>
@@ -1166,7 +1220,7 @@
     </div>
 
     <!-- Filtres -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
       <select id="pl-filter-person" onchange="renderPlaylist()" style="padding:7px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;background:white">
         <option value="">Toutes les personnes</option>
       </select>
@@ -1174,6 +1228,19 @@
         <input type="checkbox" id="pl-filter-coeur" onchange="renderPlaylist()" style="accent-color:var(--pink)">
         ❤️ Coups de cœur uniquement
       </label>
+      <button class="btn btn-outline" onclick="selectAllPlaylistVisible()" style="font-size:0.82rem;padding:5px 12px">☑ Tout sélectionner</button>
+      <button class="btn btn-outline" onclick="clearPlaylistSelection()" style="font-size:0.82rem;padding:5px 12px">☐ Désélectionner</button>
+    </div>
+
+    <!-- Barre bulk playlist (masquée par défaut) -->
+    <div id="pl-bulk-bar" style="display:none;gap:10px;flex-wrap:wrap;align-items:center;background:var(--light-pink);border-radius:10px;padding:10px 14px;margin-bottom:12px">
+      <span id="pl-bulk-count" style="font-weight:700;font-size:0.88rem;color:var(--dark-pink)">0 chanson(s)</span>
+      <span style="font-size:0.82rem;color:var(--grey)">Déplacer vers :</span>
+      <button onclick="bulkMoveSongs('ceremonie')" style="background:#FCE4EC;color:#C2185B;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem">💒 Cérémonie</button>
+      <button onclick="bulkMoveSongs('cocktail')" style="background:#FFF3E0;color:#E65100;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem">🥂 Cocktail</button>
+      <button onclick="bulkMoveSongs('diner')" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem">🍽️ Dîner</button>
+      <button onclick="bulkMoveSongs('soiree')" style="background:#E8F5E9;color:#388E3C;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem">🎉 Soirée</button>
+      <button onclick="bulkDeleteSongs()" style="background:#FFEBEE;color:var(--red);border:1px solid #FFCDD2;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem;margin-left:auto">🗑️ Supprimer la sélection</button>
     </div>
 
     <div id="pl-songs"></div>
