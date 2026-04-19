@@ -193,101 +193,8 @@
 <div id="planning" class="section">
   <div class="card">
     <div class="card-title">📅 Rétroplanning — De maintenant à juillet 2027</div>
-    <div class="timeline">
-
-      <div class="tl-item">
-        <div class="tl-dot">1</div>
-        <div class="tl-date">Maintenant — Juin 2026 (15+ mois avant)</div>
-        <div class="tl-title">🚀 Poser les bases</div>
-        <ul class="tl-tasks">
-          <li>Définir le budget global et les contributeurs</li>
-          <li>Confirmer la date : samedi 10 juillet 2027</li>
-          <li>Confirmer le Château de Jallanges et signer le contrat</li>
-          <li>Estimer et valider le nombre d'invités</li>
-          <li>Réserver traiteur, photographe, vidéaste</li>
-          <li>Commencer les visites de robes de mariée</li>
-          <li>Ouvrir la liste de mariage</li>
-        </ul>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-dot">2</div>
-        <div class="tl-date">Juil. — Déc. 2026 (12–7 mois avant)</div>
-        <div class="tl-title">📬 Communiquer & sécuriser</div>
-        <ul class="tl-tasks">
-          <li>Envoyer les Save the Date</li>
-          <li>Confirmer les témoins officiels</li>
-          <li>Contacter la mairie de Vernon-sur-Brenne pour le dossier civil</li>
-          <li>Contacter le curé / pasteur pour la cérémonie religieuse (réserver l'église)</li>
-          <li>S'inscrire aux réunions de préparation au mariage (obligatoires à l'église)</li>
-          <li>Réserver le DJ / groupe musical</li>
-          <li>Commander la robe de mariée</li>
-          <li>Réserver le fleuriste et définir le style déco</li>
-          <li>Réserver coiffeur et maquilleur</li>
-          <li>Bloquer des chambres dans les hôtels proches du château</li>
-          <li>Commencer la planification de la lune de miel</li>
-        </ul>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-dot">3</div>
-        <div class="tl-date">Jan. — Mars 2027 (6–4 mois avant)</div>
-        <div class="tl-title">📝 Finaliser les grands choix</div>
-        <ul class="tl-tasks">
-          <li>Envoyer les faire-part officiels</li>
-          <li>Finaliser le menu avec le traiteur</li>
-          <li>Déposer le dossier de mariage civil à la mairie</li>
-          <li>Choisir les alliances</li>
-          <li>Réserver les billets de lune de miel</li>
-          <li>Démarrer le plan de table</li>
-          <li>Visiter le château avec le fleuriste pour la décoration</li>
-        </ul>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-dot">4</div>
-        <div class="tl-date">Avr. — Juin 2027 (3–1 mois avant)</div>
-        <div class="tl-title">🎯 Tout confirmer</div>
-        <ul class="tl-tasks">
-          <li>Confirmer TOUS les prestataires par écrit</li>
-          <li>Finaliser le plan de table</li>
-          <li>Préparer le livret de cérémonie</li>
-          <li>Organiser l'EVJF de Keziah (Estelle !)</li>
-          <li>Écrire et répéter le discours des témoins</li>
-          <li>Préparer le sac de survie de la mariée</li>
-          <li>Essayage final de la robe + accessoires</li>
-          <li>Envoyer le planning du jour J à tous les prestataires</li>
-        </ul>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-dot">5</div>
-        <div class="tl-date">Semaine du mariage</div>
-        <div class="tl-title">✨ La ligne d'arrivée</div>
-        <ul class="tl-tasks">
-          <li>Décoration du château (J-2)</li>
-          <li>Répétition de la cérémonie (J-1)</li>
-          <li>Soirée détente / spa pour la mariée (J-1)</li>
-          <li>Livraison des fleurs (J-1 ou matin du J)</li>
-          <li>Vérifier la météo et confirmer le plan B en cas de pluie</li>
-        </ul>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-dot">💍</div>
-        <div class="tl-date" style="color:var(--pink);font-weight:800">10 JUILLET 2027 — LE GRAND JOUR ✝️</div>
-        <div class="tl-title" style="color:var(--pink)">🎉 Keziah & Briac se marient !</div>
-        <ul class="tl-tasks">
-          <li>Coiffure & maquillage le matin au château</li>
-          <li>Cérémonie civile à la mairie (matin)</li>
-          <li>✝️ Messe de mariage à l'église (après-midi)</li>
-          <li>Sortie de l'église — pétales de roses & photos</li>
-          <li>Cocktail dans les jardins du Château de Jallanges</li>
-          <li>Dîner de gala dans la salle de réception</li>
-          <li>Soirée dansante jusqu'à l'aube !</li>
-        </ul>
-      </div>
-
+    <div class="timeline" id="planning-container">
+      <!-- généré par renderPlanning() -->
     </div>
   </div>
 </div>
@@ -1074,6 +981,7 @@
       <button class="btn btn-outline" onclick="uncheckAllDocs()" style="font-size:0.82rem;padding:5px 14px">☐ Tout décocher</button>
     </div>
     <div id="docs-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="docs-custom-section" style="margin-top:20px;background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)"></div>
   </div>
 </div>
 

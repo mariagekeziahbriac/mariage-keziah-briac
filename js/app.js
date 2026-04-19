@@ -155,6 +155,67 @@ const CHECKLIST_DATA = [
   ]},
 ];
 
+// ─── Rétroplanning par défaut (6 phases) ────────────────
+const PLANNING_DEFAULT = [
+  { id:'pl1', phase:'Maintenant — Juin 2026 (15+ mois avant)', titre:'🚀 Poser les bases', taches:[
+    'Définir le budget global et les contributeurs',
+    'Confirmer la date : samedi 10 juillet 2027',
+    'Confirmer le Château de Jallanges et signer le contrat',
+    'Estimer et valider le nombre d\'invités',
+    'Réserver traiteur, photographe, vidéaste',
+    'Commencer les visites de robes de mariée',
+    'Ouvrir la liste de mariage',
+  ]},
+  { id:'pl2', phase:'Juil. — Déc. 2026 (12–7 mois avant)', titre:'📬 Communiquer & sécuriser', taches:[
+    'Envoyer les Save the Date',
+    'Confirmer les témoins officiels',
+    'Contacter la mairie de Vernon-sur-Brenne pour le dossier civil',
+    'Contacter le curé / pasteur pour la cérémonie religieuse',
+    'S\'inscrire aux réunions de préparation au mariage (obligatoires à l\'église)',
+    'Réserver le DJ / groupe musical',
+    'Commander la robe de mariée',
+    'Réserver le fleuriste et définir le style déco',
+    'Réserver coiffeur et maquilleur',
+    'Bloquer des chambres dans les hôtels proches du château',
+    'Commencer la planification de la lune de miel',
+  ]},
+  { id:'pl3', phase:'Jan. — Mars 2027 (6–4 mois avant)', titre:'📝 Finaliser les grands choix', taches:[
+    'Envoyer les faire-part officiels',
+    'Finaliser le menu avec le traiteur',
+    'Déposer le dossier de mariage civil à la mairie',
+    'Choisir les alliances',
+    'Réserver les billets de lune de miel',
+    'Démarrer le plan de table',
+    'Visiter le château avec le fleuriste pour la décoration',
+  ]},
+  { id:'pl4', phase:'Avr. — Juin 2027 (3–1 mois avant)', titre:'🎯 Tout confirmer', taches:[
+    'Confirmer TOUS les prestataires par écrit',
+    'Finaliser le plan de table',
+    'Préparer le livret de cérémonie',
+    'Organiser l\'EVJF de Keziah',
+    'Écrire et répéter le discours des témoins',
+    'Préparer le sac de survie de la mariée',
+    'Essayage final de la robe + accessoires',
+    'Envoyer le planning du jour J à tous les prestataires',
+  ]},
+  { id:'pl5', phase:'Semaine du mariage', titre:'✨ La ligne d\'arrivée', taches:[
+    'Décoration du château (J-2)',
+    'Répétition de la cérémonie (J-1)',
+    'Soirée détente / spa pour la mariée (J-1)',
+    'Livraison des fleurs (J-1 ou matin du J)',
+    'Vérifier la météo et confirmer le plan B en cas de pluie',
+  ]},
+  { id:'pl6', phase:'10 JUILLET 2027 — LE GRAND JOUR ✝️', titre:'🎉 Keziah & Briac se marient !', taches:[
+    'Coiffure & maquillage le matin au château',
+    'Cérémonie civile à la mairie (matin)',
+    '✝️ Messe de mariage à l\'église (après-midi)',
+    'Sortie de l\'église — pétales de roses & photos',
+    'Cocktail dans les jardins du Château de Jallanges',
+    'Dîner de gala dans la salle de réception',
+    'Soirée dansante jusqu\'à l\'aube !',
+  ]},
+];
+
 const BUDGET_DATA = [
   { cat: "Lieu de réception (Château de Jallanges)", est: 8000, prev: 0, acomp: 0 },
   { cat: "Traiteur (repas)", est: 12000, prev: 0, acomp: 0 },
@@ -240,7 +301,8 @@ let state = {
   venueInfos: {},
   vendors: [],
   lunedeMiel: { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} },
-  docsLegaux: { checklist:{} },
+  planning: [],
+  docsLegaux: { checklist:{}, customItems:[] },
   kitUrgence: { checklist:{}, customItems:[] },
   ambiance: { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' },
   idees: { categories:['Décoration','Musique','Animation','Repas & cocktail','Cérémonie','Photos & vidéo','Autre'], items:[] },
@@ -282,7 +344,9 @@ function load() {
     if (!state.venueInfos)  state.venueInfos = {};
     if (!state.vendors)     state.vendors = [];
     if (!state.lunedeMiel)  state.lunedeMiel = { destination:'', dateDepart:'', dateRetour:'', budget:'', notes:'', checklist:{} };
-    if (!state.docsLegaux)  state.docsLegaux = { checklist:{} };
+    if (!state.planning || !state.planning.length) state.planning = PLANNING_DEFAULT.map(p => ({ ...p, taches: [...p.taches] }));
+    if (!state.docsLegaux)  state.docsLegaux = { checklist:{}, customItems:[] };
+    if (!state.docsLegaux.customItems) state.docsLegaux.customItems = [];
     if (!state.kitUrgence)  state.kitUrgence = { checklist:{}, customItems:[] };
     if (!state.kitUrgence.customItems) state.kitUrgence.customItems = [];
     if (!state.ambiance)    state.ambiance = { colors:['#880E4F','#C2185B','#FCE4EC','#3E2723','#F5F5F5'], keywords:'', pinterest:'', notes:'' };
@@ -334,6 +398,7 @@ async function saveToFirebase() {
       venueInfos: state.venueInfos || {},
       vendors: state.vendors || [],
       lunedeMiel: state.lunedeMiel || {},
+      planning: state.planning || [],
       docsLegaux: state.docsLegaux || {},
       kitUrgence: state.kitUrgence || {},
       ambiance: state.ambiance || {},
@@ -377,8 +442,11 @@ async function loadAllFromFirebase() {
       if (d.venueInfos)  state.venueInfos = { ...state.venueInfos, ...d.venueInfos };
       if (d.vendors && d.vendors.length > 0) state.vendors = d.vendors;
       if (d.lunedeMiel)  state.lunedeMiel = { ...state.lunedeMiel, ...d.lunedeMiel };
+      if (d.planning && d.planning.length) state.planning = d.planning;
       if (d.docsLegaux)  state.docsLegaux = { ...state.docsLegaux, ...d.docsLegaux };
+      if (!state.docsLegaux.customItems) state.docsLegaux.customItems = [];
       if (d.kitUrgence)  state.kitUrgence = { ...state.kitUrgence, ...d.kitUrgence };
+      if (!state.kitUrgence.customItems) state.kitUrgence.customItems = [];
       if (d.ambiance)    state.ambiance = { ...state.ambiance, ...d.ambiance };
       if (d.idees)       state.idees    = { ...state.idees, ...d.idees };
       if (d.playlist)    state.playlist = { ...state.playlist, ...d.playlist };
@@ -479,6 +547,9 @@ function showSection(id, link) {
   if (id === 'administration' && isAdmin()) { loadMembers(); renderAuditLog(); }
   if (id === 'dashboard') renderInfosClés();
   if (id === 'budget') renderBudget();
+  if (id === 'planning') renderPlanning();
+  if (id === 'kitUrgence') renderKitUrgence();
+  if (id === 'docsLegaux') renderDocsLegaux();
   updateDashboard();
 }
 
@@ -2848,6 +2919,115 @@ const DOCS_LEGAUX_DEFAULT = [
   { key:'dl15', label:'Mise à jour du permis de conduire', detail:'Si changement de nom' },
 ];
 
+// ═══════════════════════════════════════
+// RÉTROPLANNING — CRUD
+// ═══════════════════════════════════════
+function renderPlanning() {
+  const el = document.getElementById('planning-container');
+  if (!el) return;
+  if (!state.planning || !state.planning.length) {
+    state.planning = PLANNING_DEFAULT.map(p => ({ ...p, taches: [...p.taches] }));
+  }
+  el.innerHTML = state.planning.map((phase, idx) => `
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--primary-container);color:var(--primary);border:1px solid rgba(104,93,74,0.2)">${idx + 1}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <input type="text" value="${escHtml(phase.phase)}"
+            onchange="editPlanningPhase('${phase.id}','phase',this.value)"
+            class="planning-inline-input tl-date"
+            style="flex:1;border:none;border-bottom:1px dashed transparent;background:transparent;font-family:inherit;outline:none;cursor:text;padding:1px 4px"
+            onfocus="this.style.borderBottomColor='var(--outline-variant)'"
+            onblur="this.style.borderBottomColor='transparent'">
+          <button onclick="deletePlanningPhase('${phase.id}')" title="Supprimer cette phase"
+            style="background:none;border:none;cursor:pointer;color:var(--outline);opacity:0.5;font-size:0.8rem;flex-shrink:0;padding:2px 4px"
+            onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">🗑️</button>
+        </div>
+        <input type="text" value="${escHtml(phase.titre)}"
+          onchange="editPlanningPhase('${phase.id}','titre',this.value)"
+          class="tl-title"
+          style="width:100%;border:none;border-bottom:1px dashed transparent;background:transparent;font-family:'Noto Serif',Georgia,serif;font-style:italic;font-size:1rem;font-weight:400;color:var(--on-surface);outline:none;cursor:text;padding:1px 4px;margin-bottom:8px"
+          onfocus="this.style.borderBottomColor='var(--outline-variant)'"
+          onblur="this.style.borderBottomColor='transparent'">
+        <ul class="tl-tasks" style="list-style:none">
+          ${phase.taches.map((t, ti) => `
+            <li style="display:flex;align-items:center;gap:6px;padding:2px 0" id="task-${phase.id}-${ti}">
+              <span style="color:var(--outline-variant);flex-shrink:0">–</span>
+              <span style="flex:1;font-size:0.87rem;color:var(--on-surface-variant)">${escHtml(t)}</span>
+              <button onclick="deletePlanningTask('${phase.id}',${ti})" title="Supprimer"
+                style="background:none;border:none;cursor:pointer;color:var(--red);opacity:0;font-size:0.75rem;flex-shrink:0;padding:1px 4px;transition:opacity 0.15s"
+                onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">✕</button>
+            </li>`).join('')}
+        </ul>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <input type="text" id="new-task-${phase.id}" placeholder="Nouvelle tâche…"
+            style="flex:1;border:1px dashed rgba(206,197,186,0.6);border-radius:8px;padding:5px 10px;font-family:inherit;font-size:0.83rem;background:var(--surface-container-lowest);color:var(--on-surface)"
+            onkeydown="if(event.key==='Enter'){addPlanningTask('${phase.id}');event.preventDefault()}">
+          <button onclick="addPlanningTask('${phase.id}')"
+            style="background:var(--primary);color:white;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.82rem;font-weight:600">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  el.innerHTML += `
+    <div style="margin-top:8px;padding-left:55px">
+      <button onclick="addPlanningPhase()" class="btn btn-outline" style="border-style:dashed">+ Ajouter une phase</button>
+    </div>`;
+}
+
+function editPlanningPhase(id, field, val) {
+  const phase = state.planning.find(p => p.id === id);
+  if (!phase) return;
+  phase[field] = val;
+  logAction('modification', 'Rétroplanning', `Phase "${phase.titre}" — ${field} modifié`);
+  save();
+}
+
+function addPlanningTask(phaseId) {
+  const inp = document.getElementById('new-task-' + phaseId);
+  if (!inp) return;
+  const val = inp.value.trim();
+  if (!val) return;
+  const phase = state.planning.find(p => p.id === phaseId);
+  if (!phase) return;
+  phase.taches.push(val);
+  inp.value = '';
+  logAction('ajout', 'Rétroplanning', `Tâche ajoutée dans "${phase.titre}" : ${val}`);
+  save(); renderPlanning();
+}
+
+function deletePlanningTask(phaseId, ti) {
+  const phase = state.planning.find(p => p.id === phaseId);
+  if (!phase) return;
+  if (!confirm(`Supprimer la tâche "${phase.taches[ti]}" ?`)) return;
+  phase.taches.splice(ti, 1);
+  logAction('suppression', 'Rétroplanning', `Tâche supprimée dans "${phase.titre}"`);
+  save(); renderPlanning();
+}
+
+function addPlanningPhase() {
+  const id = 'pl_' + Date.now();
+  state.planning.push({ id, phase: 'Nouvelle période', titre: '📌 Intitulé de la phase', taches: [] });
+  logAction('ajout', 'Rétroplanning', 'Nouvelle phase ajoutée');
+  save(); renderPlanning();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.planning-inline-input');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 100);
+}
+
+function deletePlanningPhase(id) {
+  const phase = state.planning.find(p => p.id === id);
+  if (!phase) return;
+  if (!confirm(`Supprimer la phase "${phase.titre}" et toutes ses tâches ?`)) return;
+  state.planning = state.planning.filter(p => p.id !== id);
+  logAction('suppression', 'Rétroplanning', `Phase "${phase.titre}" supprimée`);
+  save(); renderPlanning();
+}
+
+let _docAddMode = false;
+let _docEditId  = null;
+
 function renderDocsLegaux() {
   const el = document.getElementById('docs-checklist');
   if (!el) return;
@@ -2860,17 +3040,112 @@ function renderDocsLegaux() {
         ${item.detail?`<div style="font-size:0.8rem;color:var(--grey);margin-top:2px">${item.detail}</div>`:''}
       </div>
     </label>`).join('');
+
+  const customEl = document.getElementById('docs-custom-section');
+  if (!customEl) return;
+  const customItems = (state.docsLegaux||{}).customItems||[];
+  let html = '';
+
+  if (customItems.length > 0) {
+    html += `<div style="font-weight:700;font-size:0.9rem;margin-bottom:10px;color:var(--dark)">📌 Documents personnalisés</div>`;
+    customItems.forEach(item => {
+      const checked = cl['cust_'+item.id] || false;
+      if (_docEditId === item.id) {
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;flex-wrap:wrap">
+          <input type="text" id="doc-edit-label-${item.id}" value="${item.label.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" placeholder="Démarche ou document…" style="flex:1;min-width:180px;padding:5px 10px;border:1.5px solid var(--green);border-radius:8px;font-size:0.88rem">
+          <input type="text" id="doc-edit-detail-${item.id}" value="${(item.detail||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" placeholder="Détail (optionnel)…" style="flex:1;min-width:160px;padding:5px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:0.85rem">
+          <button onclick="saveEditDocItem('${item.id}')" style="background:var(--green);color:white;border:none;border-radius:8px;padding:5px 14px;cursor:pointer;font-size:0.85rem">✓</button>
+          <button onclick="_docEditId=null;renderDocsLegaux()" style="background:#eee;color:#555;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.85rem">✕</button>
+        </div>`;
+      } else {
+        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleDocCustomCheck('${item.id}',this.checked)" style="width:15px;height:15px;margin-top:3px;accent-color:var(--green);flex-shrink:0">
+          <div style="flex:1">
+            <span style="font-size:0.88rem;${checked?'text-decoration:line-through;color:#bbb':'font-weight:600'}">${item.label}</span>
+            ${item.detail?`<div style="font-size:0.8rem;color:var(--grey);margin-top:2px">${item.detail}</div>`:''}
+          </div>
+          <button onclick="editDocItem('${item.id}')" title="Modifier" style="background:none;border:1px solid #ddd;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.8rem;color:var(--grey)">✏️</button>
+          <button onclick="deleteDocItem('${item.id}')" title="Supprimer" style="background:none;border:1px solid #ffd0d0;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.8rem;color:#e57373">🗑️</button>
+        </div>`;
+      }
+    });
+  }
+
+  if (_docAddMode) {
+    html += `<div style="display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap">
+      <input type="text" id="doc-add-label" placeholder="Démarche ou document…" style="flex:2;min-width:180px;padding:7px 12px;border:1.5px solid var(--green);border-radius:8px;font-size:0.88rem">
+      <input type="text" id="doc-add-detail" placeholder="Détail (optionnel)…" style="flex:2;min-width:160px;padding:7px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:0.85rem">
+      <button onclick="addDocItem()" style="background:var(--green);color:white;border:none;border-radius:8px;padding:7px 16px;cursor:pointer;font-size:0.88rem;white-space:nowrap">➕ Ajouter</button>
+      <button onclick="_docAddMode=false;renderDocsLegaux()" style="background:#eee;color:#555;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:0.88rem">Annuler</button>
+    </div>`;
+  } else {
+    html += `<div style="margin-top:${customItems.length>0?'14px':'4px'}">
+      <button onclick="_docAddMode=true;_docEditId=null;renderDocsLegaux()" style="background:none;border:2px dashed var(--green);color:var(--green);border-radius:10px;padding:8px 18px;cursor:pointer;font-size:0.88rem;font-weight:600">➕ Ajouter un document personnalisé</button>
+    </div>`;
+  }
+
+  customEl.innerHTML = html;
 }
-function toggleDocCheck(k,v) { if(!state.docsLegaux) state.docsLegaux={checklist:{}}; if(!state.docsLegaux.checklist) state.docsLegaux.checklist={}; state.docsLegaux.checklist[k]=v; save(); renderDocsLegaux(); }
+
+function toggleDocCheck(k,v) { if(!state.docsLegaux) state.docsLegaux={checklist:{},customItems:[]}; if(!state.docsLegaux.checklist) state.docsLegaux.checklist={}; state.docsLegaux.checklist[k]=v; save(); renderDocsLegaux(); }
+
+function toggleDocCustomCheck(id, val) {
+  if (!state.docsLegaux) state.docsLegaux = { checklist:{}, customItems:[] };
+  if (!state.docsLegaux.checklist) state.docsLegaux.checklist = {};
+  state.docsLegaux.checklist['cust_'+id] = val;
+  save();
+}
+
 function checkAllDocs() {
-  if (!state.docsLegaux) state.docsLegaux = { checklist:{} };
+  if (!state.docsLegaux) state.docsLegaux = { checklist:{}, customItems:[] };
   if (!state.docsLegaux.checklist) state.docsLegaux.checklist = {};
   DOCS_LEGAUX_DEFAULT.forEach(item => { state.docsLegaux.checklist[item.key] = true; });
   save(); renderDocsLegaux();
 }
 function uncheckAllDocs() {
-  if (!state.docsLegaux) state.docsLegaux = { checklist:{} };
+  if (!state.docsLegaux) state.docsLegaux = { checklist:{}, customItems:[] };
   state.docsLegaux.checklist = {};
+  save(); renderDocsLegaux();
+}
+
+function addDocItem() {
+  const label  = (document.getElementById('doc-add-label')?.value||'').trim();
+  const detail = (document.getElementById('doc-add-detail')?.value||'').trim();
+  if (!label) { alert('Veuillez saisir un nom de document.'); return; }
+  if (!state.docsLegaux) state.docsLegaux = { checklist:{}, customItems:[] };
+  if (!state.docsLegaux.customItems) state.docsLegaux.customItems = [];
+  state.docsLegaux.customItems.push({ id:'doc_'+Date.now(), label, detail });
+  logAction('ajout', 'Documents légaux', `Document ajouté : "${label}"`);
+  _docAddMode = false;
+  save(); renderDocsLegaux();
+}
+
+function editDocItem(id) {
+  _docAddMode = false;
+  _docEditId  = id;
+  renderDocsLegaux();
+}
+
+function saveEditDocItem(id) {
+  const label  = (document.getElementById('doc-edit-label-'+id)?.value||'').trim();
+  const detail = (document.getElementById('doc-edit-detail-'+id)?.value||'').trim();
+  if (!label) { alert('Le nom ne peut pas être vide.'); return; }
+  const item = ((state.docsLegaux||{}).customItems||[]).find(i => i.id === id);
+  if (!item) return;
+  const oldLabel = item.label;
+  item.label  = label;
+  item.detail = detail;
+  logAction('modification', 'Documents légaux', `Document modifié : "${oldLabel}" → "${label}"`);
+  _docEditId = null;
+  save(); renderDocsLegaux();
+}
+
+function deleteDocItem(id) {
+  const _label = ((state.docsLegaux||{}).customItems||[]).find(i=>i.id===id)?.label || '?';
+  if (!confirm(`Supprimer le document "${_label}" ?`)) return;
+  logAction('suppression', 'Documents légaux', `Document supprimé : "${_label}"`);
+  state.docsLegaux.customItems = state.docsLegaux.customItems.filter(i => i.id !== id);
+  delete (state.docsLegaux.checklist||{})['cust_'+id];
   save(); renderDocsLegaux();
 }
 
