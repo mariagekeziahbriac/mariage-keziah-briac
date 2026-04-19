@@ -7,7 +7,7 @@
 
 <!-- PWA : icône & app mobile -->
 <link rel="manifest" href="manifest.json?v=2">
-<meta name="theme-color" content="#C2185B">
+<meta name="theme-color" content="#685d4a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,6 +16,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -48,41 +51,45 @@
   </div>
 </div>
 
-<!-- HERO -->
-<div class="hero">
-  <span class="emoji">💍</span>
-  <h1>Keziah & Briac</h1>
-  <h2>Mariage — Samedi 10 juillet 2027</h2>
-  <div class="venue">🏰 Château de Jallanges — Touraine, Val de Loire</div>
-  <div class="sub">Plan d'organisation préparé avec amour par Estelle</div>
-</div>
+<!-- ══ SIDEBAR DESKTOP ══ -->
+<aside class="sidebar">
 
-<!-- NAV -->
-<nav class="nav">
-  <a href="#" class="active" onclick="showSection('dashboard',this)">🏠 Tableau de bord</a>
-  <a href="#" onclick="showSection('planning',this)">📅 Rétroplanning</a>
-  <a href="#" onclick="showSection('checklist',this)">✅ Checklist</a>
-  <a href="#" onclick="showSection('budget',this)">💰 Budget</a>
-  <a href="#" onclick="showSection('guests',this)">👥 Invités</a>
-  <a href="#" onclick="showSection('vendors',this)">📋 Prestataires</a>
-  <a href="#" onclick="showSection('daytimeline',this)">🎉 Jour J</a>
-  <a href="#" onclick="showSection('venue',this)">🏰 Château</a>
-  <a href="#" onclick="showSection('gantt',this)">📊 Gantt</a>
-  <a href="#" onclick="showSection('matrix',this)">⚖️ Décisions</a>
-  <a href="#" onclick="showSection('filrouge',this)">📋 Fil rouge Jour J</a>
-  <a href="#" onclick="showSection('plantable',this)">🪑 Plan de table</a>
-  <a href="#" onclick="showSection('evjf',this)">🎉 EVJF</a>
-  <a href="#" onclick="showSection('tenues',this)">👗 Tenues</a>
-  <a href="#" onclick="showSection('fairepart',this)">💌 Faire-part</a>
-  <a href="#" onclick="showSection('lunedeMiel',this)">✈️ Lune de miel</a>
-  <a href="#" onclick="showSection('docsLegaux',this)">📄 Documents</a>
-  <a href="#" onclick="showSection('kitUrgence',this)">🧰 Kit urgence</a>
-  <a href="#" onclick="showSection('ambiance',this)">🎨 Ambiance</a>
-  <a href="#" onclick="showSection('idees',this)">💡 Idées</a>
-  <a href="#" onclick="showSection('playlist',this)">🎵 Playlist</a>
-  <a href="#" id="nav-admin-link" style="display:none;color:#E65100 !important" onclick="showSection('administration',this)">⚙️ Administration</a>
+  <!-- En-tête marque -->
+  <div class="hero">
+    <h1>Keziah &amp; Briac</h1>
+    <h2>Samedi 10 juillet 2027</h2>
+  </div>
+
+  <!-- Navigation verticale -->
+  <nav class="nav">
+    <a href="#" class="active" onclick="showSection('dashboard',this)">🏠 Tableau de bord</a>
+    <a href="#" onclick="showSection('planning',this)">📅 Rétroplanning</a>
+    <a href="#" onclick="showSection('checklist',this)">✅ Checklist</a>
+    <a href="#" onclick="showSection('budget',this)">💰 Budget</a>
+    <a href="#" onclick="showSection('guests',this)">👥 Invités</a>
+    <a href="#" onclick="showSection('vendors',this)">📋 Prestataires</a>
+    <a href="#" onclick="showSection('daytimeline',this)">🎉 Jour J</a>
+    <a href="#" onclick="showSection('venue',this)">🏰 Château</a>
+    <a href="#" onclick="showSection('gantt',this)">📊 Gantt</a>
+    <a href="#" onclick="showSection('matrix',this)">⚖️ Décisions</a>
+    <a href="#" onclick="showSection('filrouge',this)">📋 Fil rouge Jour J</a>
+    <a href="#" onclick="showSection('plantable',this)">🪑 Plan de table</a>
+    <a href="#" onclick="showSection('evjf',this)">🎉 EVJF</a>
+    <a href="#" onclick="showSection('tenues',this)">👗 Tenues</a>
+    <a href="#" onclick="showSection('fairepart',this)">💌 Faire-part</a>
+    <a href="#" onclick="showSection('lunedeMiel',this)">✈️ Lune de miel</a>
+    <a href="#" onclick="showSection('docsLegaux',this)">📄 Documents</a>
+    <a href="#" onclick="showSection('kitUrgence',this)">🧰 Kit urgence</a>
+    <a href="#" onclick="showSection('ambiance',this)">🎨 Ambiance</a>
+    <a href="#" onclick="showSection('idees',this)">💡 Idées</a>
+    <a href="#" onclick="showSection('playlist',this)">🎵 Playlist</a>
+    <a href="#" id="nav-admin-link" style="display:none" onclick="showSection('administration',this)">⚙️ Administration</a>
+  </nav>
+
+  <!-- Compte utilisateur (pied de sidebar) -->
   <div id="nav-user"></div>
-</nav>
+
+</aside>
 
 <!-- ══ MOBILE BOTTOM BAR ══ -->
 <div class="mob-bar" id="mob-bar">
@@ -128,6 +135,7 @@
   </div>
 </div>
 
+<div class="main-wrapper">
 <div class="container">
 
 <!-- ═══ TABLEAU DE BORD ═══ -->
@@ -1333,7 +1341,9 @@
 
 </div>
 
-<div class="footer">💕 Fait avec amour pour Keziah & Briac — Juillet 2027 — Château de Jallanges, Touraine</div>
+<div class="footer">💕 Fait avec amour pour Keziah &amp; Briac — Juillet 2027 — Château de Jallanges, Touraine</div>
+
+</div><!-- /main-wrapper -->
 
 <script src="js/app.js"></script>
 <script type="module" src="js/firebase.js"></script>
