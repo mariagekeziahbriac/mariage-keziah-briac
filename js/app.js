@@ -414,6 +414,18 @@ async function saveToFirebase() {
   } catch(e) { console.warn('Firebase save error:', e); }
 }
 
+// ─── Fusion sécurisée : union de deux checklists (les coches ne sont jamais effacées si elles existent localement)
+function mergeChecklists(local, remote) {
+  return { ...(local||{}), ...(remote||{}) };
+}
+// ─── Fusion sécurisée : union de deux tableaux d'items par ID (les items locaux ne disparaissent pas si Firebase est plus ancien)
+function mergeById(local, remote) {
+  const map = new Map();
+  (local||[]).forEach(i => { if (i && i.id) map.set(i.id, i); });
+  (remote||[]).forEach(i => { if (i && i.id) map.set(i.id, i); });
+  return [...map.values()];
+}
+
 // ─── Firebase : chargement initial de tout l'état
 async function loadAllFromFirebase() {
   if (!window.fbGetDoc || !window.fbDoc || !window.db) return;
@@ -442,13 +454,38 @@ async function loadAllFromFirebase() {
       if (d.venueInfos)  state.venueInfos = { ...state.venueInfos, ...d.venueInfos };
       if (d.vendors && d.vendors.length > 0) state.vendors = d.vendors;
       if (d.lunedeMiel)  state.lunedeMiel = { ...state.lunedeMiel, ...d.lunedeMiel };
-      if (d.planning && d.planning.length) state.planning = d.planning;
-      if (d.docsLegaux)  state.docsLegaux = { ...state.docsLegaux, ...d.docsLegaux };
+      // planning : préférer le plus long (le plus complet)
+      if (d.planning && d.planning.length) {
+        if (!state.planning || d.planning.length >= state.planning.length) state.planning = d.planning;
+      }
+      // docsLegaux : union checklist + fusion items par ID
+      if (d.docsLegaux) {
+        state.docsLegaux = {
+          ...state.docsLegaux, ...d.docsLegaux,
+          checklist:   mergeChecklists(state.docsLegaux?.checklist,   d.docsLegaux?.checklist),
+          customItems: mergeById(state.docsLegaux?.customItems, d.docsLegaux?.customItems),
+        };
+      }
+      if (!state.docsLegaux) state.docsLegaux = { checklist:{}, customItems:[] };
       if (!state.docsLegaux.customItems) state.docsLegaux.customItems = [];
-      if (d.kitUrgence)  state.kitUrgence = { ...state.kitUrgence, ...d.kitUrgence };
+      // kitUrgence : union checklist + fusion items par ID
+      if (d.kitUrgence) {
+        state.kitUrgence = {
+          ...state.kitUrgence, ...d.kitUrgence,
+          checklist:   mergeChecklists(state.kitUrgence?.checklist,   d.kitUrgence?.checklist),
+          customItems: mergeById(state.kitUrgence?.customItems, d.kitUrgence?.customItems),
+        };
+      }
+      if (!state.kitUrgence) state.kitUrgence = { checklist:{}, customItems:[] };
       if (!state.kitUrgence.customItems) state.kitUrgence.customItems = [];
       if (d.ambiance)    state.ambiance = { ...state.ambiance, ...d.ambiance };
-      if (d.idees)       state.idees    = { ...state.idees, ...d.idees };
+      // idées : fusion items par ID pour ne jamais perdre une idée
+      if (d.idees) {
+        state.idees = {
+          ...state.idees, ...d.idees,
+          items: mergeById(state.idees?.items, d.idees?.items),
+        };
+      }
       if (d.playlist)    state.playlist = { ...state.playlist, ...d.playlist };
       if (d.lastModifiedBy) state.lastModifiedBy = d.lastModifiedBy;
       if (d.lastModifiedAt) state.lastModifiedAt = d.lastModifiedAt;
